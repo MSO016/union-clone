@@ -1,0 +1,11 @@
+# Union Manager — dependências
+# Python 3.11+ (alvo usava 3.13; 3.11+ p/ compatibilidade ampla de wheels)
+
+# UI desktop
+PyQt6>=6.6
+
+# PDF (relatórios A4, térmico 80mm, diagnóstico)
+PyMuPDF>=1.24
+
+# utilitários
+typing_extensions>=4.9
