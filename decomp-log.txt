@@ -1,0 +1,19 @@
+﻿alvos: 197
+ok=77  parcial=104  falhou=16
+FALHOS:
+  app\database\__init__.pyc
+  app\database\migrations\__init__.pyc
+  app\translations\__init__.pyc
+  app\utils\__init__.pyc
+  app\views\__init__.pyc
+  app\views\components\__init__.pyc
+  app\views\dialogs\__init__.pyc
+  app\views\union_unlock\__init__.pyc
+  app\views\union_unlock\exy\engine\__init__.pyc
+  app\views\union_unlock\exy\gui\__init__.pyc
+  app\views\union_unlock\exy\models\__init__.pyc
+  app\views\union_unlock\fmgr\__init__.pyc
+  app\views\union_unlock\hxd\__init__.pyc
+  app\views\union_unlock\hxd\core\__init__.pyc
+  app\views\union_unlock\hxd\core\engines\__init__.pyc
+  app\views\union_unlock\hxd\gui\__init__.pyc

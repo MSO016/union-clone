@@ -1,0 +1,30 @@
+﻿[+] Processing D:\MSO\Projects\union-clone\extracted\app\RESTORECELL.exe
+[+] Pyinstaller version: 2.1+
+[+] Python version: 3.13
+[+] Length of package: 21923221 bytes
+[+] Found 18 files in CArchive
+[+] Beginning extraction...please standby
+[+] Possible entry point: pyiboot01_bootstrap.pyc
+[+] Possible entry point: pyi_rth_inspect.pyc
+[+] Possible entry point: pyi_rth_pkgutil.pyc
+[+] Possible entry point: pyi_rth_setuptools.pyc
+[+] Possible entry point: pyi_rth_multiprocessing.pyc
+[+] Possible entry point: pyi_rth_usb.pyc
+[+] Possible entry point: pyi_rth_cryptography_openssl.pyc
+[+] Possible entry point: pyi_rth_pyqt5.pyc
+[+] Possible entry point: pyi_rth_pywintypes.pyc
+[+] Possible entry point: pyi_rth_pythoncom.pyc
+[+] Possible entry point: app.pyc
+[+] Found 2537 files in PYZ archive
+[!] Warning: Empty file PYZ.pyz_extracted\config.pyc
+[!] Warning: Empty file PYZ.pyz_extracted\pywin32_system32.pyc
+[!] Warning: Empty file PYZ.pyz_extracted\setuptools\_distutils\compilers.pyc
+[!] Warning: Empty file PYZ.pyz_extracted\setuptools\_distutils\compilers\C.pyc
+[!] Warning: Empty file PYZ.pyz_extracted\setuptools\_distutils\compilers\platform.pyc
+[!] Warning: Empty file PYZ.pyz_extracted\setuptools\_vendor.pyc
+[!] Warning: Empty file PYZ.pyz_extracted\setuptools\_vendor\jaraco.pyc
+[!] Warning: Empty file PYZ.pyz_extracted\weasyprint\formatting_structure.pyc
+[!] Warning: Empty file PYZ.pyz_extracted\weasyprint\text.pyc
+[+] Successfully extracted pyinstaller archive: D:\MSO\Projects\union-clone\extracted\app\RESTORECELL.exe
+
+You can now use a python decompiler on the pyc files within the extracted directory

@@ -1,0 +1,144 @@
+﻿
+===== URL (44) =====
+https://getbootstrap.com/   << views\ordem_servico\app\static\js\bootstrap.bundle.min.js
+https://github.com/twbs/bootstrap/graphs/contributors   << views\ordem_servico\app\static\js\bootstrap.bundle.min.js
+https://github.com/twbs/bootstrap/blob/main/LICENSE   << views\ordem_servico\app\static\js\bootstrap.bundle.min.js
+https://popper.js.org   << views\ordem_servico\app\static\js\bootstrap.bundle.min.js
+https://github.com/uxsolutions/bootstrap-datepicker   << views\ordem_servico\app\static\vendor\bootstrap-datepicker\bootstrap-datepicker.min.js
+http://www.apache.org/licenses/LICENSE-2.0   << views\ordem_servico\app\static\vendor\bootstrap-datepicker\bootstrap-datepicker.min.js
+https://code.jquery.com/jquery-3.6.0.min.js   << views\ordem_servico\app\static\vendor\download_deps.ps1
+https://code.jquery.com/ui/1.13.2/jquery-ui.min.js   << views\ordem_servico\app\static\vendor\download_deps.ps1
+https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.min.css   << views\ordem_servico\app\static\vendor\download_deps.ps1
+https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js   << views\ordem_servico\app\static\vendor\download_deps.ps1
+https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css   << views\ordem_servico\app\static\vendor\download_deps.ps1
+https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.pt-BR.min.js   << views\ordem_servico\app\static\vendor\download_deps.ps1
+http://jqueryui.com   << views\ordem_servico\app\static\vendor\jquery-ui\jquery-ui.min.js
+https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css   << views\ordem_servico\app\templates\base.html
+https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css   << views\ordem_servico\app\templates\base.html
+https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css   << views\ordem_servico\app\templates\base.html
+https://code.jquery.com/ui/1.13.2/jquery-ui.js   << views\ordem_servico\app\templates\base.html
+https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js   << views\ordem_servico\app\templates\base.html
+https://cdn.jsdelivr.net/npm/sweetalert2@11   << views\ordem_servico\app\templates\base.html
+https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css   << views\ordem_servico\app\templates\calendar\index.html
+https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js   << views\ordem_servico\app\templates\calendar\index.html
+https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales/pt-br.global.min.js   << views\ordem_servico\app\templates\calendar\index.html
+http://www.w3.org/2000/svg   << views\ordem_servico\app\templates\checklists\template_form.html
+https://unpkg.com/imask   << views\ordem_servico\app\templates\clients\form.html
+https://viacep.com.br/ws/${cep   << views\ordem_servico\app\templates\clients\form.html
+https://wa.me/55{{   << views\ordem_servico\app\templates\clients\list.html
+https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js   << views\ordem_servico\app\templates\finance\base.html
+https://cdn.jsdelivr.net/npm/chart.js   << views\ordem_servico\app\templates\finance\cash_flow.html
+https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js   << views\ordem_servico\app\templates\includes\resources.html
+https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.8/index.global.min.js   << views\ordem_servico\app\templates\includes\resources.html
+https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.8/index.global.min.js   << views\ordem_servico\app\templates\includes\resources.html
+https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.8/index.global.min.js   << views\ordem_servico\app\templates\includes\resources.html
+https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.8/index.global.min.js   << views\ordem_servico\app\templates\includes\resources.html
+https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.8/index.global.min.js   << views\ordem_servico\app\templates\includes\resources.html
+https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.8/locales/pt-br.global.min.js   << views\ordem_servico\app\templates\includes\resources.html
+https://wa.me/55${result.whatsapp   << views\ordem_servico\app\templates\inventory\index.html
+https://www.restorecellsolucoes.com/   << views\ordem_servico\app\templates\license\expired.html
+https://wa.me/5585989634058   << views\ordem_servico\app\templates\license\expired.html
+https://wa.me/5585997507465   << views\ordem_servico\app\templates\license\expired.html
+https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css   << views\ordem_servico\app\templates\orders\close.html
+https://wa.me/55${whatsappNumber   << views\ordem_servico\app\templates\orders\list.html
+https://wa.me/55${whatsapp   << views\ordem_servico\app\templates\orders\view.html
+https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css   << views\ordem_servico\app\templates\settings\index.html
+https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js   << views\ordem_servico\app\templates\technicians\edit.html
+
+===== WSS (0) =====
+
+
+===== IP (2) =====
+0.0.0.0   << views\union_unlock\samsung\data\nsec_and_16\ATCommandConsole.deps.json
+10.0.0.1   << views\union_unlock\samsung\data\nsec_and_16\ATCommandConsole.deps.json
+
+===== HOST (34) =====
+update.zip   << translations\en.py
+0k.Xg   << views\login_window.pyc
+5p.JiE   << views\login_window.pyc
+logging.handlers   << views\ordem_servico\app\__init__.py
+auth.login   << views\ordem_servico\app\__init__.py
+app.log   << views\ordem_servico\app\__init__.py
+app.routes   << views\ordem_servico\app\__init__.py
+request.endpoint   << views\ordem_servico\app\__init__.py
+license.status   << views\ordem_servico\app\__init__.py
+license.welcome   << views\ordem_servico\app\__init__.py
+license.expired   << views\ordem_servico\app\__init__.py
+auth.logout   << views\ordem_servico\app\__init__.py
+utils.system   << views\ordem_servico\app\__init__.py
+financial.log   << views\ordem_servico\app\__init__.py
+sqlalchemy.engine   << views\ordem_servico\migrations\alembic.ini
+SDc.yxJ   << views\perfil_window.pyc
+TK.hi   << views\union_unlock\edl\manual.pyc
+5Z.Ta   << views\union_unlock\mit\mit_engine.pyc
+IO.Ports   << views\union_unlock\samsung\data\nsec_and_16\ATCommandConsole.deps.json
+ATCommandConsole.dll   << views\union_unlock\samsung\data\nsec_and_16\ATCommandConsole.deps.json
+Native.so   << views\union_unlock\samsung\data\nsec_and_16\ATCommandConsole.deps.json
+Native.dylib   << views\union_unlock\samsung\data\nsec_and_16\ATCommandConsole.deps.json
+Ports.dll   << views\union_unlock\samsung\data\nsec_and_16\ATCommandConsole.deps.json
+NETCore.App   << views\union_unlock\samsung\data\nsec_and_16\ATCommandConsole.runtimeconfig.json
+adb.txt   << views\union_unlock\samsung\data\nsec_and_16\steps.txt
+android.vending   << views\union_unlock\samsung\data\nsec_and_16\steps.txt
+adb.apk   << views\union_unlock\samsung\data\nsec_and_16\steps.txt
+com.adb   << views\union_unlock\samsung\data\nsec_and_16\steps.txt
+base.apk   << views\union_unlock\samsung\data\nsec_and_16\steps.txt
+classes.dex   << views\union_unlock\samsung\data\nsec_and_16\steps.txt
+com.shell   << views\union_unlock\samsung\data\nsec_and_16\steps.txt
+edl.exe   << views\union_unlock\samsung\galaxy_a05s_a057m_mods\__init__.py
+09-2026.md   << views\union_unlock\samsung\__init__.py
+1Ft.vF   << views\union_unlock\xiaomi\redmi_note8pro_begonia.pyc
+
+===== REG (0) =====
+
+
+===== SECRET (12) =====
+[arquivo contem keyword de segredo: translations\en.py]   << translations\en.py
+[arquivo contem keyword de segredo: translations\es.py]   << translations\es.py
+[arquivo contem keyword de segredo: translations\pt.py]   << translations\pt.py
+[arquivo contem keyword de segredo: views\ordem_servico\.env]   << views\ordem_servico\.env
+[arquivo contem keyword de segredo: views\ordem_servico\app\static\js\bootstrap.bundle.min.js]   << views\ordem_servico\app\static\js\bootstrap.bundle.min.js
+[arquivo contem keyword de segredo: views\ordem_servico\app\static\vendor\bootstrap\js\bootstrap.bundle.min.js]   << views\ordem_servico\app\static\vendor\bootstrap\js\bootstrap.bundle.min.js
+[arquivo contem keyword de segredo: views\ordem_servico\app\static\vendor\jquery\jquery.min.js]   << views\ordem_servico\app\static\vendor\jquery\jquery.min.js
+[arquivo contem keyword de segredo: views\ordem_servico\app\templates\auth\login.html]   << views\ordem_servico\app\templates\auth\login.html
+[arquivo contem keyword de segredo: views\ordem_servico\app\templates\auth\register.html]   << views\ordem_servico\app\templates\auth\register.html
+[arquivo contem keyword de segredo: views\ordem_servico\app\templates\settings\index.html]   << views\ordem_servico\app\templates\settings\index.html
+[arquivo contem keyword de segredo: views\ordem_servico\app\templates\users\add.html]   << views\ordem_servico\app\templates\users\add.html
+[arquivo contem keyword de segredo: views\ordem_servico\app\templates\users\form.html]   << views\ordem_servico\app\templates\users\form.html
+
+===== WINPATH (36) =====
+R:\├ü├Å├êt├å┬£-lj┬║┬ø├Ñu├©├┤u   << database\servidor_arquivos_cache_manager.pyc
+n:\n\n-   << translations\en.py
+s:\n\n-   << translations\es.py
+e:\n├ó┬Ç┬ó   << translations\pt.py
+F:\n\n{}\n\nTente   << translations\pt.py
+e:\n\n-   << translations\pt.py
+O:\┬ƒ├ºX┬ä├Ñ.├è├à┬Å├É!9├¥[eL┬╗]├ø c┬ü┬º}\┬ûD3┬ï├À=S├Ä   << utils\samsung_advanced.pyc
+P:\K├Ñ├ì┬┤y\├╣├╝┬Æ~a┬▓┬ô├ÉH├É├¡├Ä`&H┬º   << utils\usb_requirements_manager.pyc
+F:\├Ç├æ┬ì├®├ä├â6┬Ä&X┬Â   << utils\xiaomi_manager.pyc
+H:\┬░B┬×┬çi   << views\adware_tools.pyc
+k:\┬Â3├û├©├╗,┬£├À├¿├ö├ü├æ┬╝^├Ü├¥┬ô{├¡┬ó┬üx┬¿1z┬Á├╗├ü   << views\diagnostico_android.pyc
+m:\┬ï├┤┬À├âi├Ö├Ç├£├Ñ\=u+├¬I┬ô├â├Ç┬éz┬ö├│eZ├Øn├¬┬ï   << views\downloads\downloads_window.pyc
+y:\┬│_├┤├Ø├Â┬║├é├Å&├ùf┬ï┬╗┬ä   << views\downloads\downloads_window.pyc
+u:\2$┬ÿ┬ö├Á┬»┬ôW├Ñw┬ï┬ÁnC├¬a=├à├¢┬Ä┬æ+┬é├æ┬í-├¿├À┬é-├┤├¥A├å┬ùs┬╗├×├Á├Æ├ç├¿V_├Ø&Y   << views\login_window.pyc
+z:\┬¢├Ñ├ó   << views\main_window.pyc
+C:\├¿Ea├ë├è┬Ø┬ª┬│8├ìyH├¼├¡├«   << views\minhas_solucoes_view.pyc
+F:\s┬ƒ┬è┬ª├Ü   << views\monthly_report.pyc
+E:\W├é├íD┬ÿ┬Ç┬û,c!┬«┬å:┬ê┬ú   << views\service_order_window.pyc
+F:\├¼┬ö┬┐├Æ┬▒├À├┐├Ör├▒┬ó┬É+┬┤U├▒H├Æ   << views\tools_android.pyc
+N:\Pn┬®├┐├Øp├ó├┤z┬┐┬úK┬å┬êAi├¥\├âD!┬ó┬░├ª├Åx┬»eU├×├ù┬£├îb┬Ö┬ò├╝┬âqJ┬ô)C┬êJ├æ┬░┬¼q┬Ç├ÉXvJ├À5├à├æ   << views\union_unlock\dmiti\dmiti_engine.pyc
+m:\├é├Ç├ç┬ÇHs┬ù$├æ┬Ü┬ÁC┬¿┬ÿ├║├Âr┬ê├à]ot#   << views\union_unlock\edl\edl_ativo.pyc
+t:\┬»Q┬¡┬è┬╝U├àR┬¢├ƒ├╝├ô├ÿ├║n┬â.├À┬┐├©.┬»&├Å┬é├ê   << views\union_unlock\edl\edl_main.pyc
+S:\rl┬ƒp┬©n├║├ì┬ú┬å┬┐├è   << views\union_unlock\edl\manual.pyc
+h:\├ê┬í┬ª├è┬Æ├ù┬®`├Ü4┬ö=├àY%   << views\union_unlock\hxd\core\engines\newsec_engine.pyc
+R:\Y┬ûX├è,   << views\union_unlock\hxd\core\engines\newsec_engine.pyc
+q:\├½├àD├Ñ┬èm├Ñ├ÁDZ┬Ça┬╣N├ï┬ø.w├è├è├É   << views\union_unlock\hxd\gui\main_widget.pyc
+A:\├╗y┬ú%├Ö┬®V┬│   << views\union_unlock\mit\mit_engine.pyc
+t:\┬Æo┬À┬üq├çJ├Ñ┬àn┬┤┬º┬Æ┬ó┬®├¿q┬ƒ   << views\union_unlock\mit\mit_engine_2026.pyc
+d:\┬Æ┬è┬ö├│[┬¼┬ê┬¢├¢├®{├ó├ë┬«├¡o├å├é├ÿ├Ç0┬ƒHx├Ü┬à┬¼   << views\union_unlock\mit\_mit_hw_diag.pyc
+B:\├╣v├í├Æm┬®├ƒ┬úh├Ä├©J├ìM┬ñFR┬┐   << views\union_unlock\samsung\galaxy_a03s_all_mods\brom_a03s_all.pyc
+r:\├╗┬│┬Å├»┬êM├ºjV├│├ëfn├Æ   << views\union_unlock\samsung\galaxy_a03s_all_mods\brom_a03s_all.pyc
+L:\e├ü┬âw├ê$┬Ñ┬É┬ªe3├Ä   << views\union_unlock\samsung\galaxy_a10s_all_mods\brom_a10s_all.pyc
+y:\├Å┬Á┬«N┬í├Ü├ù├ë├│2├å}   << views\union_unlock\samsung\galaxy_a22_5g_a226br.pyc
+z:\e┬©├║┬Â[├▓Ch├ñ   << views\union_unlock\samsung\galaxy_taba_t295_mods\edl_taba_t295.pyc
+H:\t┬¬┬Ä┬ñs)┬│n├▓(┬▒l-├à├«N├Ç├¢v├â┬®yb┬¬├Ào├ó├ƒ   << views\union_unlock\sideload\xiaomi\xiaomi_sideload_gui.pyc
+k:\├ö├½├£┬╣6\┬ä%├å┬┐┬Æk┬ä┬¢├ñ├ƒ}├¡┬åC├¡┬¢Bb┬º┬│├®nO┬Á4├æ   << views\union_unlock\spd\transport.pyc

@@ -1,0 +1,1083 @@
+﻿_import_hook.pyc (Python 3.13)
+[Code]
+    File Name: <m>
+    Object Name: <module>
+    Qualified Name: <module>
+    Arg Count: 0
+    Pos Only Arg Count: 0
+    KW Only Arg Count: 0
+    Stack Size: 5
+    Flags: 0x00000000
+    [Names]
+        'importlib'
+        'importlib.abc'
+        'importlib.machinery'
+        'importlib.util'
+        'marshal'
+        'os'
+        'sys'
+        'types'
+        '_h0'
+        '_S0'
+        '_r0'
+        'abc'
+        'MetaPathFinder'
+        '_F0'
+        'Loader'
+        '_L0'
+        'activate'
+    [Locals+Names]
+    [Constants]
+        0
+        None
+        False
+        (
+            '_'
+            'importlib'
+            'os'
+            'sys'
+            'io'
+            'abc'
+            'codecs'
+            'encodings'
+            'zipimport'
+            'marshal'
+            'types'
+            'struct'
+            'PyQt5'
+            'PyQt6'
+            'numpy'
+            'PIL'
+            'cv2'
+            'cryptography'
+            'flask'
+            'waitress'
+            'jinja2'
+            'werkzeug'
+            'sqlalchemy'
+            'psutil'
+            'win32'
+            'comtypes'
+            'ctypes'
+            'email'
+            'http'
+            'urllib'
+            'ssl'
+            'socket'
+            'json'
+            'logging'
+            'threading'
+            'multiprocessing'
+            'concurrent'
+            'asyncio'
+            'collections'
+            'functools'
+            'itertools'
+            'operator'
+            'pathlib'
+            'shutil'
+            'tempfile'
+            'glob'
+            'fnmatch'
+            're'
+            'string'
+            'textwrap'
+            'unicodedata'
+            'locale'
+            'decimal'
+            'fractions'
+            'random'
+            'statistics'
+            'math'
+            'datetime'
+            'time'
+            'calendar'
+            'hashlib'
+            'hmac'
+            'base64'
+            'binascii'
+            'zlib'
+            'gzip'
+            'bz2'
+            'lzma'
+            'zipfile'
+            'tarfile'
+            'csv'
+            'configparser'
+            'argparse'
+            'getpass'
+            'platform'
+            'uuid'
+            'copy'
+            'pprint'
+            'traceback'
+            'warnings'
+            'contextlib'
+            'dataclasses'
+            'enum'
+            'typing'
+            'inspect'
+            'dis'
+            'tokenize'
+            'ast'
+            'subprocess'
+            'signal'
+            'select'
+            'selectors'
+            'mmap'
+            'pickle'
+            'shelve'
+            'dbm'
+            'sqlite3'
+            'xml'
+            'html'
+            'webbrowser'
+            'cgi'
+            'ftplib'
+            'imaplib'
+            'smtplib'
+            'mysql'
+            'pymysql'
+            'boto3'
+            'botocore'
+            'requests'
+            'certifi'
+            'charset_normalizer'
+            'idna'
+            'socks'
+            'pkg_resources'
+            'setuptools'
+            'pip'
+            'wheel'
+            'pydantic'
+            'attr'
+            'click'
+            'colorama'
+            'tqdm'
+            'serial'
+            'usb'
+            'hid'
+            'wmi'
+            'pythoncom'
+            'qrcode'
+            'reportlab'
+            'openpyxl'
+            'xlsxwriter'
+        )
+        [Code]
+            File Name: <m>
+            Object Name: _r0
+            Qualified Name: _r0
+            Arg Count: 0
+            Pos Only Arg Count: 0
+            KW Only Arg Count: 0
+            Stack Size: 5
+            Flags: 0x00000003 (CO_OPTIMIZED | CO_NEWLOCALS)
+            [Names]
+                '__import__'
+                'bytes'
+                'decode'
+                'getattr'
+                'Exception'
+            [Locals+Names]
+                '_m'
+                '_n1'
+                '_n2'
+            [Constants]
+                None
+                'app.utils._security_crypto'
+                '_'
+                (
+                    'fromlist'
+                )
+                (
+                    100
+                    101
+                    99
+                    114
+                    121
+                    112
+                    116
+                    95
+                    112
+                    121
+                    99
+                )
+                (
+                    105
+                    115
+                    95
+                    112
+                    121
+                    99
+                    95
+                    101
+                    110
+                    99
+                    114
+                    121
+                    112
+                    116
+                    101
+                    100
+                )
+                (
+                    None
+                    None
+                )
+            [Disassembly]
+                0       RESUME                          0
+                2       NOP                             
+                4       LOAD_GLOBAL                     1: NULL + __import__
+                14      LOAD_CONST                      1: 'app.utils._security_crypto'
+                16      LOAD_CONST                      2: '_'
+                18      BUILD_LIST                      1
+                20      LOAD_CONST                      3: ('fromlist',)
+                22      CALL_KW                         2
+                24      STORE_FAST                      0: _m
+                26      LOAD_GLOBAL                     3: NULL + bytes
+                36      BUILD_LIST                      0
+                38      LOAD_CONST                      4: (100, 101, 99, 114, 121, 112, 116, 95, 112, 121, 99)
+                40      LIST_EXTEND                     1
+                42      CALL                            1
+                50      LOAD_ATTR                       5: decode
+                70      CALL                            0
+                78      STORE_FAST                      1: _n1
+                80      LOAD_GLOBAL                     3: NULL + bytes
+                90      BUILD_LIST                      0
+                92      LOAD_CONST                      5: (105, 115, 95, 112, 121, 99, 95, 101, 110, 99, 114, 121, 112, 116, 101, 100)
+                94      LIST_EXTEND                     1
+                96      CALL                            1
+                104     LOAD_ATTR                       5: decode
+                124     CALL                            0
+                132     STORE_FAST                      2: _n2
+                134     LOAD_GLOBAL                     7: NULL + getattr
+                144     LOAD_FAST_LOAD_FAST             1: _m, _n1
+                146     CALL                            2
+                154     LOAD_GLOBAL                     7: NULL + getattr
+                164     LOAD_FAST_LOAD_FAST             2: _m, _n2
+                166     CALL                            2
+                174     BUILD_TUPLE                     2
+                176     RETURN_VALUE                    
+                178     PUSH_EXC_INFO                   
+                180     LOAD_GLOBAL                     8: Exception
+                190     CHECK_EXC_MATCH                 
+                192     POP_JUMP_IF_FALSE               3 (to 200)
+                196     POP_TOP                         
+                198     POP_EXCEPT                      
+                200     RETURN_CONST                    6: (None, None)
+                202     RERAISE                         0
+                204     COPY                            3
+                206     POP_EXCEPT                      
+                208     RERAISE                         1
+            [Exception Table]
+                4 to 176 -> 178 [0] 
+                178 to 198 -> 204 [1] lasti
+                202 to 204 -> 204 [1] lasti
+        [Code]
+            File Name: <m>
+            Object Name: _F0
+            Qualified Name: _F0
+            Arg Count: 0
+            Pos Only Arg Count: 0
+            KW Only Arg Count: 0
+            Stack Size: 2
+            Flags: 0x00000000
+            [Names]
+                '__name__'
+                '__module__'
+                '__qualname__'
+                '__firstlineno__'
+                '__init__'
+                'find_spec'
+                '__static_attributes__'
+            [Locals+Names]
+            [Constants]
+                '_F0'
+                54
+                [Code]
+                    File Name: <m>
+                    Object Name: __init__
+                    Qualified Name: _F0.__init__
+                    Arg Count: 2
+                    Pos Only Arg Count: 0
+                    KW Only Arg Count: 0
+                    Stack Size: 2
+                    Flags: 0x00000003 (CO_OPTIMIZED | CO_NEWLOCALS)
+                    [Names]
+                        '_b'
+                    [Locals+Names]
+                        'self'
+                        'bp'
+                    [Constants]
+                        None
+                    [Disassembly]
+                        0       RESUME                          0
+                        2       LOAD_FAST_LOAD_FAST             16: bp, self
+                        4       STORE_ATTR                      0: _b
+                        14      RETURN_CONST                    0: None
+                    [Exception Table]
+                None
+                [Code]
+                    File Name: <m>
+                    Object Name: find_spec
+                    Qualified Name: _F0.find_spec
+                    Arg Count: 4
+                    Pos Only Arg Count: 0
+                    KW Only Arg Count: 0
+                    Stack Size: 8
+                    Flags: 0x00000003 (CO_OPTIMIZED | CO_NEWLOCALS)
+                    [Names]
+                        'split'
+                        '_S0'
+                        'startswith'
+                        '_r0'
+                        'len'
+                        'os'
+                        'path'
+                        'join'
+                        'list'
+                        'append'
+                        '_b'
+                        'isdir'
+                        'isfile'
+                        'open'
+                        'read'
+                        'IOError'
+                        'OSError'
+                        'endswith'
+                        '_L0'
+                        'importlib'
+                        'machinery'
+                        'ModuleSpec'
+                        'dirname'
+                        'submodule_search_locations'
+                    [Locals+Names]
+                        'self'
+                        'fullname'
+                        'path'
+                        'target'
+                        't'
+                        '_d'
+                        '_v'
+                        'p'
+                        'rp'
+                        'mn'
+                        'sd'
+                        'd'
+                        'fp'
+                        'pi'
+                        'f'
+                        'hd'
+                        'ip'
+                        'ld'
+                        'sp'
+                    [Constants]
+                        None
+                        '.'
+                        0
+                        1
+                        -1
+                        ''
+                        '.pyc'
+                        '__init__.pyc'
+                        'rb'
+                        4
+                        (
+                            'origin'
+                            'is_package'
+                        )
+                    [Disassembly]
+                        0       RESUME                          0
+                        2       LOAD_FAST                       1: fullname
+                        4       LOAD_ATTR                       1: split
+                        24      LOAD_CONST                      1: '.'
+                        26      CALL                            1
+                        34      LOAD_CONST                      2: 0
+                        36      BINARY_SUBSCR                   
+                        40      STORE_FAST                      4: t
+                        42      LOAD_FAST                       4: t
+                        44      LOAD_GLOBAL                     2: _S0
+                        54      CONTAINS_OP                     0 (in)
+                        58      POP_JUMP_IF_TRUE                26 (to 112)
+                        62      LOAD_FAST                       1: fullname
+                        64      LOAD_ATTR                       5: startswith
+                        84      LOAD_GLOBAL                     2: _S0
+                        94      CALL                            1
+                        102     TO_BOOL                         
+                        110     POP_JUMP_IF_FALSE               1 (to 114)
+                        114     RETURN_CONST                    0: None
+                        116     LOAD_GLOBAL                     7: NULL + _r0
+                        126     CALL                            0
+                        134     UNPACK_SEQUENCE                 2
+                        138     STORE_FAST_STORE_FAST           86: _d, _v
+                        140     LOAD_FAST                       5: _d
+                        142     POP_JUMP_IF_NOT_NONE            1 (to 146)
+                        146     RETURN_CONST                    0: None
+                        148     LOAD_FAST                       1: fullname
+                        150     LOAD_ATTR                       1: split
+                        170     LOAD_CONST                      1: '.'
+                        172     CALL                            1
+                        180     STORE_FAST                      7: p
+                        182     LOAD_GLOBAL                     9: NULL + len
+                        192     LOAD_FAST                       7: p
+                        194     CALL                            1
+                        202     LOAD_CONST                      3: 1
+                        204     COMPARE_OP                      148 (>)
+                        208     POP_JUMP_IF_FALSE               32 (to 274)
+                        212     LOAD_GLOBAL                     10: os
+                        222     LOAD_ATTR                       12: path
+                        242     LOAD_ATTR                       14: join
+                        262     PUSH_NULL                       
+                        264     LOAD_FAST                       7: p
+                        266     LOAD_CONST                      0: None
+                        268     LOAD_CONST                      4: -1
+                        270     BINARY_SLICE                    
+                        272     CALL_FUNCTION_EX                0
+                        274     JUMP_FORWARD                    1 (to 278)
+                        276     LOAD_CONST                      5: ''
+                        278     STORE_FAST                      8: rp
+                        280     LOAD_FAST                       7: p
+                        282     LOAD_CONST                      4: -1
+                        284     BINARY_SUBSCR                   
+                        288     STORE_FAST                      9: mn
+                        290     BUILD_LIST                      0
+                        292     STORE_FAST                      10: sd
+                        294     LOAD_FAST                       2: path
+                        296     TO_BOOL                         
+                        304     POP_JUMP_IF_FALSE               11 (to 328)
+                        308     LOAD_GLOBAL                     17: NULL + list
+                        318     LOAD_FAST                       2: path
+                        320     CALL                            1
+                        328     STORE_FAST                      10: sd
+                        330     LOAD_FAST                       10: sd
+                        332     LOAD_ATTR                       19: append
+                        352     LOAD_GLOBAL                     10: os
+                        362     LOAD_ATTR                       12: path
+                        382     LOAD_ATTR                       15: join
+                        402     LOAD_FAST                       0: self
+                        404     LOAD_ATTR                       20: _b
+                        424     LOAD_FAST                       8: rp
+                        426     CALL                            2
+                        434     CALL                            1
+                        442     POP_TOP                         
+                        444     LOAD_FAST                       10: sd
+                        446     GET_ITER                        
+                        448     FOR_ITER                        344 (to 1140)
+                        454     STORE_FAST                      11: d
+                        456     LOAD_GLOBAL                     10: os
+                        466     LOAD_ATTR                       12: path
+                        486     LOAD_ATTR                       23: isdir
+                        506     LOAD_FAST                       11: d
+                        508     CALL                            1
+                        516     TO_BOOL                         
+                        524     POP_JUMP_IF_TRUE                2 (to 530)
+                        528     JUMP_BACKWARD                   42 (to 446)
+                        532     LOAD_GLOBAL                     10: os
+                        542     LOAD_ATTR                       12: path
+                        562     LOAD_ATTR                       15: join
+                        582     LOAD_FAST_LOAD_FAST             185: d, mn
+                        584     LOAD_CONST                      6: '.pyc'
+                        586     BINARY_OP                       0 (+)
+                        590     CALL                            2
+                        598     STORE_FAST                      12: fp
+                        600     LOAD_GLOBAL                     10: os
+                        610     LOAD_ATTR                       12: path
+                        630     LOAD_ATTR                       25: isfile
+                        650     LOAD_FAST                       12: fp
+                        652     CALL                            1
+                        660     TO_BOOL                         
+                        668     POP_JUMP_IF_TRUE                73 (to 816)
+                        672     LOAD_GLOBAL                     10: os
+                        682     LOAD_ATTR                       12: path
+                        702     LOAD_ATTR                       15: join
+                        722     LOAD_FAST_LOAD_FAST             185: d, mn
+                        724     LOAD_CONST                      7: '__init__.pyc'
+                        726     CALL                            3
+                        734     STORE_FAST                      13: pi
+                        736     LOAD_GLOBAL                     10: os
+                        746     LOAD_ATTR                       12: path
+                        766     LOAD_ATTR                       25: isfile
+                        786     LOAD_FAST                       13: pi
+                        788     CALL                            1
+                        796     TO_BOOL                         
+                        804     POP_JUMP_IF_FALSE               3 (to 812)
+                        808     LOAD_FAST                       13: pi
+                        810     STORE_FAST                      12: fp
+                        812     JUMP_FORWARD                    2 (to 818)
+                        814     JUMP_BACKWARD                   185 (to 446)
+                        818     NOP                             
+                        820     LOAD_GLOBAL                     27: NULL + open
+                        830     LOAD_FAST                       12: fp
+                        832     LOAD_CONST                      8: 'rb'
+                        834     CALL                            2
+                        842     BEFORE_WITH                     
+                        844     STORE_FAST                      14: f
+                        846     LOAD_FAST                       14: f
+                        848     LOAD_ATTR                       29: read
+                        868     LOAD_CONST                      9: 4
+                        870     CALL                            1
+                        878     STORE_FAST                      15: hd
+                        880     LOAD_CONST                      0: None
+                        882     LOAD_CONST                      0: None
+                        884     LOAD_CONST                      0: None
+                        886     CALL                            2
+                        894     POP_TOP                         
+                        896     LOAD_FAST                       6: _v
+                        898     PUSH_NULL                       
+                        900     LOAD_FAST_CHECK                 15: hd
+                        902     CALL                            1
+                        910     TO_BOOL                         
+                        918     POP_JUMP_IF_TRUE                2 (to 924)
+                        922     JUMP_BACKWARD                   239 (to 446)
+                        926     LOAD_FAST                       12: fp
+                        928     LOAD_ATTR                       35: endswith
+                        948     LOAD_CONST                      7: '__init__.pyc'
+                        950     CALL                            1
+                        958     STORE_FAST                      16: ip
+                        960     LOAD_GLOBAL                     37: NULL + _L0
+                        970     LOAD_FAST                       12: fp
+                        972     CALL                            1
+                        980     STORE_FAST                      17: ld
+                        982     LOAD_GLOBAL                     38: importlib
+                        992     LOAD_ATTR                       40: machinery
+                        1012    LOAD_ATTR                       43: ModuleSpec
+                        1032    LOAD_FAST                       1: fullname
+                        1034    LOAD_FAST                       17: ld
+                        1036    LOAD_FAST                       12: fp
+                        1038    LOAD_FAST                       16: ip
+                        1040    LOAD_CONST                      10: ('origin', 'is_package')
+                        1042    CALL_KW                         4
+                        1044    STORE_FAST                      18: sp
+                        1046    LOAD_FAST                       16: ip
+                        1048    TO_BOOL                         
+                        1056    POP_JUMP_IF_FALSE               37 (to 1132)
+                        1060    LOAD_GLOBAL                     10: os
+                        1070    LOAD_ATTR                       12: path
+                        1090    LOAD_ATTR                       45: dirname
+                        1110    LOAD_FAST                       12: fp
+                        1112    CALL                            1
+                        1120    BUILD_LIST                      1
+                        1122    LOAD_FAST                       18: sp
+                        1124    STORE_ATTR                      23: submodule_search_locations
+                        1134    LOAD_FAST                       18: sp
+                        1136    SWAP                            2
+                        1138    POP_TOP                         
+                        1140    RETURN_VALUE                    
+                        1142    END_FOR                         
+                        1144    POP_TOP                         
+                        1146    RETURN_CONST                    0: None
+                        1148    PUSH_EXC_INFO                   
+                        1150    WITH_EXCEPT_START               
+                        1152    TO_BOOL                         
+                        1160    POP_JUMP_IF_TRUE                1 (to 1164)
+                        1164    RERAISE                         2
+                        1166    POP_TOP                         
+                        1168    POP_EXCEPT                      
+                        1170    POP_TOP                         
+                        1172    POP_TOP                         
+                        1174    JUMP_BACKWARD_NO_INTERRUPT      140 (to 896)
+                        1176    COPY                            3
+                        1178    POP_EXCEPT                      
+                        1180    RERAISE                         1
+                        1182    PUSH_EXC_INFO                   
+                        1184    LOAD_GLOBAL                     30: IOError
+                        1194    LOAD_GLOBAL                     32: OSError
+                        1204    BUILD_TUPLE                     2
+                        1206    CHECK_EXC_MATCH                 
+                        1208    POP_JUMP_IF_FALSE               5 (to 1220)
+                        1212    POP_TOP                         
+                        1214    POP_EXCEPT                      
+                        1216    JUMP_BACKWARD                   387 (to 446)
+                        1222    RERAISE                         0
+                        1224    COPY                            3
+                        1226    POP_EXCEPT                      
+                        1228    RERAISE                         1
+                    [Exception Table]
+                        820 to 844 -> 1182 [1] 
+                        844 to 880 -> 1148 [2] lasti
+                        880 to 896 -> 1182 [1] 
+                        1148 to 1168 -> 1176 [4] lasti
+                        1168 to 1174 -> 1182 [1] 
+                        1176 to 1182 -> 1182 [1] 
+                        1182 to 1214 -> 1224 [2] lasti
+                        1222 to 1224 -> 1224 [2] lasti
+                (
+                    '_b'
+                )
+                (
+                    None
+                )
+            [Disassembly]
+                0       RESUME                          0
+                2       LOAD_NAME                       0: __name__
+                4       STORE_NAME                      1: __module__
+                6       LOAD_CONST                      0: '_F0'
+                8       STORE_NAME                      2: __qualname__
+                10      LOAD_CONST                      1: 54
+                12      STORE_NAME                      3: __firstlineno__
+                14      LOAD_CONST                      2: <CODE> __init__
+                16      MAKE_FUNCTION                   
+                18      STORE_NAME                      4: __init__
+                20      LOAD_CONST                      6: (None,)
+                22      LOAD_CONST                      4: <CODE> find_spec
+                24      MAKE_FUNCTION                   
+                26      SET_FUNCTION_ATTRIBUTE          1 (MAKE_FUNCTION_DEFAULTS)
+                28      STORE_NAME                      5: find_spec
+                30      LOAD_CONST                      5: ('_b',)
+                32      STORE_NAME                      6: __static_attributes__
+                34      RETURN_CONST                    3: None
+            [Exception Table]
+        '_F0'
+        [Code]
+            File Name: <m>
+            Object Name: _L0
+            Qualified Name: _L0
+            Arg Count: 0
+            Pos Only Arg Count: 0
+            KW Only Arg Count: 0
+            Stack Size: 1
+            Flags: 0x00000000
+            [Names]
+                '__name__'
+                '__module__'
+                '__qualname__'
+                '__firstlineno__'
+                '__init__'
+                'create_module'
+                'exec_module'
+                '__static_attributes__'
+            [Locals+Names]
+            [Constants]
+                '_L0'
+                111
+                [Code]
+                    File Name: <m>
+                    Object Name: __init__
+                    Qualified Name: _L0.__init__
+                    Arg Count: 2
+                    Pos Only Arg Count: 0
+                    KW Only Arg Count: 0
+                    Stack Size: 2
+                    Flags: 0x00000003 (CO_OPTIMIZED | CO_NEWLOCALS)
+                    [Names]
+                        '_p'
+                    [Locals+Names]
+                        'self'
+                        'p'
+                    [Constants]
+                        None
+                    [Disassembly]
+                        0       RESUME                          0
+                        2       LOAD_FAST_LOAD_FAST             16: p, self
+                        4       STORE_ATTR                      0: _p
+                        14      RETURN_CONST                    0: None
+                    [Exception Table]
+                [Code]
+                    File Name: <m>
+                    Object Name: create_module
+                    Qualified Name: _L0.create_module
+                    Arg Count: 2
+                    Pos Only Arg Count: 0
+                    KW Only Arg Count: 0
+                    Stack Size: 1
+                    Flags: 0x00000003 (CO_OPTIMIZED | CO_NEWLOCALS)
+                    [Names]
+                    [Locals+Names]
+                        'self'
+                        'spec'
+                    [Constants]
+                        None
+                    [Disassembly]
+                        0       RESUME                          0
+                        2       RETURN_CONST                    0: None
+                    [Exception Table]
+                [Code]
+                    File Name: <m>
+                    Object Name: exec_module
+                    Qualified Name: _L0.exec_module
+                    Arg Count: 2
+                    Pos Only Arg Count: 0
+                    KW Only Arg Count: 0
+                    Stack Size: 6
+                    Flags: 0x00000003 (CO_OPTIMIZED | CO_NEWLOCALS)
+                    [Names]
+                        '_r0'
+                        'ImportError'
+                        '_p'
+                        'open'
+                        'read'
+                        'IOError'
+                        'OSError'
+                        'len'
+                        'marshal'
+                        'loads'
+                        'Exception'
+                        '__file__'
+                        '__loader__'
+                        'hasattr'
+                        'exec'
+                        '__dict__'
+                    [Locals+Names]
+                        'self'
+                        'module'
+                        '_d'
+                        '_'
+                        'f'
+                        'ed'
+                        'rd'
+                        '_hs'
+                        'bc'
+                        'co'
+                    [Constants]
+                        None
+                        'rb'
+                        16
+                        '__path__'
+                    [Disassembly]
+                        0       RESUME                          0
+                        2       LOAD_GLOBAL                     1: NULL + _r0
+                        12      CALL                            0
+                        20      UNPACK_SEQUENCE                 2
+                        24      STORE_FAST_STORE_FAST           35: _d, _
+                        26      LOAD_FAST                       2: _d
+                        28      POP_JUMP_IF_NOT_NONE            21 (to 72)
+                        32      LOAD_GLOBAL                     3: NULL + ImportError
+                        42      LOAD_FAST                       0: self
+                        44      LOAD_ATTR                       4: _p
+                        64      CALL                            1
+                        72      RAISE_VARARGS                   1
+                        74      NOP                             
+                        76      LOAD_GLOBAL                     7: NULL + open
+                        86      LOAD_FAST                       0: self
+                        88      LOAD_ATTR                       4: _p
+                        108     LOAD_CONST                      1: 'rb'
+                        110     CALL                            2
+                        118     BEFORE_WITH                     
+                        120     STORE_FAST                      4: f
+                        122     LOAD_FAST                       4: f
+                        124     LOAD_ATTR                       9: read
+                        144     CALL                            0
+                        152     STORE_FAST                      5: ed
+                        154     LOAD_CONST                      0: None
+                        156     LOAD_CONST                      0: None
+                        158     LOAD_CONST                      0: None
+                        160     CALL                            2
+                        168     POP_TOP                         
+                        170     LOAD_FAST                       2: _d
+                        172     PUSH_NULL                       
+                        174     LOAD_FAST_CHECK                 5: ed
+                        176     CALL                            1
+                        184     STORE_FAST                      6: rd
+                        186     LOAD_FAST                       6: rd
+                        188     POP_JUMP_IF_NOT_NONE            21 (to 232)
+                        192     LOAD_GLOBAL                     3: NULL + ImportError
+                        202     LOAD_FAST                       0: self
+                        204     LOAD_ATTR                       4: _p
+                        224     CALL                            1
+                        232     RAISE_VARARGS                   1
+                        234     LOAD_CONST                      2: 16
+                        236     STORE_FAST                      7: _hs
+                        238     LOAD_GLOBAL                     15: NULL + len
+                        248     LOAD_FAST                       6: rd
+                        250     CALL                            1
+                        258     LOAD_FAST                       7: _hs
+                        260     COMPARE_OP                      58 (<=)
+                        264     POP_JUMP_IF_FALSE               21 (to 308)
+                        268     LOAD_GLOBAL                     3: NULL + ImportError
+                        278     LOAD_FAST                       0: self
+                        280     LOAD_ATTR                       4: _p
+                        300     CALL                            1
+                        308     RAISE_VARARGS                   1
+                        310     LOAD_FAST_LOAD_FAST             103: rd, _hs
+                        312     LOAD_CONST                      0: None
+                        314     BINARY_SLICE                    
+                        316     STORE_FAST                      8: bc
+                        318     NOP                             
+                        320     LOAD_GLOBAL                     16: marshal
+                        330     LOAD_ATTR                       18: loads
+                        350     PUSH_NULL                       
+                        352     LOAD_FAST                       8: bc
+                        354     CALL                            1
+                        362     STORE_FAST                      9: co
+                        364     LOAD_FAST                       0: self
+                        366     LOAD_ATTR                       4: _p
+                        386     LOAD_FAST                       1: module
+                        388     STORE_ATTR                      11: __file__
+                        398     LOAD_FAST_LOAD_FAST             1: self, module
+                        400     STORE_ATTR                      12: __loader__
+                        410     LOAD_GLOBAL                     27: NULL + hasattr
+                        420     LOAD_FAST                       1: module
+                        422     LOAD_CONST                      3: '__path__'
+                        424     CALL                            2
+                        432     TO_BOOL                         
+                        440     POP_JUMP_IF_FALSE               1 (to 444)
+                        444     NOP                             
+                        446     LOAD_GLOBAL                     29: NULL + exec
+                        456     LOAD_FAST_LOAD_FAST             145: co, module
+                        458     LOAD_ATTR                       30: __dict__
+                        478     CALL                            2
+                        486     POP_TOP                         
+                        488     RETURN_CONST                    0: None
+                        490     PUSH_EXC_INFO                   
+                        492     WITH_EXCEPT_START               
+                        494     TO_BOOL                         
+                        502     POP_JUMP_IF_TRUE                1 (to 506)
+                        506     RERAISE                         2
+                        508     POP_TOP                         
+                        510     POP_EXCEPT                      
+                        512     POP_TOP                         
+                        514     POP_TOP                         
+                        516     JUMP_BACKWARD_NO_INTERRUPT      174 (to 170)
+                        518     COPY                            3
+                        520     POP_EXCEPT                      
+                        522     RERAISE                         1
+                        524     PUSH_EXC_INFO                   
+                        526     LOAD_GLOBAL                     10: IOError
+                        536     LOAD_GLOBAL                     12: OSError
+                        546     BUILD_TUPLE                     2
+                        548     CHECK_EXC_MATCH                 
+                        550     POP_JUMP_IF_FALSE               22 (to 596)
+                        554     POP_TOP                         
+                        556     LOAD_GLOBAL                     3: NULL + ImportError
+                        566     LOAD_FAST                       0: self
+                        568     LOAD_ATTR                       4: _p
+                        588     CALL                            1
+                        596     RAISE_VARARGS                   1
+                        598     RERAISE                         0
+                        600     COPY                            3
+                        602     POP_EXCEPT                      
+                        604     RERAISE                         1
+                        606     PUSH_EXC_INFO                   
+                        608     LOAD_GLOBAL                     20: Exception
+                        618     CHECK_EXC_MATCH                 
+                        620     POP_JUMP_IF_FALSE               22 (to 666)
+                        624     POP_TOP                         
+                        626     LOAD_GLOBAL                     3: NULL + ImportError
+                        636     LOAD_FAST                       0: self
+                        638     LOAD_ATTR                       4: _p
+                        658     CALL                            1
+                        666     RAISE_VARARGS                   1
+                        668     RERAISE                         0
+                        670     COPY                            3
+                        672     POP_EXCEPT                      
+                        674     RERAISE                         1
+                    [Exception Table]
+                        76 to 120 -> 524 [0] 
+                        120 to 154 -> 490 [1] lasti
+                        154 to 170 -> 524 [0] 
+                        320 to 364 -> 606 [0] 
+                        490 to 510 -> 518 [3] lasti
+                        510 to 516 -> 524 [0] 
+                        518 to 524 -> 524 [0] 
+                        524 to 600 -> 600 [1] lasti
+                        606 to 670 -> 670 [1] lasti
+                (
+                    '_p'
+                )
+                None
+            [Disassembly]
+                0       RESUME                          0
+                2       LOAD_NAME                       0: __name__
+                4       STORE_NAME                      1: __module__
+                6       LOAD_CONST                      0: '_L0'
+                8       STORE_NAME                      2: __qualname__
+                10      LOAD_CONST                      1: 111
+                12      STORE_NAME                      3: __firstlineno__
+                14      LOAD_CONST                      2: <CODE> __init__
+                16      MAKE_FUNCTION                   
+                18      STORE_NAME                      4: __init__
+                20      LOAD_CONST                      3: <CODE> create_module
+                22      MAKE_FUNCTION                   
+                24      STORE_NAME                      5: create_module
+                26      LOAD_CONST                      4: <CODE> exec_module
+                28      MAKE_FUNCTION                   
+                30      STORE_NAME                      6: exec_module
+                32      LOAD_CONST                      5: ('_p',)
+                34      STORE_NAME                      7: __static_attributes__
+                36      RETURN_CONST                    6: None
+            [Exception Table]
+        '_L0'
+        [Code]
+            File Name: <m>
+            Object Name: activate
+            Qualified Name: activate
+            Arg Count: 0
+            Pos Only Arg Count: 0
+            KW Only Arg Count: 0
+            Stack Size: 9
+            Flags: 0x00000003 (CO_OPTIMIZED | CO_NEWLOCALS)
+            [Names]
+                '_h0'
+                'getattr'
+                'sys'
+                'os'
+                'path'
+                'join'
+                '_MEIPASS'
+                'dirname'
+                'abspath'
+                '__file__'
+                'isdir'
+                'meta_path'
+                'insert'
+                '_F0'
+                'Exception'
+            [Locals+Names]
+                '_bp'
+            [Constants]
+                None
+                True
+                'frozen'
+                False
+                'app'
+                0
+            [Disassembly]
+                0       RESUME                          0
+                2       LOAD_GLOBAL                     0: _h0
+                12      TO_BOOL                         
+                20      POP_JUMP_IF_FALSE               1 (to 24)
+                24      RETURN_CONST                    1: True
+                26      NOP                             
+                28      LOAD_CONST                      0: None
+                30      STORE_FAST                      0: _bp
+                32      LOAD_GLOBAL                     3: NULL + getattr
+                42      LOAD_GLOBAL                     4: sys
+                52      LOAD_CONST                      2: 'frozen'
+                54      LOAD_CONST                      3: False
+                56      CALL                            3
+                64      TO_BOOL                         
+                72      POP_JUMP_IF_FALSE               46 (to 166)
+                76      LOAD_GLOBAL                     6: os
+                86      LOAD_ATTR                       8: path
+                106     LOAD_ATTR                       11: join
+                126     LOAD_GLOBAL                     4: sys
+                136     LOAD_ATTR                       12: _MEIPASS
+                156     CALL                            1
+                164     STORE_FAST                      0: _bp
+                166     JUMP_FORWARD                    122 (to 412)
+                168     LOAD_GLOBAL                     6: os
+                178     LOAD_ATTR                       8: path
+                198     LOAD_ATTR                       15: dirname
+                218     LOAD_GLOBAL                     6: os
+                228     LOAD_ATTR                       8: path
+                248     LOAD_ATTR                       15: dirname
+                268     LOAD_GLOBAL                     6: os
+                278     LOAD_ATTR                       8: path
+                298     LOAD_ATTR                       15: dirname
+                318     LOAD_GLOBAL                     6: os
+                328     LOAD_ATTR                       8: path
+                348     LOAD_ATTR                       17: abspath
+                368     LOAD_GLOBAL                     18: __file__
+                378     CALL                            1
+                386     CALL                            1
+                394     CALL                            1
+                402     CALL                            1
+                410     STORE_FAST                      0: _bp
+                412     LOAD_GLOBAL                     6: os
+                422     LOAD_ATTR                       8: path
+                442     LOAD_ATTR                       21: isdir
+                462     LOAD_GLOBAL                     6: os
+                472     LOAD_ATTR                       8: path
+                492     LOAD_ATTR                       11: join
+                512     LOAD_FAST                       0: _bp
+                514     LOAD_CONST                      4: 'app'
+                516     CALL                            2
+                524     CALL                            1
+                532     TO_BOOL                         
+                540     POP_JUMP_IF_TRUE                1 (to 544)
+                544     RETURN_CONST                    3: False
+                546     LOAD_GLOBAL                     4: sys
+                556     LOAD_ATTR                       22: meta_path
+                576     LOAD_ATTR                       25: insert
+                596     LOAD_CONST                      5: 0
+                598     LOAD_GLOBAL                     27: NULL + _F0
+                608     LOAD_FAST                       0: _bp
+                610     CALL                            1
+                618     CALL                            2
+                626     POP_TOP                         
+                628     LOAD_CONST                      1: True
+                630     STORE_GLOBAL                    0: _h0
+                632     RETURN_CONST                    1: True
+                634     PUSH_EXC_INFO                   
+                636     LOAD_GLOBAL                     28: Exception
+                646     CHECK_EXC_MATCH                 
+                648     POP_JUMP_IF_FALSE               3 (to 656)
+                652     POP_TOP                         
+                654     POP_EXCEPT                      
+                656     RETURN_CONST                    3: False
+                658     RERAISE                         0
+                660     COPY                            3
+                662     POP_EXCEPT                      
+                664     RERAISE                         1
+            [Exception Table]
+                28 to 544 -> 634 [0] 
+                546 to 632 -> 634 [0] 
+                634 to 654 -> 660 [1] lasti
+                658 to 660 -> 660 [1] lasti
+    [Disassembly]
+        0       RESUME                          0
+        2       LOAD_CONST                      0: 0
+        4       LOAD_CONST                      1: None
+        6       IMPORT_NAME                     0: importlib
+        8       STORE_NAME                      0: importlib
+        10      LOAD_CONST                      0: 0
+        12      LOAD_CONST                      1: None
+        14      IMPORT_NAME                     1: importlib.abc
+        16      STORE_NAME                      0: importlib
+        18      LOAD_CONST                      0: 0
+        20      LOAD_CONST                      1: None
+        22      IMPORT_NAME                     2: importlib.machinery
+        24      STORE_NAME                      0: importlib
+        26      LOAD_CONST                      0: 0
+        28      LOAD_CONST                      1: None
+        30      IMPORT_NAME                     3: importlib.util
+        32      STORE_NAME                      0: importlib
+        34      LOAD_CONST                      0: 0
+        36      LOAD_CONST                      1: None
+        38      IMPORT_NAME                     4: marshal
+        40      STORE_NAME                      4: marshal
+        42      LOAD_CONST                      0: 0
+        44      LOAD_CONST                      1: None
+        46      IMPORT_NAME                     5: os
+        48      STORE_NAME                      5: os
+        50      LOAD_CONST                      0: 0
+        52      LOAD_CONST                      1: None
+        54      IMPORT_NAME                     6: sys
+        56      STORE_NAME                      6: sys
+        58      LOAD_CONST                      0: 0
+        60      LOAD_CONST                      1: None
+        62      IMPORT_NAME                     7: types
+        64      STORE_NAME                      7: types
+        66      LOAD_CONST                      2: False
+        68      STORE_GLOBAL                    8: _h0
+        70      LOAD_CONST                      3: ('_', 'importlib', 'os', 'sys', 'io', 'abc', 'codecs', 'encodings', 'zipimport', 'marshal', 'types', 'struct', 'PyQt5', 'PyQt6', 'numpy', 'PIL', 'cv2', 'cryptography', 'flask', 'waitress', 'jinja2', 'werkzeug', 'sqlalchemy', 'psutil', 'win32', 'comtypes', 'ctypes', 'email', 'http', 'urllib', 'ssl', 'socket', 'json', 'logging', 'threading', 'multiprocessing', 'concurrent', 'asyncio', 'collections', 'functools', 'itertools', 'operator', 'pathlib', 'shutil', 'tempfile', 'glob', 'fnmatch', 're', 'string', 'textwrap', 'unicodedata', 'locale', 'decimal', 'fractions', 'random', 'statistics', 'math', 'datetime', 'time', 'calendar', 'hashlib', 'hmac', 'base64', 'binascii', 'zlib', 'gzip', 'bz2', 'lzma', 'zipfile', 'tarfile', 'csv', 'configparser', 'argparse', 'getpass', 'platform', 'uuid', 'copy', 'pprint', 'traceback', 'warnings', 'contextlib', 'dataclasses', 'enum', 'typing', 'inspect', 'dis', 'tokenize', 'ast', 'subprocess', 'signal', 'select', 'selectors', 'mmap', 'pickle', 'shelve', 'dbm', 'sqlite3', 'xml', 'html', 'webbrowser', 'cgi', 'ftplib', 'imaplib', 'smtplib', 'mysql', 'pymysql', 'boto3', 'botocore', 'requests', 'certifi', 'charset_normalizer', 'idna', 'socks', 'pkg_resources', 'setuptools', 'pip', 'wheel', 'pydantic', 'attr', 'click', 'colorama', 'tqdm', 'serial', 'usb', 'hid', 'wmi', 'pythoncom', 'qrcode', 'reportlab', 'openpyxl', 'xlsxwriter')
+        72      STORE_NAME                      9: _S0
+        74      LOAD_CONST                      4: <CODE> _r0
+        76      MAKE_FUNCTION                   
+        78      STORE_NAME                      10: _r0
+        80      LOAD_BUILD_CLASS                
+        82      PUSH_NULL                       
+        84      LOAD_CONST                      5: <CODE> _F0
+        86      MAKE_FUNCTION                   
+        88      LOAD_CONST                      6: '_F0'
+        90      LOAD_NAME                       0: importlib
+        92      LOAD_ATTR                       22: abc
+        112     LOAD_ATTR                       24: MetaPathFinder
+        132     CALL                            3
+        140     STORE_NAME                      13: _F0
+        142     LOAD_BUILD_CLASS                
+        144     PUSH_NULL                       
+        146     LOAD_CONST                      7: <CODE> _L0
+        148     MAKE_FUNCTION                   
+        150     LOAD_CONST                      8: '_L0'
+        152     LOAD_NAME                       0: importlib
+        154     LOAD_ATTR                       22: abc
+        174     LOAD_ATTR                       28: Loader
+        194     CALL                            3
+        202     STORE_NAME                      15: _L0
+        204     LOAD_CONST                      9: <CODE> activate
+        206     MAKE_FUNCTION                   
+        208     STORE_NAME                      16: activate
+        210     RETURN_CONST                    1: None
+    [Exception Table]

@@ -1,0 +1,240 @@
+==================== base.db ====================
+CREATE TABLE solucoes (
+                    id INTEGER PRIMARY KEY,
+                    marca TEXT NOT NULL,
+                    modelo TEXT NOT NULL,
+                    descricao TEXT,
+                    observacoes TEXT,
+                    status TEXT DEFAULT 'ativo',
+                    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    data_sincronizacao DATETIME,
+                    hash_verificacao TEXT,
+                    versao TEXT,
+                    ultima_modificacao DATETIME,
+                    diagrama_blob BLOB,
+                    imagem_blob BLOB,
+                    diagrama_blob_2 BLOB,
+                    imagem_blob_2 BLOB,
+                    diagrama_blob_3 BLOB,
+                    imagem_blob_3 BLOB
+                );
+CREATE TABLE sqlite_sequence(name,seq);
+CREATE TABLE sync_control (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ultima_sincronizacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    status VARCHAR(50),
+                    detalhes TEXT,
+                    total_sincronizado INTEGER DEFAULT 0,
+                    erros INTEGER DEFAULT 0,
+                    duracao_segundos INTEGER DEFAULT 0
+                );
+-- rows: solucoes = 2562
+-- rows: sync_control = 1454
+
+==================== service_orders.db ====================
+CREATE INDEX idx_clients_tipo_cliente 
+            ON clients(tipo_cliente);
+CREATE TABLE clients (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            phone TEXT,
+            email TEXT,
+            address TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            user_id INTEGER NOT NULL, tipo_cliente TEXT DEFAULT 'pessoa_fisica', observacoes TEXT DEFAULT '',
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );
+CREATE TABLE company_settings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            company_name TEXT,
+            trading_name TEXT,
+            cnpj TEXT,
+            address TEXT,
+            city TEXT,
+            state TEXT,
+            phone TEXT,
+            email TEXT,
+            website TEXT,
+            logo BLOB,
+            footer_message TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            user_id INTEGER NOT NULL, warranty_text TEXT DEFAULT "TERMOS DE GARANTIA:
+
+1. A garantia dos serviços prestados é de 90 dias, contados a partir da data de entrega do equipamento.
+2. A garantia cobre apenas os serviços realizados e peças substituídas descritas nesta ordem de serviço.
+3. A garantia não cobre:
+   - Danos causados por mau uso, quedas ou acidentes
+   - Problemas diferentes dos originalmente consertados
+   - Oxidação ou danos por água
+   - Violação do equipamento por terceiros
+4. Para acionar a garantia, é necessário apresentar esta ordem de serviço.",
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );
+CREATE TABLE knowledge_base (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            device_type TEXT NOT NULL,
+            brand TEXT NOT NULL,
+            model TEXT NOT NULL,
+            issue_description TEXT NOT NULL,
+            solution TEXT NOT NULL,
+            steps_taken TEXT NOT NULL,
+            success_rate INTEGER,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            user_id INTEGER NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );
+CREATE TABLE knowledge_base_attachments (id INTEGER PRIMARY KEY AUTOINCREMENT, knowledge_base_id INTEGER, file_path TEXT, file_type TEXT, description TEXT, FOREIGN KEY (knowledge_base_id) REFERENCES knowledge_base(id));
+CREATE TABLE service_order_photos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            service_order_id INTEGER NOT NULL,
+            photo_path TEXT NOT NULL,
+            description TEXT,
+            upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (service_order_id) REFERENCES service_orders(id)
+        );
+CREATE TABLE service_orders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            client_id INTEGER NOT NULL,
+            device_type TEXT,
+            brand TEXT,
+            model TEXT,
+            serial_number TEXT,
+            reported_issue TEXT,
+            initial_diagnosis TEXT,
+            status TEXT NOT NULL,
+            solution TEXT,
+            steps_taken TEXT,
+            failure_reason TEXT,
+            entry_date TIMESTAMP DEFAULT (datetime('now', 'localtime')),
+            completion_date TIMESTAMP,
+            technician_notes TEXT,
+            service_value DECIMAL(10,2),
+            user_id INTEGER NOT NULL, completion_photo TEXT, original_os_id INTEGER, diagnosis TEXT,
+            FOREIGN KEY (client_id) REFERENCES clients(id),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );
+CREATE TABLE service_orders_backup(
+  id INT,
+  client_id INT,
+  device_type TEXT,
+  brand TEXT,
+  model TEXT,
+  serial_number TEXT,
+  reported_issue TEXT,
+  initial_diagnosis TEXT,
+  status TEXT,
+  solution TEXT,
+  steps_taken TEXT,
+  failure_reason TEXT,
+  entry_date NUM,
+  completion_date NUM,
+  technician_notes TEXT,
+  user_id INT,
+  completion_photo TEXT,
+  original_os_id INT,
+  diagnosis TEXT,
+  service_value NUM
+);
+CREATE TABLE sqlite_sequence(name,seq);
+CREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            is_admin INTEGER DEFAULT 0
+        );
+-- rows: clients = 0
+-- rows: company_settings = 0
+-- rows: knowledge_base = 0
+-- rows: knowledge_base_attachments = 0
+-- rows: service_order_photos = 0
+-- rows: service_orders = 0
+-- rows: service_orders_backup = 0
+-- rows: users = 0
+
+==================== user_solutions_1.db ====================
+CREATE INDEX idx_marca_modelo 
+                ON user_solutions(marca, modelo);
+CREATE INDEX idx_status 
+                ON user_solutions(status);
+CREATE TABLE sqlite_sequence(name,seq);
+CREATE TABLE user_solutions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    marca TEXT NOT NULL,
+                    modelo TEXT NOT NULL,
+                    descricao TEXT,
+                    observacoes TEXT,
+                    status TEXT NOT NULL DEFAULT 'ativo',
+                    data_criacao DATETIME DEFAULT (datetime('now', 'localtime')),
+                    imagem_blob BLOB,
+                    diagrama_blob BLOB
+                , imagem_1_blob BLOB, imagem_2_blob BLOB, diagrama_2_blob BLOB, permite_compartilhamento BOOLEAN DEFAULT 0, data_modificacao DATETIME DEFAULT (datetime('now', 'localtime')));
+-- rows: user_solutions = 0
+
+==================== app.db ====================
+
+==================== servidor_arquivos_cache.db ====================
+CREATE INDEX idx_cache_valido ON cache_servidor_arquivos(cache_valido_ate);
+CREATE INDEX idx_categoria ON cache_servidor_arquivos(categoria);
+CREATE INDEX idx_downloads_desc ON cache_servidor_arquivos(downloads_count DESC);
+CREATE INDEX idx_gratuito ON cache_servidor_arquivos(is_gratuito);
+CREATE INDEX idx_marca ON cache_servidor_arquivos(marca);
+CREATE INDEX idx_marca_categoria ON cache_servidor_arquivos(marca, categoria);
+CREATE INDEX idx_titulo_search ON cache_servidor_arquivos(LOWER(titulo));
+CREATE TABLE cache_config (
+                        chave TEXT PRIMARY KEY,
+                        valor TEXT NOT NULL,
+                        data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP
+                    );
+CREATE TABLE cache_marcas_resumo (
+                        marca TEXT PRIMARY KEY,
+                        total_arquivos INTEGER DEFAULT 0,
+                        total_gratuitos INTEGER DEFAULT 0,
+                        total_premiums INTEGER DEFAULT 0,
+                        total_downloads INTEGER DEFAULT 0,
+                        categorias_json TEXT,
+                        cache_valido_ate DATETIME
+                    );
+CREATE TABLE cache_servidor_arquivos (
+                        id INTEGER PRIMARY KEY,
+                        marca TEXT NOT NULL,
+                        categoria TEXT NOT NULL,
+                        titulo TEXT NOT NULL,
+                        descricao TEXT,
+                        versao TEXT,
+                        tamanho_arquivo INTEGER,
+                        tipo_arquivo TEXT,
+                        data_upload DATETIME,
+                        downloads_count INTEGER DEFAULT 0,
+                        is_gratuito BOOLEAN DEFAULT 0,
+                        is_premium BOOLEAN DEFAULT 0,
+                        tags TEXT,
+                        rating REAL DEFAULT 0.0,
+                        status TEXT DEFAULT 'ativo',
+                        preco DECIMAL(10,2),
+                        autor TEXT,
+                        
+                        -- Controle do cache
+                        cache_timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        cache_valido_ate DATETIME,
+                        hash_metadados TEXT,
+                        
+                        UNIQUE(id)
+                    );
+CREATE TABLE cache_sync_control (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        tipo_sync TEXT NOT NULL,
+                        timestamp_inicio DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        timestamp_fim DATETIME,
+                        status TEXT DEFAULT 'em_andamento',
+                        registros_processados INTEGER DEFAULT 0,
+                        erros INTEGER DEFAULT 0,
+                        duracao_segundos REAL DEFAULT 0.0
+                    );
+CREATE TABLE sqlite_sequence(name,seq);
+-- rows: cache_config = 4
+-- rows: cache_marcas_resumo = 14
+-- rows: cache_servidor_arquivos = 305
+-- rows: cache_sync_control = 1
+

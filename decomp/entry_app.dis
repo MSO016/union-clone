@@ -1,0 +1,1382 @@
+﻿app.pyc (Python 3.13)
+[Code]
+    File Name: app.py
+    Object Name: <module>
+    Qualified Name: <module>
+    Arg Count: 0
+    Pos Only Arg Count: 0
+    KW Only Arg Count: 0
+    Stack Size: 15
+    Flags: 0x00000000
+    [Names]
+        'sys'
+        'os'
+        'ctypes'
+        'platform'
+        'windll'
+        'user32'
+        'SetProcessDpiAwarenessContext'
+        'c_void_p'
+        'Exception'
+        'shcore'
+        'SetProcessDpiAwareness'
+        'getattr'
+        'win32com'
+        'path'
+        'join'
+        'environ'
+        'get'
+        'expanduser'
+        '_gen_py'
+        'makedirs'
+        '__gen_path__'
+        'PyQt5.QtWidgets'
+        'QApplication'
+        'QMessageBox'
+        'PyQt5.QtGui'
+        'QIcon'
+        'PyQt5.QtCore'
+        'QSharedMemory'
+        'Qt'
+        'QSettings'
+        'app.utils._import_hook'
+        'activate'
+        '_activate_hook'
+        'app.views.login_window'
+        'LoginWindow'
+        'app.utils.path_manager'
+        'PathManager'
+        'ImportError'
+        '_imp_err'
+        'str'
+        'lower'
+        '_msg_low'
+        'any'
+        '_is_policy_block'
+        '_user_msg'
+        'datetime'
+        '_dt'
+        '_log_dir'
+        'open'
+        '_lf'
+        'write'
+        'now'
+        'isoformat'
+        'type'
+        '__name__'
+        'MessageBoxW'
+        'print'
+        'exit'
+        'is_admin'
+        'run_as_admin'
+        'admin_status'
+        'KeyboardInterrupt'
+        'hasattr'
+        'setAttribute'
+        'AA_ShareOpenGLContexts'
+        'PyQt5.QtWebEngineWidgets'
+        'QWebEngineView'
+        'e'
+        'AA_EnableHighDpiScaling'
+        'AA_UseHighDpiPixmaps'
+        '_user32'
+        'gdi32'
+        '_gdi32'
+        'GetDC'
+        '_hdc'
+        'GetDeviceCaps'
+        '_phys_w'
+        '_phys_h'
+        '_dpi'
+        'ReleaseDC'
+        'round'
+        '_scale'
+        'int'
+        '_log_w'
+        '_log_h'
+        'argv'
+        'app'
+        'shared_memory'
+        'attach'
+        'warning'
+        'create'
+        'app.utils._cfg_probe'
+        'scan'
+        '_guard_scan'
+        'has_blocking'
+        '_guard_has_blocking'
+        'is_debugger_attached'
+        '_guard_is_dbg'
+        'generic_user_message'
+        '_guard_msg'
+        '_guard_dets'
+        '_guard_dbg'
+        'critical'
+        'detach'
+        'SystemExit'
+        'setStyle'
+        '_settings'
+        'value'
+        'bool'
+        'qdarkstyle'
+        'setStyleSheet'
+        'load_stylesheet_pyqt5'
+        'get_resource_path'
+        'icon'
+        'setWindowIcon'
+        'login'
+        'show'
+        'exec_'
+        'exit_code'
+    [Locals+Names]
+    [Constants]
+        0
+        None
+        'win32'
+        -4
+        2
+        'frozen'
+        False
+        'LOCALAPPDATA'
+        'TEMP'
+        '~'
+        'RESTORECELL'
+        'gen_py'
+        True
+        (
+            'exist_ok'
+        )
+        (
+            'QApplication'
+            'QMessageBox'
+        )
+        (
+            'QIcon'
+        )
+        (
+            'QSharedMemory'
+            'Qt'
+            'QSettings'
+        )
+        (
+            'activate'
+        )
+        (
+            'LoginWindow'
+        )
+        (
+            'PathManager'
+        )
+        [Code]
+            File Name: app.py
+            Object Name: <genexpr>
+            Qualified Name: <genexpr>
+            Arg Count: 1
+            Pos Only Arg Count: 0
+            KW Only Arg Count: 0
+            Stack Size: 3
+            Flags: 0x00000023 (CO_OPTIMIZED | CO_NEWLOCALS | CO_GENERATOR)
+            [Names]
+                '_msg_low'
+            [Locals+Names]
+                '.0'
+                '_k'
+            [Constants]
+                None
+            [Disassembly]
+                0       RETURN_GENERATOR                
+                2       POP_TOP                         
+                4       RESUME                          0
+                6       LOAD_FAST                       0: .0
+                8       GET_ITER                        
+                10      FOR_ITER                        13 (to 38)
+                14      STORE_FAST_LOAD_FAST            17: _k, _k
+                16      LOAD_GLOBAL                     0: _msg_low
+                26      CONTAINS_OP                     0 (in)
+                30      YIELD_VALUE                     0
+                32      RESUME                          5
+                34      POP_TOP                         
+                36      JUMP_BACKWARD                   15 (to 8)
+                40      END_FOR                         
+                42      POP_TOP                         
+                44      RETURN_CONST                    0: None
+                46      CALL_INTRINSIC_1                3 (INTRINSIC_STOPITERATION_ERROR)
+                48      RERAISE                         1
+            [Exception Table]
+                4 to 46 -> 46 [0] lasti
+        (
+            'dll load failed'
+            'policy'
+            'pol├¡'
+            'bloqueou'
+            'blocked'
+        )
+        "TECH UNION SOLUTIONS - Inicializacao Bloqueada\n\nUm componente do sistema foi bloqueado pela politica de\nseguranca do Windows.\n\nPossiveis solucoes:\n  1. Clique com o botao direito no programa e escolha\n     'Executar como Administrador'\n\n  2. Mova o programa para a pasta C:\\UNION\\ e tente novamente\n\n  3. No Windows 11: Configuracoes > Privacidade e seguranca >\n     Seguranca do Windows > Controle de aplicativos e navegador\n     > desative o 'Controle inteligente de aplicativos'\n\n  4. Se o problema persistir, contate o suporte tecnico\n\nCodigo: INIT-001"
+        'TECH UNION SOLUTIONS - Erro de Inicializacao\n\nNao foi possivel iniciar um componente do sistema.\n\nTente reinstalar o aplicativo ou contate o suporte tecnico.\n\nCodigo: INIT-002'
+        'startup_error.log'
+        'a'
+        'utf-8'
+        (
+            'encoding'
+        )
+        '['
+        '] '
+        'INIT-001'
+        'INIT-002'
+        ' type='
+        ' is_policy='
+        '\n'
+        'TECH UNION SOLUTIONS'
+        16
+        1
+        [Code]
+            File Name: app.py
+            Object Name: is_admin
+            Qualified Name: is_admin
+            Arg Count: 0
+            Pos Only Arg Count: 0
+            KW Only Arg Count: 0
+            Stack Size: 4
+            Flags: 0x00000003 (CO_OPTIMIZED | CO_NEWLOCALS)
+            [Names]
+                'ctypes'
+                'windll'
+                'shell32'
+                'IsUserAnAdmin'
+            [Locals+Names]
+            [Constants]
+                'Verifica se o programa est├í rodando como administrador'
+                False
+            [Disassembly]
+                0       RESUME                          0
+                2       NOP                             
+                4       LOAD_GLOBAL                     0: ctypes
+                14      LOAD_ATTR                       2: windll
+                34      LOAD_ATTR                       4: shell32
+                54      LOAD_ATTR                       7: IsUserAnAdmin
+                74      CALL                            0
+                82      RETURN_VALUE                    
+                84      PUSH_EXC_INFO                   
+                86      POP_TOP                         
+                88      POP_EXCEPT                      
+                90      RETURN_CONST                    1: False
+                92      COPY                            3
+                94      POP_EXCEPT                      
+                96      RERAISE                         1
+            [Exception Table]
+                4 to 82 -> 84 [0] 
+                84 to 88 -> 92 [1] lasti
+        [Code]
+            File Name: app.py
+            Object Name: run_as_admin
+            Qualified Name: run_as_admin
+            Arg Count: 0
+            Pos Only Arg Count: 0
+            KW Only Arg Count: 0
+            Stack Size: 8
+            Flags: 0x00000003 (CO_OPTIMIZED | CO_NEWLOCALS)
+            [Names]
+                'is_admin'
+                'ctypes'
+                'windll'
+                'user32'
+                'MessageBoxW'
+                'shell32'
+                'ShellExecuteW'
+                'sys'
+                'executable'
+                'join'
+                'argv'
+                'exit'
+                'Exception'
+                'print'
+            [Locals+Names]
+                'MB_YESNO'
+                'MB_ICONQUESTION'
+                'IDYES'
+                'resultado'
+                'e'
+            [Constants]
+                '\nSolicita eleva├º├úo para administrador de forma gentil.\nRetorna True se j├í ├® admin ou se o usu├írio aceitou reiniciar.\nRetorna False se o usu├írio recusou (continua sem admin).\n'
+                True
+                4
+                32
+                6
+                0
+                'TECH UNION SOLUTIONS\n\nPara melhor desempenho do sistema,\nrecomendamos executar como Administrador.\n\nDeseja continuar como Administrador?\n\nÔÇó SIM = Melhor desempenho (recomendado)\nÔÇó N├âO = Continuar normalmente\n\nÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ\nAo prosseguir, voc├¬ declara ser t├®cnico autorizado\ne assume total responsabilidade pelo uso desta\nferramenta. Consulte os Termos de Uso para mais\ninforma├º├Áes.'
+                'TECH UNION SOLUTIONS'
+                None
+                'runas'
+                ' '
+                1
+                'N├úo foi poss├¡vel obter permiss├Áes.\n\nO programa continuar├í normalmente.\nSe tiver problemas, tente executar como Administrador.'
+                'Aviso'
+                48
+                False
+                '[AVISO] Executando SEM permissoes de administrador'
+                '   Algumas funcoes de ADB/Fastboot podem apresentar erro 0xc0000005'
+            [Disassembly]
+                0       RESUME                          0
+                2       LOAD_GLOBAL                     1: NULL + is_admin
+                12      CALL                            0
+                20      TO_BOOL                         
+                28      POP_JUMP_IF_FALSE               1 (to 32)
+                32      RETURN_CONST                    1: True
+                34      LOAD_CONST                      2: 4
+                36      STORE_FAST                      0: MB_YESNO
+                38      LOAD_CONST                      3: 32
+                40      STORE_FAST                      1: MB_ICONQUESTION
+                42      LOAD_CONST                      4: 6
+                44      STORE_FAST                      2: IDYES
+                46      LOAD_GLOBAL                     2: ctypes
+                56      LOAD_ATTR                       4: windll
+                76      LOAD_ATTR                       6: user32
+                96      LOAD_ATTR                       9: MessageBoxW
+                116     LOAD_CONST                      5: 0
+                118     LOAD_CONST                      6: 'TECH UNION SOLUTIONS\n\nPara melhor desempenho do sistema,\nrecomendamos executar como Administrador.\n\nDeseja continuar como Administrador?\n\nÔÇó SIM = Melhor desempenho (recomendado)\nÔÇó N├âO = Continuar normalmente\n\nÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ\nAo prosseguir, voc├¬ declara ser t├®cnico autorizado\ne assume total responsabilidade pelo uso desta\nferramenta. Consulte os Termos de Uso para mais\ninforma├º├Áes.'
+                120     LOAD_CONST                      7: 'TECH UNION SOLUTIONS'
+                122     LOAD_FAST_LOAD_FAST             1: MB_YESNO, MB_ICONQUESTION
+                124     BINARY_OP                       7 (|)
+                128     CALL                            4
+                136     STORE_FAST                      3: resultado
+                138     LOAD_FAST_LOAD_FAST             50: resultado, IDYES
+                140     COMPARE_OP                      88 (==)
+                144     POP_JUMP_IF_FALSE               113 (to 372)
+                148     NOP                             
+                150     LOAD_GLOBAL                     2: ctypes
+                160     LOAD_ATTR                       4: windll
+                180     LOAD_ATTR                       10: shell32
+                200     LOAD_ATTR                       13: ShellExecuteW
+                220     LOAD_CONST                      8: None
+                222     LOAD_CONST                      9: 'runas'
+                224     LOAD_GLOBAL                     14: sys
+                234     LOAD_ATTR                       16: executable
+                254     LOAD_CONST                      10: ' '
+                256     LOAD_ATTR                       19: join
+                276     LOAD_GLOBAL                     14: sys
+                286     LOAD_ATTR                       20: argv
+                306     CALL                            1
+                314     LOAD_CONST                      8: None
+                316     LOAD_CONST                      11: 1
+                318     CALL                            6
+                326     POP_TOP                         
+                328     LOAD_GLOBAL                     14: sys
+                338     LOAD_ATTR                       22: exit
+                358     PUSH_NULL                       
+                360     LOAD_CONST                      5: 0
+                362     CALL                            1
+                370     POP_TOP                         
+                372     RETURN_CONST                    1: True
+                374     LOAD_GLOBAL                     27: NULL + print
+                384     LOAD_CONST                      16: '[AVISO] Executando SEM permissoes de administrador'
+                386     CALL                            1
+                394     POP_TOP                         
+                396     LOAD_GLOBAL                     27: NULL + print
+                406     LOAD_CONST                      17: '   Algumas funcoes de ADB/Fastboot podem apresentar erro 0xc0000005'
+                408     CALL                            1
+                416     POP_TOP                         
+                418     RETURN_CONST                    15: False
+                420     PUSH_EXC_INFO                   
+                422     LOAD_GLOBAL                     24: Exception
+                432     CHECK_EXC_MATCH                 
+                434     POP_JUMP_IF_FALSE               54 (to 544)
+                438     STORE_FAST                      4: e
+                440     LOAD_GLOBAL                     2: ctypes
+                450     LOAD_ATTR                       4: windll
+                470     LOAD_ATTR                       6: user32
+                490     LOAD_ATTR                       9: MessageBoxW
+                510     LOAD_CONST                      5: 0
+                512     LOAD_CONST                      12: 'N├úo foi poss├¡vel obter permiss├Áes.\n\nO programa continuar├í normalmente.\nSe tiver problemas, tente executar como Administrador.'
+                514     LOAD_CONST                      13: 'Aviso'
+                516     LOAD_CONST                      14: 48
+                518     CALL                            4
+                526     POP_TOP                         
+                528     POP_EXCEPT                      
+                530     LOAD_CONST                      8: None
+                532     STORE_FAST                      4: e
+                534     DELETE_FAST                     4: e
+                536     RETURN_CONST                    15: False
+                538     LOAD_CONST                      8: None
+                540     STORE_FAST                      4: e
+                542     DELETE_FAST                     4: e
+                544     RERAISE                         1
+                546     RERAISE                         0
+                548     COPY                            3
+                550     POP_EXCEPT                      
+                552     RERAISE                         1
+            [Exception Table]
+                150 to 372 -> 420 [0] 
+                420 to 440 -> 548 [1] lasti
+                440 to 528 -> 538 [1] lasti
+                538 to 548 -> 548 [1] lasti
+        '__main__'
+        '[OK] Executando como Administrador'
+        'AA_ShareOpenGLContexts'
+        (
+            'QWebEngineView'
+        )
+        '[OK] PyQtWebEngine inicializado com sucesso'
+        '[AVISO] PyQtWebEngine nao disponivel - navegador interno desabilitado'
+        '[AVISO] Erro ao inicializar PyQtWebEngine: '
+        'AA_EnableHighDpiScaling'
+        'AA_UseHighDpiPixmaps'
+        118
+        117
+        88
+        96
+        '[DPI] Fisico='
+        'x'
+        ' Logico='
+        ' Escala='
+        100
+        '% DPI='
+        '[DPI] GetDC falhou (RDP headless?) - HiDPI ativado por padrao'
+        '[DPI] Diagnostico de resolucao falhou - HiDPI ativado por padrao'
+        'UNION_TECHNICAL_SINGLE_INSTANCE'
+        'UNION TECHNICAL'
+        'O UNION TECHNICAL j├í est├í em execu├º├úo!\n\nVerifique na barra de tarefas ou feche a aplica├º├úo anterior antes de abrir novamente.'
+        'N├úo foi poss├¡vel iniciar a aplica├º├úo.\n\nO UNION TECHNICAL pode j├í estar em execu├º├úo.'
+        (
+            'scan'
+            'has_blocking'
+            'is_debugger_attached'
+            'generic_user_message'
+        )
+        'pre_login'
+        'Fusion'
+        'TechUnion'
+        'UNION'
+        'theme/dark_mode'
+        (
+            'type'
+        )
+        '[TEMA] Tema escuro (QDarkStyle) aplicado'
+        '[AVISO] qdarkstyle indisponivel: '
+        '[TEMA] Tema claro (Fusion padrao)'
+        'icon.png'
+    [Disassembly]
+        0       RESUME                          0
+        2       LOAD_CONST                      0: 0
+        4       LOAD_CONST                      1: None
+        6       IMPORT_NAME                     0: sys
+        8       STORE_NAME                      0: sys
+        10      LOAD_CONST                      0: 0
+        12      LOAD_CONST                      1: None
+        14      IMPORT_NAME                     1: os
+        16      STORE_NAME                      1: os
+        18      LOAD_CONST                      0: 0
+        20      LOAD_CONST                      1: None
+        22      IMPORT_NAME                     2: ctypes
+        24      STORE_NAME                      2: ctypes
+        26      LOAD_NAME                       0: sys
+        28      LOAD_ATTR                       6: platform
+        48      LOAD_CONST                      2: 'win32'
+        50      COMPARE_OP                      88 (==)
+        54      POP_JUMP_IF_FALSE               54 (to 164)
+        58      NOP                             
+        60      LOAD_NAME                       2: ctypes
+        62      LOAD_ATTR                       8: windll
+        82      LOAD_ATTR                       10: user32
+        102     LOAD_ATTR                       13: SetProcessDpiAwarenessContext
+        122     LOAD_NAME                       2: ctypes
+        124     LOAD_ATTR                       14: c_void_p
+        144     PUSH_NULL                       
+        146     LOAD_CONST                      3: -4
+        148     CALL                            1
+        156     CALL                            1
+        164     POP_TOP                         
+        166     LOAD_NAME                       11: getattr
+        168     PUSH_NULL                       
+        170     LOAD_NAME                       0: sys
+        172     LOAD_CONST                      5: 'frozen'
+        174     LOAD_CONST                      6: False
+        176     CALL                            3
+        184     TO_BOOL                         
+        192     POP_JUMP_IF_FALSE               135 (to 464)
+        196     NOP                             
+        198     LOAD_CONST                      0: 0
+        200     LOAD_CONST                      1: None
+        202     IMPORT_NAME                     12: win32com
+        204     STORE_NAME                      12: win32com
+        206     LOAD_NAME                       1: os
+        208     LOAD_ATTR                       26: path
+        228     LOAD_ATTR                       29: join
+        248     LOAD_NAME                       1: os
+        250     LOAD_ATTR                       30: environ
+        270     LOAD_ATTR                       33: get
+        290     LOAD_CONST                      7: 'LOCALAPPDATA'
+        292     LOAD_NAME                       1: os
+        294     LOAD_ATTR                       30: environ
+        314     LOAD_ATTR                       33: get
+        334     LOAD_CONST                      8: 'TEMP'
+        336     LOAD_NAME                       1: os
+        338     LOAD_ATTR                       26: path
+        358     LOAD_ATTR                       35: expanduser
+        378     LOAD_CONST                      9: '~'
+        380     CALL                            1
+        388     CALL                            2
+        396     CALL                            2
+        404     LOAD_CONST                      10: 'RESTORECELL'
+        406     LOAD_CONST                      11: 'gen_py'
+        408     CALL                            3
+        416     STORE_NAME                      18: _gen_py
+        418     LOAD_NAME                       1: os
+        420     LOAD_ATTR                       38: makedirs
+        440     PUSH_NULL                       
+        442     LOAD_NAME                       18: _gen_py
+        444     LOAD_CONST                      12: True
+        446     LOAD_CONST                      13: ('exist_ok',)
+        448     CALL_KW                         2
+        450     POP_TOP                         
+        452     LOAD_NAME                       18: _gen_py
+        454     LOAD_NAME                       12: win32com
+        456     STORE_ATTR                      20: __gen_path__
+        466     LOAD_CONST                      0: 0
+        468     LOAD_CONST                      14: ('QApplication', 'QMessageBox')
+        470     IMPORT_NAME                     21: PyQt5.QtWidgets
+        472     IMPORT_FROM                     22: QApplication
+        474     STORE_NAME                      22: QApplication
+        476     IMPORT_FROM                     23: QMessageBox
+        478     STORE_NAME                      23: QMessageBox
+        480     POP_TOP                         
+        482     LOAD_CONST                      0: 0
+        484     LOAD_CONST                      15: ('QIcon',)
+        486     IMPORT_NAME                     24: PyQt5.QtGui
+        488     IMPORT_FROM                     25: QIcon
+        490     STORE_NAME                      25: QIcon
+        492     POP_TOP                         
+        494     LOAD_CONST                      0: 0
+        496     LOAD_CONST                      16: ('QSharedMemory', 'Qt', 'QSettings')
+        498     IMPORT_NAME                     26: PyQt5.QtCore
+        500     IMPORT_FROM                     27: QSharedMemory
+        502     STORE_NAME                      27: QSharedMemory
+        504     IMPORT_FROM                     28: Qt
+        506     STORE_NAME                      28: Qt
+        508     IMPORT_FROM                     29: QSettings
+        510     STORE_NAME                      29: QSettings
+        512     POP_TOP                         
+        514     NOP                             
+        516     LOAD_CONST                      0: 0
+        518     LOAD_CONST                      17: ('activate',)
+        520     IMPORT_NAME                     30: app.utils._import_hook
+        522     IMPORT_FROM                     31: activate
+        524     STORE_NAME                      32: _activate_hook
+        526     POP_TOP                         
+        528     LOAD_NAME                       32: _activate_hook
+        530     PUSH_NULL                       
+        532     CALL                            0
+        540     POP_TOP                         
+        542     NOP                             
+        544     LOAD_CONST                      0: 0
+        546     LOAD_CONST                      18: ('LoginWindow',)
+        548     IMPORT_NAME                     33: app.views.login_window
+        550     IMPORT_FROM                     34: LoginWindow
+        552     STORE_NAME                      34: LoginWindow
+        554     POP_TOP                         
+        556     LOAD_CONST                      0: 0
+        558     LOAD_CONST                      19: ('PathManager',)
+        560     IMPORT_NAME                     35: app.utils.path_manager
+        562     IMPORT_FROM                     36: PathManager
+        564     STORE_NAME                      36: PathManager
+        566     POP_TOP                         
+        568     LOAD_CONST                      38: <CODE> is_admin
+        570     MAKE_FUNCTION                   
+        572     STORE_NAME                      58: is_admin
+        574     LOAD_CONST                      39: <CODE> run_as_admin
+        576     MAKE_FUNCTION                   
+        578     STORE_NAME                      59: run_as_admin
+        580     LOAD_NAME                       54: __name__
+        582     LOAD_CONST                      40: '__main__'
+        584     COMPARE_OP                      88 (==)
+        588     POP_JUMP_IF_FALSE               857 (to 2306)
+        594     NOP                             
+        596     LOAD_NAME                       59: run_as_admin
+        598     PUSH_NULL                       
+        600     CALL                            0
+        608     STORE_NAME                      60: admin_status
+        610     LOAD_NAME                       60: admin_status
+        612     TO_BOOL                         
+        620     POP_JUMP_IF_FALSE               8 (to 638)
+        624     LOAD_NAME                       56: print
+        626     PUSH_NULL                       
+        628     LOAD_CONST                      41: '[OK] Executando como Administrador'
+        630     CALL                            1
+        638     POP_TOP                         
+        640     LOAD_NAME                       62: hasattr
+        642     PUSH_NULL                       
+        644     LOAD_NAME                       28: Qt
+        646     LOAD_CONST                      42: 'AA_ShareOpenGLContexts'
+        648     CALL                            2
+        656     TO_BOOL                         
+        664     POP_JUMP_IF_FALSE               29 (to 724)
+        668     LOAD_NAME                       22: QApplication
+        670     LOAD_ATTR                       126: setAttribute
+        690     PUSH_NULL                       
+        692     LOAD_NAME                       28: Qt
+        694     LOAD_ATTR                       128: AA_ShareOpenGLContexts
+        714     LOAD_CONST                      12: True
+        716     CALL                            2
+        724     POP_TOP                         
+        726     NOP                             
+        728     LOAD_CONST                      0: 0
+        730     LOAD_CONST                      43: ('QWebEngineView',)
+        732     IMPORT_NAME                     65: PyQt5.QtWebEngineWidgets
+        734     IMPORT_FROM                     66: QWebEngineView
+        736     STORE_NAME                      66: QWebEngineView
+        738     POP_TOP                         
+        740     LOAD_NAME                       56: print
+        742     PUSH_NULL                       
+        744     LOAD_CONST                      44: '[OK] PyQtWebEngine inicializado com sucesso'
+        746     CALL                            1
+        754     POP_TOP                         
+        756     LOAD_NAME                       62: hasattr
+        758     PUSH_NULL                       
+        760     LOAD_NAME                       28: Qt
+        762     LOAD_CONST                      47: 'AA_EnableHighDpiScaling'
+        764     CALL                            2
+        772     TO_BOOL                         
+        780     POP_JUMP_IF_FALSE               29 (to 840)
+        784     LOAD_NAME                       22: QApplication
+        786     LOAD_ATTR                       126: setAttribute
+        806     PUSH_NULL                       
+        808     LOAD_NAME                       28: Qt
+        810     LOAD_ATTR                       136: AA_EnableHighDpiScaling
+        830     LOAD_CONST                      12: True
+        832     CALL                            2
+        840     POP_TOP                         
+        842     LOAD_NAME                       62: hasattr
+        844     PUSH_NULL                       
+        846     LOAD_NAME                       28: Qt
+        848     LOAD_CONST                      48: 'AA_UseHighDpiPixmaps'
+        850     CALL                            2
+        858     TO_BOOL                         
+        866     POP_JUMP_IF_FALSE               29 (to 926)
+        870     LOAD_NAME                       22: QApplication
+        872     LOAD_ATTR                       126: setAttribute
+        892     PUSH_NULL                       
+        894     LOAD_NAME                       28: Qt
+        896     LOAD_ATTR                       138: AA_UseHighDpiPixmaps
+        916     LOAD_CONST                      12: True
+        918     CALL                            2
+        926     POP_TOP                         
+        928     NOP                             
+        930     LOAD_NAME                       2: ctypes
+        932     LOAD_ATTR                       8: windll
+        952     LOAD_ATTR                       10: user32
+        972     STORE_NAME                      70: _user32
+        974     LOAD_NAME                       2: ctypes
+        976     LOAD_ATTR                       8: windll
+        996     LOAD_ATTR                       142: gdi32
+        1016    STORE_NAME                      72: _gdi32
+        1018    LOAD_NAME                       70: _user32
+        1020    LOAD_ATTR                       147: GetDC
+        1040    LOAD_CONST                      0: 0
+        1042    CALL                            1
+        1050    STORE_NAME                      74: _hdc
+        1052    LOAD_NAME                       74: _hdc
+        1054    TO_BOOL                         
+        1062    POP_JUMP_IF_FALSE               142 (to 1348)
+        1066    LOAD_NAME                       72: _gdi32
+        1068    LOAD_ATTR                       151: GetDeviceCaps
+        1088    LOAD_NAME                       74: _hdc
+        1090    LOAD_CONST                      49: 118
+        1092    CALL                            2
+        1100    STORE_NAME                      76: _phys_w
+        1102    LOAD_NAME                       72: _gdi32
+        1104    LOAD_ATTR                       151: GetDeviceCaps
+        1124    LOAD_NAME                       74: _hdc
+        1126    LOAD_CONST                      50: 117
+        1128    CALL                            2
+        1136    STORE_NAME                      77: _phys_h
+        1138    LOAD_NAME                       72: _gdi32
+        1140    LOAD_ATTR                       151: GetDeviceCaps
+        1160    LOAD_NAME                       74: _hdc
+        1162    LOAD_CONST                      51: 88
+        1164    CALL                            2
+        1172    STORE_NAME                      78: _dpi
+        1174    LOAD_NAME                       70: _user32
+        1176    LOAD_ATTR                       159: ReleaseDC
+        1196    LOAD_CONST                      0: 0
+        1198    LOAD_NAME                       74: _hdc
+        1200    CALL                            2
+        1208    POP_TOP                         
+        1210    LOAD_NAME                       80: round
+        1212    PUSH_NULL                       
+        1214    LOAD_NAME                       78: _dpi
+        1216    LOAD_CONST                      52: 96
+        1218    BINARY_OP                       11 (/)
+        1222    LOAD_CONST                      4: 2
+        1224    CALL                            2
+        1232    STORE_NAME                      81: _scale
+        1234    LOAD_NAME                       82: int
+        1236    PUSH_NULL                       
+        1238    LOAD_NAME                       76: _phys_w
+        1240    LOAD_NAME                       81: _scale
+        1242    BINARY_OP                       11 (/)
+        1246    CALL                            1
+        1254    STORE_NAME                      83: _log_w
+        1256    LOAD_NAME                       82: int
+        1258    PUSH_NULL                       
+        1260    LOAD_NAME                       77: _phys_h
+        1262    LOAD_NAME                       81: _scale
+        1264    BINARY_OP                       11 (/)
+        1268    CALL                            1
+        1276    STORE_NAME                      84: _log_h
+        1278    LOAD_NAME                       56: print
+        1280    PUSH_NULL                       
+        1282    LOAD_CONST                      53: '[DPI] Fisico='
+        1284    LOAD_NAME                       76: _phys_w
+        1286    FORMAT_SIMPLE                   
+        1288    LOAD_CONST                      54: 'x'
+        1290    LOAD_NAME                       77: _phys_h
+        1292    FORMAT_SIMPLE                   
+        1294    LOAD_CONST                      55: ' Logico='
+        1296    LOAD_NAME                       83: _log_w
+        1298    FORMAT_SIMPLE                   
+        1300    LOAD_CONST                      54: 'x'
+        1302    LOAD_NAME                       84: _log_h
+        1304    FORMAT_SIMPLE                   
+        1306    LOAD_CONST                      56: ' Escala='
+        1308    LOAD_NAME                       82: int
+        1310    PUSH_NULL                       
+        1312    LOAD_NAME                       81: _scale
+        1314    LOAD_CONST                      57: 100
+        1316    BINARY_OP                       5 (*)
+        1320    CALL                            1
+        1328    FORMAT_SIMPLE                   
+        1330    LOAD_CONST                      58: '% DPI='
+        1332    LOAD_NAME                       78: _dpi
+        1334    FORMAT_SIMPLE                   
+        1336    BUILD_STRING                    12
+        1338    CALL                            1
+        1346    POP_TOP                         
+        1348    JUMP_FORWARD                    9 (to 1368)
+        1350    LOAD_NAME                       56: print
+        1352    PUSH_NULL                       
+        1354    LOAD_CONST                      59: '[DPI] GetDC falhou (RDP headless?) - HiDPI ativado por padrao'
+        1356    CALL                            1
+        1364    POP_TOP                         
+        1366    NOP                             
+        1368    LOAD_NAME                       22: QApplication
+        1370    PUSH_NULL                       
+        1372    LOAD_NAME                       0: sys
+        1374    LOAD_ATTR                       170: argv
+        1394    CALL                            1
+        1402    STORE_NAME                      86: app
+        1404    LOAD_NAME                       27: QSharedMemory
+        1406    PUSH_NULL                       
+        1408    LOAD_CONST                      61: 'UNION_TECHNICAL_SINGLE_INSTANCE'
+        1410    CALL                            1
+        1418    STORE_NAME                      87: shared_memory
+        1420    LOAD_NAME                       87: shared_memory
+        1422    LOAD_ATTR                       177: attach
+        1442    CALL                            0
+        1450    TO_BOOL                         
+        1458    POP_JUMP_IF_FALSE               38 (to 1536)
+        1462    LOAD_NAME                       23: QMessageBox
+        1464    LOAD_ATTR                       178: warning
+        1484    PUSH_NULL                       
+        1486    LOAD_CONST                      1: None
+        1488    LOAD_CONST                      62: 'UNION TECHNICAL'
+        1490    LOAD_CONST                      63: 'O UNION TECHNICAL j├í est├í em execu├º├úo!\n\nVerifique na barra de tarefas ou feche a aplica├º├úo anterior antes de abrir novamente.'
+        1492    CALL                            3
+        1500    POP_TOP                         
+        1502    LOAD_NAME                       0: sys
+        1504    LOAD_ATTR                       114: exit
+        1524    PUSH_NULL                       
+        1526    LOAD_CONST                      37: 1
+        1528    CALL                            1
+        1536    POP_TOP                         
+        1538    LOAD_NAME                       87: shared_memory
+        1540    LOAD_ATTR                       181: create
+        1560    LOAD_CONST                      37: 1
+        1562    CALL                            1
+        1570    TO_BOOL                         
+        1578    POP_JUMP_IF_TRUE                38 (to 1656)
+        1582    LOAD_NAME                       23: QMessageBox
+        1584    LOAD_ATTR                       178: warning
+        1604    PUSH_NULL                       
+        1606    LOAD_CONST                      1: None
+        1608    LOAD_CONST                      62: 'UNION TECHNICAL'
+        1610    LOAD_CONST                      64: 'N├úo foi poss├¡vel iniciar a aplica├º├úo.\n\nO UNION TECHNICAL pode j├í estar em execu├º├úo.'
+        1612    CALL                            3
+        1620    POP_TOP                         
+        1622    LOAD_NAME                       0: sys
+        1624    LOAD_ATTR                       114: exit
+        1644    PUSH_NULL                       
+        1646    LOAD_CONST                      37: 1
+        1648    CALL                            1
+        1656    POP_TOP                         
+        1658    NOP                             
+        1660    LOAD_CONST                      0: 0
+        1662    LOAD_CONST                      65: ('scan', 'has_blocking', 'is_debugger_attached', 'generic_user_message')
+        1664    IMPORT_NAME                     91: app.utils._cfg_probe
+        1666    IMPORT_FROM                     92: scan
+        1668    STORE_NAME                      93: _guard_scan
+        1670    IMPORT_FROM                     94: has_blocking
+        1672    STORE_NAME                      95: _guard_has_blocking
+        1674    IMPORT_FROM                     96: is_debugger_attached
+        1676    STORE_NAME                      97: _guard_is_dbg
+        1678    IMPORT_FROM                     98: generic_user_message
+        1680    STORE_NAME                      99: _guard_msg
+        1682    POP_TOP                         
+        1684    LOAD_NAME                       93: _guard_scan
+        1686    PUSH_NULL                       
+        1688    CALL                            0
+        1696    STORE_NAME                      100: _guard_dets
+        1698    LOAD_NAME                       97: _guard_is_dbg
+        1700    PUSH_NULL                       
+        1702    CALL                            0
+        1710    STORE_NAME                      101: _guard_dbg
+        1712    LOAD_NAME                       95: _guard_has_blocking
+        1714    PUSH_NULL                       
+        1716    LOAD_NAME                       100: _guard_dets
+        1718    CALL                            1
+        1726    TO_BOOL                         
+        1734    POP_JUMP_IF_TRUE                7 (to 1750)
+        1738    LOAD_NAME                       101: _guard_dbg
+        1740    TO_BOOL                         
+        1748    POP_JUMP_IF_FALSE               61 (to 1872)
+        1752    LOAD_NAME                       23: QMessageBox
+        1754    LOAD_ATTR                       204: critical
+        1774    PUSH_NULL                       
+        1776    LOAD_CONST                      1: None
+        1778    LOAD_CONST                      35: 'TECH UNION SOLUTIONS'
+        1780    LOAD_NAME                       99: _guard_msg
+        1782    PUSH_NULL                       
+        1784    LOAD_CONST                      66: 'pre_login'
+        1786    CALL                            1
+        1794    CALL                            3
+        1802    POP_TOP                         
+        1804    NOP                             
+        1806    LOAD_NAME                       87: shared_memory
+        1808    LOAD_ATTR                       207: detach
+        1828    CALL                            0
+        1836    POP_TOP                         
+        1838    LOAD_NAME                       0: sys
+        1840    LOAD_ATTR                       114: exit
+        1860    PUSH_NULL                       
+        1862    LOAD_CONST                      0: 0
+        1864    CALL                            1
+        1872    POP_TOP                         
+        1874    LOAD_NAME                       86: app
+        1876    LOAD_ATTR                       211: setStyle
+        1896    LOAD_CONST                      67: 'Fusion'
+        1898    CALL                            1
+        1906    POP_TOP                         
+        1908    LOAD_NAME                       29: QSettings
+        1910    PUSH_NULL                       
+        1912    LOAD_CONST                      68: 'TechUnion'
+        1914    LOAD_CONST                      69: 'UNION'
+        1916    CALL                            2
+        1924    STORE_NAME                      106: _settings
+        1926    LOAD_NAME                       106: _settings
+        1928    LOAD_ATTR                       215: value
+        1948    LOAD_CONST                      70: 'theme/dark_mode'
+        1950    LOAD_CONST                      6: False
+        1952    LOAD_NAME                       108: bool
+        1954    LOAD_CONST                      71: ('type',)
+        1956    CALL_KW                         3
+        1958    TO_BOOL                         
+        1966    POP_JUMP_IF_FALSE               46 (to 2060)
+        1970    NOP                             
+        1972    LOAD_CONST                      0: 0
+        1974    LOAD_CONST                      1: None
+        1976    IMPORT_NAME                     109: qdarkstyle
+        1978    STORE_NAME                      109: qdarkstyle
+        1980    LOAD_NAME                       86: app
+        1982    LOAD_ATTR                       221: setStyleSheet
+        2002    LOAD_NAME                       109: qdarkstyle
+        2004    LOAD_ATTR                       222: load_stylesheet_pyqt5
+        2024    PUSH_NULL                       
+        2026    CALL                            0
+        2034    CALL                            1
+        2042    POP_TOP                         
+        2044    LOAD_NAME                       56: print
+        2046    PUSH_NULL                       
+        2048    LOAD_CONST                      72: '[TEMA] Tema escuro (QDarkStyle) aplicado'
+        2050    CALL                            1
+        2058    POP_TOP                         
+        2060    JUMP_FORWARD                    8 (to 2078)
+        2062    LOAD_NAME                       56: print
+        2064    PUSH_NULL                       
+        2066    LOAD_CONST                      74: '[TEMA] Tema claro (Fusion padrao)'
+        2068    CALL                            1
+        2076    POP_TOP                         
+        2078    LOAD_NAME                       25: QIcon
+        2080    PUSH_NULL                       
+        2082    LOAD_NAME                       36: PathManager
+        2084    LOAD_ATTR                       224: get_resource_path
+        2104    PUSH_NULL                       
+        2106    LOAD_CONST                      75: 'icon.png'
+        2108    CALL                            1
+        2116    CALL                            1
+        2124    STORE_NAME                      113: icon
+        2126    LOAD_NAME                       86: app
+        2128    LOAD_ATTR                       229: setWindowIcon
+        2148    LOAD_NAME                       113: icon
+        2150    CALL                            1
+        2158    POP_TOP                         
+        2160    LOAD_NAME                       34: LoginWindow
+        2162    PUSH_NULL                       
+        2164    CALL                            0
+        2172    STORE_NAME                      115: login
+        2174    LOAD_NAME                       115: login
+        2176    LOAD_ATTR                       233: show
+        2196    CALL                            0
+        2204    POP_TOP                         
+        2206    LOAD_NAME                       86: app
+        2208    LOAD_ATTR                       235: exec_
+        2228    CALL                            0
+        2236    STORE_NAME                      118: exit_code
+        2238    LOAD_NAME                       87: shared_memory
+        2240    LOAD_ATTR                       207: detach
+        2260    CALL                            0
+        2268    POP_TOP                         
+        2270    LOAD_NAME                       0: sys
+        2272    LOAD_ATTR                       114: exit
+        2292    PUSH_NULL                       
+        2294    LOAD_NAME                       118: exit_code
+        2296    CALL                            1
+        2304    POP_TOP                         
+        2306    RETURN_CONST                    1: None
+        2308    RETURN_CONST                    1: None
+        2310    PUSH_EXC_INFO                   
+        2312    LOAD_NAME                       8: Exception
+        2314    CHECK_EXC_MATCH                 
+        2316    POP_JUMP_IF_FALSE               56 (to 2430)
+        2320    POP_TOP                         
+        2322    NOP                             
+        2324    LOAD_NAME                       2: ctypes
+        2326    LOAD_ATTR                       8: windll
+        2346    LOAD_ATTR                       18: shcore
+        2366    LOAD_ATTR                       21: SetProcessDpiAwareness
+        2386    LOAD_CONST                      4: 2
+        2388    CALL                            1
+        2396    POP_TOP                         
+        2398    POP_EXCEPT                      
+        2400    JUMP_BACKWARD_NO_INTERRUPT      1119 (to 166)
+        2404    PUSH_EXC_INFO                   
+        2406    LOAD_NAME                       8: Exception
+        2408    CHECK_EXC_MATCH                 
+        2410    POP_JUMP_IF_FALSE               5 (to 2422)
+        2414    POP_TOP                         
+        2416    POP_EXCEPT                      
+        2418    POP_EXCEPT                      
+        2420    JUMP_BACKWARD_NO_INTERRUPT      1129 (to 166)
+        2424    RERAISE                         0
+        2426    COPY                            3
+        2428    POP_EXCEPT                      
+        2430    RERAISE                         1
+        2432    RERAISE                         0
+        2434    COPY                            3
+        2436    POP_EXCEPT                      
+        2438    RERAISE                         1
+        2440    PUSH_EXC_INFO                   
+        2442    LOAD_NAME                       8: Exception
+        2444    CHECK_EXC_MATCH                 
+        2446    POP_JUMP_IF_FALSE               4 (to 2456)
+        2450    POP_TOP                         
+        2452    POP_EXCEPT                      
+        2454    JUMP_BACKWARD_NO_INTERRUPT      996 (to 466)
+        2458    RERAISE                         0
+        2460    COPY                            3
+        2462    POP_EXCEPT                      
+        2464    RERAISE                         1
+        2466    PUSH_EXC_INFO                   
+        2468    LOAD_NAME                       8: Exception
+        2470    CHECK_EXC_MATCH                 
+        2472    POP_JUMP_IF_FALSE               4 (to 2482)
+        2476    POP_TOP                         
+        2478    POP_EXCEPT                      
+        2480    JUMP_BACKWARD_NO_INTERRUPT      971 (to 542)
+        2484    RERAISE                         0
+        2486    COPY                            3
+        2488    POP_EXCEPT                      
+        2490    RERAISE                         1
+        2492    PUSH_EXC_INFO                   
+        2494    LOAD_NAME                       37: ImportError
+        2496    CHECK_EXC_MATCH                 
+        2498    POP_JUMP_IF_FALSE               450 (to 3402)
+        2504    STORE_NAME                      38: _imp_err
+        2506    LOAD_NAME                       39: str
+        2508    PUSH_NULL                       
+        2510    LOAD_NAME                       38: _imp_err
+        2512    CALL                            1
+        2520    LOAD_ATTR                       81: lower
+        2540    CALL                            0
+        2548    STORE_NAME                      41: _msg_low
+        2550    LOAD_NAME                       42: any
+        2552    PUSH_NULL                       
+        2554    LOAD_CONST                      20: <CODE> <genexpr>
+        2556    MAKE_FUNCTION                   
+        2558    LOAD_CONST                      21: ('dll load failed', 'policy', 'pol├¡', 'bloqueou', 'blocked')
+        2560    GET_ITER                        
+        2562    CALL                            0
+        2570    CALL                            1
+        2578    STORE_NAME                      43: _is_policy_block
+        2580    LOAD_NAME                       43: _is_policy_block
+        2582    TO_BOOL                         
+        2590    POP_JUMP_IF_FALSE               3 (to 2598)
+        2594    LOAD_CONST                      22: "TECH UNION SOLUTIONS - Inicializacao Bloqueada\n\nUm componente do sistema foi bloqueado pela politica de\nseguranca do Windows.\n\nPossiveis solucoes:\n  1. Clique com o botao direito no programa e escolha\n     'Executar como Administrador'\n\n  2. Mova o programa para a pasta C:\\UNION\\ e tente novamente\n\n  3. No Windows 11: Configuracoes > Privacidade e seguranca >\n     Seguranca do Windows > Controle de aplicativos e navegador\n     > desative o 'Controle inteligente de aplicativos'\n\n  4. Se o problema persistir, contate o suporte tecnico\n\nCodigo: INIT-001"
+        2596    STORE_NAME                      44: _user_msg
+        2598    JUMP_FORWARD                    2 (to 2604)
+        2600    LOAD_CONST                      23: 'TECH UNION SOLUTIONS - Erro de Inicializacao\n\nNao foi possivel iniciar um componente do sistema.\n\nTente reinstalar o aplicativo ou contate o suporte tecnico.\n\nCodigo: INIT-002'
+        2602    STORE_NAME                      44: _user_msg
+        2604    NOP                             
+        2606    LOAD_CONST                      0: 0
+        2608    LOAD_CONST                      1: None
+        2610    IMPORT_NAME                     45: datetime
+        2612    STORE_NAME                      46: _dt
+        2614    LOAD_NAME                       1: os
+        2616    LOAD_ATTR                       26: path
+        2636    LOAD_ATTR                       29: join
+        2656    LOAD_NAME                       1: os
+        2658    LOAD_ATTR                       30: environ
+        2678    LOAD_ATTR                       33: get
+        2698    LOAD_CONST                      7: 'LOCALAPPDATA'
+        2700    LOAD_NAME                       1: os
+        2702    LOAD_ATTR                       30: environ
+        2722    LOAD_ATTR                       33: get
+        2742    LOAD_CONST                      8: 'TEMP'
+        2744    LOAD_NAME                       1: os
+        2746    LOAD_ATTR                       26: path
+        2766    LOAD_ATTR                       35: expanduser
+        2786    LOAD_CONST                      9: '~'
+        2788    CALL                            1
+        2796    CALL                            2
+        2804    CALL                            2
+        2812    LOAD_CONST                      10: 'RESTORECELL'
+        2814    CALL                            2
+        2822    STORE_NAME                      47: _log_dir
+        2824    LOAD_NAME                       1: os
+        2826    LOAD_ATTR                       38: makedirs
+        2846    PUSH_NULL                       
+        2848    LOAD_NAME                       47: _log_dir
+        2850    LOAD_CONST                      12: True
+        2852    LOAD_CONST                      13: ('exist_ok',)
+        2854    CALL_KW                         2
+        2856    POP_TOP                         
+        2858    LOAD_NAME                       48: open
+        2860    PUSH_NULL                       
+        2862    LOAD_NAME                       1: os
+        2864    LOAD_ATTR                       26: path
+        2884    LOAD_ATTR                       29: join
+        2904    LOAD_NAME                       47: _log_dir
+        2906    LOAD_CONST                      24: 'startup_error.log'
+        2908    CALL                            2
+        2916    LOAD_CONST                      25: 'a'
+        2918    LOAD_CONST                      26: 'utf-8'
+        2920    LOAD_CONST                      27: ('encoding',)
+        2922    CALL_KW                         3
+        2924    BEFORE_WITH                     
+        2926    STORE_NAME                      49: _lf
+        2928    LOAD_NAME                       49: _lf
+        2930    LOAD_ATTR                       101: write
+        2950    LOAD_CONST                      28: '['
+        2952    LOAD_NAME                       46: _dt
+        2954    LOAD_ATTR                       90: datetime
+        2974    LOAD_ATTR                       103: now
+        2994    CALL                            0
+        3002    LOAD_ATTR                       105: isoformat
+        3022    CALL                            0
+        3030    FORMAT_SIMPLE                   
+        3032    LOAD_CONST                      29: '] '
+        3034    LOAD_NAME                       43: _is_policy_block
+        3036    TO_BOOL                         
+        3044    POP_JUMP_IF_FALSE               2 (to 3050)
+        3048    LOAD_CONST                      30: 'INIT-001'
+        3050    JUMP_FORWARD                    1 (to 3054)
+        3052    LOAD_CONST                      31: 'INIT-002'
+        3054    FORMAT_SIMPLE                   
+        3056    LOAD_CONST                      32: ' type='
+        3058    LOAD_NAME                       53: type
+        3060    PUSH_NULL                       
+        3062    LOAD_NAME                       38: _imp_err
+        3064    CALL                            1
+        3072    LOAD_ATTR                       108: __name__
+        3092    FORMAT_SIMPLE                   
+        3094    LOAD_CONST                      33: ' is_policy='
+        3096    LOAD_NAME                       43: _is_policy_block
+        3098    FORMAT_SIMPLE                   
+        3100    LOAD_CONST                      34: '\n'
+        3102    BUILD_STRING                    9
+        3104    CALL                            1
+        3112    POP_TOP                         
+        3114    LOAD_CONST                      1: None
+        3116    LOAD_CONST                      1: None
+        3118    LOAD_CONST                      1: None
+        3120    CALL                            2
+        3128    POP_TOP                         
+        3130    JUMP_FORWARD                    29 (to 3190)
+        3132    PUSH_EXC_INFO                   
+        3134    WITH_EXCEPT_START               
+        3136    TO_BOOL                         
+        3144    POP_JUMP_IF_TRUE                1 (to 3148)
+        3148    RERAISE                         2
+        3150    POP_TOP                         
+        3152    POP_EXCEPT                      
+        3154    POP_TOP                         
+        3156    POP_TOP                         
+        3158    JUMP_FORWARD                    15 (to 3190)
+        3160    COPY                            3
+        3162    POP_EXCEPT                      
+        3164    RERAISE                         1
+        3166    PUSH_EXC_INFO                   
+        3168    LOAD_NAME                       8: Exception
+        3170    CHECK_EXC_MATCH                 
+        3172    POP_JUMP_IF_FALSE               3 (to 3180)
+        3176    POP_TOP                         
+        3178    POP_EXCEPT                      
+        3180    JUMP_FORWARD                    4 (to 3190)
+        3182    RERAISE                         0
+        3184    COPY                            3
+        3186    POP_EXCEPT                      
+        3188    RERAISE                         1
+        3190    NOP                             
+        3192    LOAD_NAME                       0: sys
+        3194    LOAD_ATTR                       6: platform
+        3214    LOAD_CONST                      2: 'win32'
+        3216    COMPARE_OP                      88 (==)
+        3220    POP_JUMP_IF_FALSE               41 (to 3304)
+        3224    LOAD_NAME                       2: ctypes
+        3226    LOAD_ATTR                       8: windll
+        3246    LOAD_ATTR                       10: user32
+        3266    LOAD_ATTR                       111: MessageBoxW
+        3286    LOAD_CONST                      0: 0
+        3288    LOAD_NAME                       44: _user_msg
+        3290    LOAD_CONST                      35: 'TECH UNION SOLUTIONS'
+        3292    LOAD_CONST                      36: 16
+        3294    CALL                            4
+        3302    POP_TOP                         
+        3304    JUMP_FORWARD                    21 (to 3348)
+        3306    LOAD_NAME                       56: print
+        3308    PUSH_NULL                       
+        3310    LOAD_NAME                       44: _user_msg
+        3312    CALL                            1
+        3320    POP_TOP                         
+        3322    JUMP_FORWARD                    12 (to 3348)
+        3324    PUSH_EXC_INFO                   
+        3326    LOAD_NAME                       8: Exception
+        3328    CHECK_EXC_MATCH                 
+        3330    POP_JUMP_IF_FALSE               3 (to 3338)
+        3334    POP_TOP                         
+        3336    POP_EXCEPT                      
+        3338    JUMP_FORWARD                    4 (to 3348)
+        3340    RERAISE                         0
+        3342    COPY                            3
+        3344    POP_EXCEPT                      
+        3346    RERAISE                         1
+        3348    LOAD_NAME                       0: sys
+        3350    LOAD_ATTR                       114: exit
+        3370    PUSH_NULL                       
+        3372    LOAD_CONST                      37: 1
+        3374    CALL                            1
+        3382    POP_TOP                         
+        3384    POP_EXCEPT                      
+        3386    LOAD_CONST                      1: None
+        3388    STORE_NAME                      38: _imp_err
+        3390    DELETE_NAME                     38: _imp_err
+        3392    JUMP_BACKWARD_NO_INTERRUPT      1414 (to 568)
+        3396    LOAD_CONST                      1: None
+        3398    STORE_NAME                      38: _imp_err
+        3400    DELETE_NAME                     38: _imp_err
+        3402    RERAISE                         1
+        3404    RERAISE                         0
+        3406    COPY                            3
+        3408    POP_EXCEPT                      
+        3410    RERAISE                         1
+        3412    PUSH_EXC_INFO                   
+        3414    LOAD_NAME                       61: KeyboardInterrupt
+        3416    CHECK_EXC_MATCH                 
+        3418    POP_JUMP_IF_FALSE               22 (to 3464)
+        3422    POP_TOP                         
+        3424    LOAD_NAME                       0: sys
+        3426    LOAD_ATTR                       114: exit
+        3446    PUSH_NULL                       
+        3448    LOAD_CONST                      0: 0
+        3450    CALL                            1
+        3458    POP_TOP                         
+        3460    POP_EXCEPT                      
+        3462    JUMP_BACKWARD_NO_INTERRUPT      1428 (to 610)
+        3466    RERAISE                         0
+        3468    COPY                            3
+        3470    POP_EXCEPT                      
+        3472    RERAISE                         1
+        3474    PUSH_EXC_INFO                   
+        3476    LOAD_NAME                       37: ImportError
+        3478    CHECK_EXC_MATCH                 
+        3480    POP_JUMP_IF_FALSE               12 (to 3506)
+        3484    POP_TOP                         
+        3486    LOAD_NAME                       56: print
+        3488    PUSH_NULL                       
+        3490    LOAD_CONST                      45: '[AVISO] PyQtWebEngine nao disponivel - navegador interno desabilitado'
+        3492    CALL                            1
+        3500    POP_TOP                         
+        3502    POP_EXCEPT                      
+        3504    JUMP_BACKWARD_NO_INTERRUPT      1376 (to 756)
+        3508    LOAD_NAME                       8: Exception
+        3510    CHECK_EXC_MATCH                 
+        3512    POP_JUMP_IF_FALSE               38 (to 3590)
+        3516    STORE_NAME                      67: e
+        3518    LOAD_NAME                       56: print
+        3520    PUSH_NULL                       
+        3522    LOAD_CONST                      46: '[AVISO] Erro ao inicializar PyQtWebEngine: '
+        3524    LOAD_NAME                       53: type
+        3526    PUSH_NULL                       
+        3528    LOAD_NAME                       67: e
+        3530    CALL                            1
+        3538    LOAD_ATTR                       108: __name__
+        3558    FORMAT_SIMPLE                   
+        3560    BUILD_STRING                    2
+        3562    CALL                            1
+        3570    POP_TOP                         
+        3572    POP_EXCEPT                      
+        3574    LOAD_CONST                      1: None
+        3576    STORE_NAME                      67: e
+        3578    DELETE_NAME                     67: e
+        3580    JUMP_BACKWARD_NO_INTERRUPT      1414 (to 756)
+        3584    LOAD_CONST                      1: None
+        3586    STORE_NAME                      67: e
+        3588    DELETE_NAME                     67: e
+        3590    RERAISE                         1
+        3592    RERAISE                         0
+        3594    COPY                            3
+        3596    POP_EXCEPT                      
+        3598    RERAISE                         1
+        3600    PUSH_EXC_INFO                   
+        3602    LOAD_NAME                       8: Exception
+        3604    CHECK_EXC_MATCH                 
+        3606    POP_JUMP_IF_FALSE               12 (to 3632)
+        3610    POP_TOP                         
+        3612    LOAD_NAME                       56: print
+        3614    PUSH_NULL                       
+        3616    LOAD_CONST                      60: '[DPI] Diagnostico de resolucao falhou - HiDPI ativado por padrao'
+        3618    CALL                            1
+        3626    POP_TOP                         
+        3628    POP_EXCEPT                      
+        3630    JUMP_BACKWARD_NO_INTERRUPT      1133 (to 1368)
+        3634    RERAISE                         0
+        3636    COPY                            3
+        3638    POP_EXCEPT                      
+        3640    RERAISE                         1
+        3642    PUSH_EXC_INFO                   
+        3644    LOAD_NAME                       8: Exception
+        3646    CHECK_EXC_MATCH                 
+        3648    POP_JUMP_IF_FALSE               4 (to 3658)
+        3652    POP_TOP                         
+        3654    POP_EXCEPT                      
+        3656    JUMP_BACKWARD_NO_INTERRUPT      911 (to 1838)
+        3660    RERAISE                         0
+        3662    COPY                            3
+        3664    POP_EXCEPT                      
+        3666    RERAISE                         1
+        3668    PUSH_EXC_INFO                   
+        3670    LOAD_NAME                       104: SystemExit
+        3672    CHECK_EXC_MATCH                 
+        3674    POP_JUMP_IF_FALSE               2 (to 3680)
+        3678    POP_TOP                         
+        3680    RAISE_VARARGS                   0
+        3682    LOAD_NAME                       8: Exception
+        3684    CHECK_EXC_MATCH                 
+        3686    POP_JUMP_IF_FALSE               4 (to 3696)
+        3690    POP_TOP                         
+        3692    POP_EXCEPT                      
+        3694    JUMP_BACKWARD_NO_INTERRUPT      912 (to 1874)
+        3698    RERAISE                         0
+        3700    COPY                            3
+        3702    POP_EXCEPT                      
+        3704    RERAISE                         1
+        3706    PUSH_EXC_INFO                   
+        3708    LOAD_NAME                       8: Exception
+        3710    CHECK_EXC_MATCH                 
+        3712    POP_JUMP_IF_FALSE               38 (to 3790)
+        3716    STORE_NAME                      67: e
+        3718    LOAD_NAME                       56: print
+        3720    PUSH_NULL                       
+        3722    LOAD_CONST                      73: '[AVISO] qdarkstyle indisponivel: '
+        3724    LOAD_NAME                       53: type
+        3726    PUSH_NULL                       
+        3728    LOAD_NAME                       67: e
+        3730    CALL                            1
+        3738    LOAD_ATTR                       108: __name__
+        3758    FORMAT_SIMPLE                   
+        3760    BUILD_STRING                    2
+        3762    CALL                            1
+        3770    POP_TOP                         
+        3772    POP_EXCEPT                      
+        3774    LOAD_CONST                      1: None
+        3776    STORE_NAME                      67: e
+        3778    DELETE_NAME                     67: e
+        3780    JUMP_BACKWARD_NO_INTERRUPT      853 (to 2078)
+        3784    LOAD_CONST                      1: None
+        3786    STORE_NAME                      67: e
+        3788    DELETE_NAME                     67: e
+        3790    RERAISE                         1
+        3792    RERAISE                         0
+        3794    COPY                            3
+        3796    POP_EXCEPT                      
+        3798    RERAISE                         1
+    [Exception Table]
+        60 to 166 -> 2310 [0] 
+        198 to 466 -> 2440 [0] 
+        516 to 542 -> 2466 [0] 
+        544 to 568 -> 2492 [0] 
+        596 to 610 -> 3412 [0] 
+        728 to 756 -> 3474 [0] 
+        930 to 1348 -> 3600 [0] 
+        1350 to 1366 -> 3600 [0] 
+        1660 to 1804 -> 3668 [0] 
+        1806 to 1838 -> 3642 [0] 
+        1838 to 1874 -> 3668 [0] 
+        1972 to 2060 -> 3706 [0] 
+        2310 to 2322 -> 2434 [1] lasti
+        2324 to 2398 -> 2404 [1] 
+        2404 to 2416 -> 2426 [2] lasti
+        2416 to 2418 -> 2434 [1] lasti
+        2424 to 2426 -> 2426 [2] lasti
+        2426 to 2434 -> 2434 [1] lasti
+        2440 to 2452 -> 2460 [1] lasti
+        2458 to 2460 -> 2460 [1] lasti
+        2466 to 2478 -> 2486 [1] lasti
+        2484 to 2486 -> 2486 [1] lasti
+        2492 to 2506 -> 3406 [1] lasti
+        2506 to 2604 -> 3396 [1] lasti
+        2606 to 2926 -> 3166 [1] 
+        2926 to 3114 -> 3132 [2] lasti
+        3114 to 3130 -> 3166 [1] 
+        3130 to 3132 -> 3396 [1] lasti
+        3132 to 3152 -> 3160 [4] lasti
+        3152 to 3158 -> 3166 [1] 
+        3158 to 3160 -> 3396 [1] lasti
+        3160 to 3166 -> 3166 [1] 
+        3166 to 3178 -> 3184 [2] lasti
+        3178 to 3182 -> 3396 [1] lasti
+        3182 to 3184 -> 3184 [2] lasti
+        3184 to 3190 -> 3396 [1] lasti
+        3192 to 3304 -> 3324 [1] 
+        3304 to 3306 -> 3396 [1] lasti
+        3306 to 3322 -> 3324 [1] 
+        3322 to 3324 -> 3396 [1] lasti
+        3324 to 3336 -> 3342 [2] lasti
+        3336 to 3340 -> 3396 [1] lasti
+        3340 to 3342 -> 3342 [2] lasti
+        3342 to 3384 -> 3396 [1] lasti
+        3396 to 3406 -> 3406 [1] lasti
+        3412 to 3460 -> 3468 [1] lasti
+        3466 to 3468 -> 3468 [1] lasti
+        3474 to 3502 -> 3594 [1] lasti
+        3508 to 3518 -> 3594 [1] lasti
+        3518 to 3572 -> 3584 [1] lasti
+        3584 to 3594 -> 3594 [1] lasti
+        3600 to 3628 -> 3636 [1] lasti
+        3634 to 3636 -> 3636 [1] lasti
+        3642 to 3654 -> 3662 [1] lasti
+        3654 to 3660 -> 3668 [0] 
+        3660 to 3662 -> 3662 [1] lasti
+        3662 to 3668 -> 3668 [0] 
+        3668 to 3692 -> 3700 [1] lasti
+        3698 to 3700 -> 3700 [1] lasti
+        3706 to 3718 -> 3794 [1] lasti
+        3718 to 3772 -> 3784 [1] lasti
+        3784 to 3794 -> 3794 [1] lasti

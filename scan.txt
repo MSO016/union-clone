@@ -1,0 +1,122 @@
+﻿size: 345,991,869
+
+inno-zlib(zlb 1A)  (1+ mostrados):
+   0x165600
+
+gzip  (12+ mostrados):
+   0x1522557  0x184c108  0x4e31826  0x6ba3f9c  0x6c3ce5d  0x8371f95  0x8b673e4  0x97900bd  0xbbcedae  0xc9e39d5  0xe4cebbd  0xe4cf238
+
+zip-localhdr  (12+ mostrados):
+   0x34b7a6f  0x34bf8da  0x3646e3b  0x3650bfb  0x3650d1d  0x366bcdc  0x366be79  0x36b9dbc  0x36b9e9e  0x377d985  0x442c8c4  0x4430b22
+
+zip-eocd  (1+ mostrados):
+   0x62c5c90
+
+lzma-alone-marker(5d000000)  (8+ mostrados):
+   0x312d3  0x6ab96  0x92774  0xcea03  0xcea6e  0xf163e  0xc0683b0  0x141a84f0
+
+Inno Setup text  (4+ mostrados):
+   0x11a1fc  0x11a23c  0x164e0c  0x1484e681
+
+Inno text  (5+ mostrados):
+   0x11a1fc  0x11a23c  0x164da4  0x164e0c  0x1484e681
+
+--- overlay head @0x165600 ---
+00165600  0 0 62 0 20 0 0 36 0 16 0 0 26 96 0 70  zlb. ..6..].&..p
+00165610  0 17 0 0 5 0 0 0 0 94 1 0 44 0 0 0  .........../D.|.
+00165620  0 0 18 0 0 80 60 31 0 95 0 0 0 20 61 0  ......`1....~ a{
+00165630  52 0 0 54 14 96 0 0 95 0 71 0 86 55 0 0  R..T...[..qN.U..
+00165640  74 0 1 0 66 0 0 0 58 0 0 0 79 0 0 0  t...f...X..Oy..k
+00165650  0 0 0 0 0 0 32 0 0 82 0 88 0 7 0 0  M<....2[J.O....L
+00165660  0 0 0 80 58 0 42 0 21 0 0 6 64 0 40 0  }>..X.Bn!...d<@.
+00165670  0 0 14 0 73 0 0 0 0 0 0 6 0 0 82 27  ...,sN......k..'
+00165680  58 7 0 31 0 6 0 0 0 69 0 0 12 0 0 0  X..1J.+..i......
+00165690  0 0 11 0 99 8 0 0 0 0 22 0 38 0 68 34  .........n".8.h4
+001656a0  83 0 0 6 36 0 0 37 0 29 0 0 0 67 0 0  ....6..7.)._ng..
+001656b0  0 0 7 52 0 75 0 79 0 0 0 0 37 0 0 25  ...R.u.y....7..%
+001656c0  0 22 0 24 39 0 64 0 53 78 48 0 0 0 83 0  .".$9.d.SxH.....
+001656d0  40 0 3 0 23 0 0 98 0 69 26 0 0 72 0 51  @...#+...i&..r.Q
+001656e0  10 0 84 0 0 0 38 80 93 0 0 16 74 6 52 91  ......8..}..t.R.
+001656f0  68 57 50 0 0 0 0 0 11 50 42 0 0 0 83 8  hWP+.....PB.....
+
+--- strings nas primeiras 64KB do overlay (98) ---
+Pg~(W&Yy
+VDOwewD
+B%w[;j
+4J^A J
+|vHVqx
+T:pGr_-$
+mB~v(0y
+X 8M@p
+3CO&Vh
++Of=z*
+{}M<-t
+@l>+vF
+fNQx=2Y
+Y:=N>HW
+FvNx`=
+GP)sH->F
+DOxAp!-`
+zLbUeFa`
+Js2Q~k
+,\erte6
+}yt\Gb7
+7$(e;o
+4t7_@_
+X[R,Bf
+>YAL'C
+l'I_OE
+:O>g>u
+EhA1Amf
+6!tLqM
+8w k8T
++* I3o^5
+7D08oba
+y`sT+BY
+7 6=D[<
+v"TKk;
+/,Vl^)
+xvUX_sd)S/V
+L,BR*4
+V~k/Ho#en|
+Px2oX [
+P,D]dY
+;'|v j
+'hwq*P
+g<j5|B
+aR%.N(
+LHq.m21
+9_eU\`
+T$xGh2
+#x$t]N*
+T%HE'mE
+R|Mz%"8k
+Q~@|{A
+>x_Mk"
+*lxOJJN~S
+%,\#@~
+X/ @R)-
+[~gf_@Hh
+ZWZW/?
+K>DMC^!
+K/k{G\
+
+--- ALL interesting strings do PE inteiro (scan limitado 12MB) ---
+kernel32.dll
+comctl32.dll
+user32.dll
+oleaut32.dll
+advapi32.dll
+kernel32.dll
+user32.dll
+kernel32.dll
+        <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true</dpiAware>
+<file name="comctl32.dll" loadFrom="%SystemRoot%\system32\" />
+<file name="mpr.dll" loadFrom="%SystemRoot%\system32\" />
+<file name="netapi32.dll" loadFrom="%SystemRoot%\system32\" />
+<file name="netutils.dll" loadFrom="%SystemRoot%\system32\" />
+<file name="textshaping.dll" loadFrom="%SystemRoot%\system32\" />
+<file name="version.dll" loadFrom="%SystemRoot%\system32\" />
+<file name="winhttp.dll" loadFrom="%SystemRoot%\system32\" />
+B^IYZIY:\
+dr{8f:\1

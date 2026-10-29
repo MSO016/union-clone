@@ -1,0 +1,20 @@
+﻿from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QTextEdit, QPushButton)
+from PyQt5.QtCore import Qt
+class ManualAndroid(QMainWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+    def setup_ui(self):
+        self.setWindowTitle('Manual de Uso - Diagn├│sticos Android')
+        self.setMinimumSize(800, 600)
+        central = QWidget()
+        self.setCentralWidget(central)
+        layout = QVBoxLayout(central)
+        manual = QTextEdit()
+        manual.setReadOnly(True)
+        content = '# Manual de Uso - Diagn├│sticos Android\n\n## Instala├º├úo do ADB e Fastboot\n1. INSTALA├ç├âO DO PLATFORM TOOLS:\n   ÔÇó Baixe o Android Platform Tools: https://developer.android.com/tools/releases/platform-tools\n   ÔÇó Escolha a vers├úo para Windows\n   ÔÇó Extraia o arquivo ZIP para C:\\Android\\Sdk\\platform-tools\n   ÔÇó Verifique se os arquivos est├úo presentes:\n     - adb.exe\n     - fastboot.exe\n     - AdbWinApi.dll\n     - AdbWinUsbApi.dll\n\n2. CONFIGURA├ç├âO DO SISTEMA:\n   ÔÇó Abra o Painel de Controle\n   ÔÇó Sistema e Seguran├ºa > Sistema\n   ÔÇó Configura├º├Áes avan├ºadas do sistema\n   ÔÇó Vari├íveis de Ambiente\n   ÔÇó Em "Vari├íveis do Sistema", encontre PATH\n   ÔÇó Clique em Editar\n   ÔÇó Adicione: C:\\Android\\Sdk\\platform-tools\n   ÔÇó Clique OK em todas as janelas\n\n3. INSTALA├ç├âO DOS DRIVERS:\n   ÔÇó Baixe o Universal ADB Drivers: https://adb.clockworkmod.com\n   ÔÇó Execute como administrador\n   ÔÇó Reinicie o computador ap├│s a instala├º├úo\n\n4. VERIFICA├ç├âO:\n   ÔÇó Abra o PowerShell ou Prompt de Comando\n   ÔÇó Digite: adb --version\n   ÔÇó Digite: fastboot --version\n   ÔÇó Se mostrar as vers├Áes, a instala├º├úo est├í correta\n\n## Diagn├│stico de Bateria\nÔÇó Atualizar Info Bateria: Mostra informa├º├Áes detalhadas sobre o estado atual da bateria\nÔÇó Resetar Estat├¡sticas: Limpa as estat├¡sticas de uso da bateria\n\n## Logs do Sistema\nÔÇó Iniciar Captura: Come├ºa a capturar logs do sistema em tempo real\nÔÇó Parar Captura: Interrompe a captura de logs para evitar sobrecarga\nÔÇó Limpar Logs: Limpa a ├írea de visualiza├º├úo de logs\n\n## Diagn├│sticos Adicionais\nÔÇó An├ílise de WiFi: Verifica configura├º├Áes e estado da conex├úo WiFi\nÔÇó An├ílise de Rede: Mostra informa├º├Áes sobre conectividade de rede\nÔÇó Verificar Sensores: Lista todos os sensores do dispositivo e seus estados\n\n## Diagn├│sticos Avan├ºados\nÔÇó Corrigir DM-Verity Xiaomi: Soluciona o erro "dm-verity corruption" em dispositivos Xiaomi\n  - Requer modo Fastboot\n  - Executa automaticamente os comandos necess├írios\n  - Reinicia o dispositivo ap├│s a corre├º├úo\n\n## Status de Conex├úo\nÔÇó Verificar Conex├úo ADB: Confirma se o dispositivo est├í conectado via ADB\nÔÇó Verificar Conex├úo Fastboot: Confirma se o dispositivo est├í em modo Fastboot\n\n## Dicas Importantes\nÔÇó Certifique-se que o dispositivo est├í conectado via USB\nÔÇó Ative a Depura├º├úo USB nas configura├º├Áes do desenvolvedor\nÔÇó Para melhor performance, pare a captura de logs quando n├úo estiver usando\nÔÇó Use o bot├úo "Verificar Conex├úo" para confirmar se o dispositivo est├í conectado\nÔÇó Para usar o modo Fastboot:\n  - Desligue o dispositivo\n  - Pressione Volume Baixo + Power (varia por modelo)\n  - Aguarde entrar no modo Fastboot\nÔÇó Mantenha os drivers ADB/Fastboot atualizados\nÔÇó Use cabos USB de qualidade para conex├úo est├ível\n\n## Requisitos do Sistema\nÔÇó Windows 10/11\nÔÇó Platform Tools instalado (adb.exe, fastboot.exe)\nÔÇó Drivers USB adequados\nÔÇó Acesso ├ás Op├º├Áes de Desenvolvedor no dispositivo\n\n## Solu├º├úo de Problemas\nÔÇó Se o dispositivo n├úo for detectado:\n  - Verifique a conex├úo USB\n  - Reinstale os drivers\n  - Tente outra porta USB\nÔÇó Para problemas com Fastboot:\n  - Confirme se o dispositivo est├í realmente em modo Fastboot\n  - Verifique se os drivers est├úo instalados corretamente\n  - Tente executar como administrador'
+        manual.setMarkdown(content)
+        layout.addWidget(manual)
+        btn_close = QPushButton('Fechar')
+        btn_close.clicked.connect(self.close)
+        layout.addWidget(btn_close)

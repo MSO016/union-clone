@@ -1,0 +1,275 @@
+﻿
+===== URL (37) =====
+https://dl.google.com/android/repository/platform-tools-latest-windows.zip   << app\utils\adb_manager.py
+http://127.0.0.1:{self._porta   << app\utils\os_manager.py
+http://{ip   << app\utils\os_manager.py
+https://en-us.support.motorola.com/app/standalone/bootloader/unlock-your-device-c   << app\utils\tools_android.py
+https://motorola-global-portal.custhelp.com/app/standalone/bootloader/unlock-your-device-a   << app\utils\tools_android.py
+https://github.com/daynix/UsbDk/releases/download/v1.00-22/UsbDk_1.0.22_x64.msi   << app\utils\usb_requirements_manager.py
+https://github.com/winfsp/winfsp/releases/download/v2.1/winfsp-2.1.25156.msi   << app\utils\usb_requirements_manager.py
+https://aka.ms/vc14/vc_redist.x64.exe   << app\utils\usb_requirements_manager.py
+https://aka.ms/vc14/vc_redist.x86.exe   << app\utils\usb_requirements_manager.py
+https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/8.0.28/windowsdesktop-runtime-8.0.28-win-x64.exe   << app\utils\usb_requirements_manager.py
+https://mifirm.net   << app\utils\web_view_widget.py
+https://www.google.com   << app\utils\web_view_widget.py
+https://developer.android.com/studio/releases/platform-tools   << app\views\diagnostico_android.py
+https://adb.clockworkmod.com/   << app\views\diagnostico_android.py
+https://wa.me/{whatsapp_limpo   << app\views\downloads\detalhe_arquivo_window.py
+https://wa.me/{numero   << app\views\downloads\downloads_window.py
+https://wa.me/558594129977   << app\views\login_window.py
+https://wa.me/5585997507465   << app\views\login_window.py
+https://restorecellsolucoes.com   << app\views\login_window.py
+https://instagram.com/restorecell10   << app\views\login_window.py
+https://one.one.one.one   << app\views\login_window.py
+https://mifirm.net/list/model   << app\views\main_window.py
+https://samfw.com/firmware/SM-A715F   << app\views\main_window.py
+https://lgrom.com/   << app\views\main_window.py
+https://ipsw.me/   << app\views\main_window.py
+https://www.youtube.com/@RestorecellST   << app\views\main_window.py
+https://www.youtube.com/@ramoncell   << app\views\main_window.py
+https://linktr.ee/techunionsolutions   << app\views\main_window.py
+https://developer.android.com/tools/releases/platform-tools   << app\views\manual_android.py
+https://adb.clockworkmod.com   << app\views\manual_android.py
+https://instagram.com/{parceiro[   << app\views\parceiros_view.py
+https://seusite.com   << app\views\perfil_window.py
+https://linkedin.com/in/seuperfil   << app\views\perfil_window.py
+https://github.com/seuusuario   << app\views\perfil_window.py
+https://mirrors.lolinet.com/firmware/lenomola/   << app\views\tools_android.py
+https://en.wikipedia.org/wiki/GUID_Partition_Table   << app\views\union_unlock\edl\gpt_parser.py
+https://techunionservices.com/service/honor-frp-key-ww-via-sn-maximo-24-hrs-usuarios-union   << app\views\union_unlock\honor\honor_frp_widget.py
+
+===== WSS (0) =====
+
+
+===== IP (8) =====
+127.0.0.1   << app\utils\os_manager.py
+0.0.0.0   << app\utils\os_manager.py
+127.0.0.1:5000   << app\utils\os_manager.py
+0.0.0.0:5000   << app\utils\os_manager.py
+8.8.8.8   << app\utils\os_manager.py
+1.1.1.1   << app\views\diagnostico_android.py
+8.8.4.4   << app\views\diagnostico_android.py
+1.3.4.5   << app\views\login_window.py
+
+===== HOST (1138) =====
+self.logger   << app\database\downloads_cache.py
+sqlite3.Row   << app\database\downloads_cache.py
+cursor.rowcount   << app\database\downloads_cache.py
+update.zip   << app\translations\en.py
+self.permissions   << app\utils\adb_app_manager.py
+result.returncode   << app\utils\adb_app_manager.py
+result.stderr   << app\utils\adb_app_manager.py
+subprocess.TimeoutExpired   << app\utils\adb_app_manager.py
+version.sdk   << app\utils\adb_app_manager.py
+AndroidVersion.UNKNOWN   << app\utils\adb_app_manager.py
+AppType.SYSTEM   << app\utils\adb_app_manager.py
+AppType.USER   << app\utils\adb_app_manager.py
+AppType.DISABLED   << app\utils\adb_app_manager.py
+AppType.ENABLED   << app\utils\adb_app_manager.py
+payjoy.access   << app\utils\adb_app_manager.py
+payjoy.permission   << app\utils\adb_app_manager.py
+android.deviceowner   << app\utils\adb_app_manager.py
+android.mdm   << app\utils\adb_app_manager.py
+android.knox   << app\utils\adb_app_manager.py
+com.airwatch   << app\utils\adb_app_manager.py
+com.mobileiron   << app\utils\adb_app_manager.py
+microsoft.intune   << app\utils\adb_app_manager.py
+citrix.xenmobile   << app\utils\adb_app_manager.py
+soti.mobicontrol   << app\utils\adb_app_manager.py
+good.gd   << app\utils\adb_app_manager.py
+vmware.boxer   << app\utils\adb_app_manager.py
+blackberry.dynamics   << app\utils\adb_app_manager.py
+checkpoint.pointsec   << app\utils\adb_app_manager.py
+com.zenprise   << app\utils\adb_app_manager.py
+android.securezone   << app\utils\adb_app_manager.py
+lookout.enterprise   << app\utils\adb_app_manager.py
+mobilesecurity.sep   << app\utils\adb_app_manager.py
+kaspersky.ksm   << app\utils\adb_app_manager.py
+edge.client   << app\utils\adb_app_manager.py
+receiver.nfuse   << app\utils\adb_app_manager.py
+ras.client   << app\utils\adb_app_manager.py
+teamviewer.quicksupport   << app\utils\adb_app_manager.py
+logmein.rescue   << app\utils\adb_app_manager.py
+android.enterprise   << app\utils\adb_app_manager.py
+42gears.suremdm   << app\utils\adb_app_manager.py
+manageengine.mdm   << app\utils\adb_app_manager.py
+sophos.mobilecontrol   << app\utils\adb_app_manager.py
+comodo.mdm   << app\utils\adb_app_manager.py
+eset.mdm   << app\utils\adb_app_manager.py
+bitdefender.mdm   << app\utils\adb_app_manager.py
+norton.mdm   << app\utils\adb_app_manager.py
+mcafee.mdm   << app\utils\adb_app_manager.py
+paloaltonetworks.globalprotect   << app\utils\adb_app_manager.py
+mi.globalbrowser   << app\utils\adb_app_manager.py
+android.chrome   << app\utils\adb_app_manager.py
+android.browser   << app\utils\adb_app_manager.py
+mozilla.firefox   << app\utils\adb_app_manager.py
+app.sbrowser   << app\utils\adb_app_manager.py
+opera.browser   << app\utils\adb_app_manager.py
+mini.native   << app\utils\adb_app_manager.py
+UCMobile.intl   << app\utils\adb_app_manager.py
+chrome.beta   << app\utils\adb_app_manager.py
+chrome.dev   << app\utils\adb_app_manager.py
+PyQt5.QtWidgets   << app\utils\adb_manager.py
+PyQt5.QtCore   << app\utils\adb_manager.py
+self.lock   << app\utils\adb_manager.py
+self.startupinfo   << app\utils\adb_manager.py
+os.name   << app\utils\adb_manager.py
+startupinfo.dwFlags   << app\utils\adb_manager.py
+startupinfo.wShowWindow   << app\utils\adb_manager.py
+self.running   << app\utils\adb_manager.py
+result.stdout   << app\utils\adb_manager.py
+si.dwFlags   << app\utils\adb_manager.py
+si.wShowWindow   << app\utils\adb_manager.py
+adb.exe   << app\utils\adb_manager.py
+urllib.request   << app\utils\adb_manager.py
+google.com   << app\utils\adb_manager.py
+platform-tools-latest-windows.zip   << app\utils\adb_manager.py
+platform-tools.zip   << app\utils\adb_manager.py
+AdbWinApi.dll   << app\utils\adb_manager.py
+AdbWinUsbApi.dll   << app\utils\adb_manager.py
+fastboot.exe   << app\utils\adb_manager.py
+process.returncode   << app\utils\adb_manager.py
+process.stderr   << app\utils\adb_manager.py
+process.stdout   << app\utils\adb_manager.py
+product.model   << app\utils\adb_manager.py
+adbkey.pub   << app\utils\adb_manager.py
+subprocess.CalledProcessError   << app\utils\adb_manager.py
+product.brand   << app\utils\adb_manager.py
+version.release   << app\utils\adb_manager.py
+product.device   << app\utils\adb_manager.py
+product.board   << app\utils\adb_manager.py
+product.manufacturer   << app\utils\adb_manager.py
+ro.hardware   << app\utils\adb_manager.py
+board.platform   << app\utils\adb_manager.py
+build.id   << app\utils\adb_manager.py
+build.type   << app\utils\adb_manager.py
+build.fingerprint   << app\utils\adb_manager.py
+expect.baseband   << app\utils\adb_manager.py
+System.err   << app\utils\adb_manager.py
+QMessageBox.Yes   << app\utils\adb_manager.py
+QMessageBox.No   << app\utils\adb_manager.py
+android.systemui   << app\utils\adb_manager.py
+self.alerts   << app\utils\adb_system_monitor.py
+process.pid   << app\utils\adb_system_monitor.py
+process.name   << app\utils\adb_system_monitor.py
+info.timestamp   << app\utils\adb_system_monitor.py
+com.whatsapp   << app\utils\adb_system_monitor.py
+instagram.android   << app\utils\adb_system_monitor.py
+facebook.katana   << app\utils\adb_system_monitor.py
+android.youtube   << app\utils\adb_system_monitor.py
+spotify.music   << app\utils\adb_system_monitor.py
+android.gms   << app\utils\adb_system_monitor.py
+android.vending   << app\utils\adb_system_monitor.py
+apps.photos   << app\utils\adb_system_monitor.py
+apps.docs   << app\utils\adb_system_monitor.py
+android.gm   << app\utils\adb_system_monitor.py
+android.maps   << app\utils\adb_system_monitor.py
+uber.Rider   << app\utils\adb_system_monitor.py
+com.ubercab   << app\utils\adb_system_monitor.py
+zhiliaoapp.musically   << app\utils\adb_system_monitor.py
+netflix.mediaclient   << app\utils\adb_system_monitor.py
+android.shopping   << app\utils\adb_system_monitor.py
+office.word   << app\utils\adb_system_monitor.py
+adobe.reader   << app\utils\adb_system_monitor.py
+... +1018
+
+===== REG (0) =====
+
+
+===== SECRET (32) =====
+[arquivo contem keyword de segredo: app\translations\en.py]   << app\translations\en.py
+[arquivo contem keyword de segredo: app\translations\es.py]   << app\translations\es.py
+[arquivo contem keyword de segredo: app\translations\pt.py]   << app\translations\pt.py
+[arquivo contem keyword de segredo: app\utils\adb_manager.py]   << app\utils\adb_manager.py
+[arquivo contem keyword de segredo: app\utils\adware_hardening.py]   << app\utils\adware_hardening.py
+[arquivo contem keyword de segredo: app\utils\backup_manager.py]   << app\utils\backup_manager.py
+[arquivo contem keyword de segredo: app\utils\correcao_wdef.py]   << app\utils\correcao_wdef.py
+[arquivo contem keyword de segredo: app\utils\mtk_manager.py]   << app\utils\mtk_manager.py
+[arquivo contem keyword de segredo: app\utils\os_manager.py]   << app\utils\os_manager.py
+[arquivo contem keyword de segredo: app\utils\painel_administrativo.py]   << app\utils\painel_administrativo.py
+[arquivo contem keyword de segredo: app\utils\scrcpy_manager.py]   << app\utils\scrcpy_manager.py
+[arquivo contem keyword de segredo: app\utils\unlock_tools_manager.py]   << app\utils\unlock_tools_manager.py
+[arquivo contem keyword de segredo: app\utils\usb_requirements_manager.py]   << app\utils\usb_requirements_manager.py
+[arquivo contem keyword de segredo: app\utils\xiaomi_manager.py]   << app\utils\xiaomi_manager.py
+[arquivo contem keyword de segredo: app\utils\_import_hook.py]   << app\utils\_import_hook.py
+[arquivo contem keyword de segredo: app\views\adware_tools.py]   << app\views\adware_tools.py
+[arquivo contem keyword de segredo: app\views\login_window.py]   << app\views\login_window.py
+[arquivo contem keyword de segredo: app\views\main_window.py]   << app\views\main_window.py
+[arquivo contem keyword de segredo: app\views\tools_android.py]   << app\views\tools_android.py
+[arquivo contem keyword de segredo: app\views\ui\diag_theme.py]   << app\views\ui\diag_theme.py
+[arquivo contem keyword de segredo: app\views\union_unlock\edl\firehose_ops.py]   << app\views\union_unlock\edl\firehose_ops.py
+[arquivo contem keyword de segredo: app\views\union_unlock\edl\_qcom_io.py]   << app\views\union_unlock\edl\_qcom_io.py
+[arquivo contem keyword de segredo: app\views\union_unlock\exy\engine\exynos_engine.py]   << app\views\union_unlock\exy\engine\exynos_engine.py
+[arquivo contem keyword de segredo: app\views\union_unlock\exy\engine\exynos_tools_loader.py]   << app\views\union_unlock\exy\engine\exynos_tools_loader.py
+[arquivo contem keyword de segredo: app\views\union_unlock\exy\engine\_cfg.py]   << app\views\union_unlock\exy\engine\_cfg.py
+[arquivo contem keyword de segredo: app\views\union_unlock\honor\honor_frp_widget.py]   << app\views\union_unlock\honor\honor_frp_widget.py
+[arquivo contem keyword de segredo: app\views\union_unlock\hxd\gui\tema.py]   << app\views\union_unlock\hxd\gui\tema.py
+[arquivo contem keyword de segredo: app\views\union_unlock\mit\mit_engine_2026.py]   << app\views\union_unlock\mit\mit_engine_2026.py
+[arquivo contem keyword de segredo: app\views\union_unlock\spd\bin_spd.py]   << app\views\union_unlock\spd\bin_spd.py
+[arquivo contem keyword de segredo: app\views\union_unlock\spd\partition_tab.py]   << app\views\union_unlock\spd\partition_tab.py
+[arquivo contem keyword de segredo: app\views\union_unlock\spd\workers.py]   << app\views\union_unlock\spd\workers.py
+[arquivo contem keyword de segredo: _import_hook.py]   << _import_hook.py
+
+===== WINPATH (103) =====
+A:\n\n1.   << app\database\migrations\add_warranty_text.py
+n:\n\n-   << app\translations\en.py
+s:\n\n-   << app\translations\es.py
+e:\n├â┬ö├â┬ç├â┬│   << app\translations\pt.py
+F:\n\n{}\n\nTente   << app\translations\pt.py
+e:\n\n-   << app\translations\pt.py
+s:\n1.   << app\utils\adb_app_manager.py
+s:\n├â┬ö├â┬ç├â┬│   << app\utils\adb_app_manager.py
+r:\n├â┬ö├â┬ç├â┬│   << app\utils\adb_app_manager.py
+A:\nNavegadores   << app\utils\adb_app_manager.py
+S:\n\n1├é┬┤├é┬®├â┬à├â┬ö├â┬ó├â┬║   << app\utils\adb_app_manager.py
+a:\n├â┬ö├â┬ç├â┬│   << app\utils\adb_app_manager.py
+L:\n├â┬ö├â┬ç├â┬│   << app\utils\adb_app_manager.py
+O:\n├â┬ö├â┬ç├â┬│   << app\utils\adb_app_manager.py
+r:\n1.   << app\utils\adb_manager.py
+a:\n{str(e)}\n\nVerifique   << app\utils\adb_manager.py
+e:\n1.   << app\utils\adb_manager.py
+m:\n{save_path}\n\nEste   << app\utils\adb_manager.py
+p:\n{str(e)}   << app\utils\backup_manager.py
+o:\n{str(e)}\n\nVerifique   << app\utils\backup_manager.py
+e:\n{result}\n\nRecomenda-se   << app\utils\backup_manager.py
+e:\n{str(e)}   << app\utils\backup_manager.py
+s:\n{str(e)}   << app\utils\backup_manager.py
+B:\n\n{status}\n\nDeseja   << app\utils\correcao_wdef.py
+r:\n\n{result_text}\n\n├é┬¡├å┬Æ├â┬å├â┬¡   << app\utils\correcao_wdef.py
+s:\n\n{msg}   << app\utils\correcao_wdef.py
+s:\n1├é┬┤├é┬®├â┬à├â┬ö├â┬ó├â┬║   << app\utils\frp_mtk_manager.py
+o:\nWhatsApp:   << app\utils\frp_mtk_manager.py
+m:\n{msg}   << app\utils\os_manager.py
+r:\n\n{servico[   << app\utils\premium_services_manager.py
+m:\n{pdf_path}\n\nO   << app\utils\report_printer.py
+F:\n{str(e)}   << app\utils\report_printer.py
+O:\n\n1.   << app\utils\samsung_advanced.py
+o:\n{result}   << app\utils\tools_android.py
+e:\npip   << app\utils\web_view_widget.py
+R:\n\n   << app\views\adb_app_manager_view.py
+o:\n\n{message}\n\n├é┬┤├é┬®├â┬à   << app\views\adb_app_manager_view.py
+o:\n\n{message}\n\nPoss├ó┬ö┬£├é┬íveis   << app\views\adb_app_manager_view.py
+o:\n\nPID:   << app\views\adb_system_monitor_view.py
+o:\n{status_output}\n   << app\views\adb_system_monitor_view.py
+o:\n{str(e)}   << app\views\adb_system_monitor_view.py
+m:\n{filename}   << app\views\adb_system_monitor_view.py
+s:\n\n1.   << app\views\adware_tools.py
+o:\n\n{critical_apps_str}\n\n├â┬ö├â┬£├â┬í├é┬┤├é┬®├â┬à   << app\views\adware_tools.py
+s:\n\n{app_list_str}\n\nDeseja   << app\views\adware_tools.py
+e:\nConfiguracoes   << app\views\adware_tools.py
+s:\n\n{str(e)}   << app\views\client_form.py
+F:\n\n├é┬¡├å┬Æ├â┬┤├â┬ñ   << app\views\close_service_order.py
+m:\n{pdf_path}\n\nDeseja   << app\views\close_service_order.py
+m:\n{pdf_path}\n\nVoc├ó┬ö┬£├é┬¼   << app\views\close_service_order.py
+r:\n{str(e)}   << app\views\diagnostico_android.py
+m:\n{self.save_path}\n\nEste   << app\views\diagnostico_android.py
+O:\n{msg}   << app\views\diagnostico_android.py
+o:\n\n{model}\nSerial:   << app\views\diagnostico_android.py
+o:\nList   << app\views\diagnostico_android.py
+d:\n\n{str(e)}   << app\views\downloads\arquivo_gratuito_dialog.py
+a:\n\n{str(e)}\n\nContate   << app\views\downloads\detalhe_arquivo_window.py
+e:\nWhatsApp:   << app\views\downloads\detalhe_arquivo_window.py
+e:\n\n{codigo}   << app\views\downloads\detalhe_arquivo_window.py
+O:\nAnterior:   << app\views\downloads\detalhe_arquivo_window.py
+... +43

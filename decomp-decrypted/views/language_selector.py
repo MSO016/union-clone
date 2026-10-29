@@ -1,0 +1,52 @@
+﻿from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QComboBox, QPushButton, QLabel, QFrame, QHBoxLayout)
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon, QFont
+from app.utils.translation_manager import TranslationManager
+from app.utils.path_manager import PathManager
+class LanguageSelectorDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.translation_manager = TranslationManager.get_instance()
+        self.setup_ui()
+    def setup_ui(self):
+        self.setWindowTitle('­ƒîÉ Selecionar Idioma')
+        self.setFixedSize(430, 220)
+        self.setStyleSheet('\n            QDialog {\n                background-color: white;\n            }\n            QLabel {\n                color: #333333;\n            }\n            QComboBox {\n                padding: 4px 10px;\n                border: 1px solid #2196F3;\n                border-radius: 3px;\n                background: white;\n                min-width: 200px;\n                min-height: 30px;\n                font-size: 13px;\n                color: #333333;\n                margin: 0 5px;\n            }\n            QComboBox:focus {\n                border: 2px solid #2196F3;\n            }\n            QComboBox::drop-down {\n                border: none;\n                width: 25px;\n            }\n            QComboBox::down-arrow {\n                width: 10px;\n                height: 10px;\n                margin-right: 8px;\n            }\n            QComboBox QAbstractItemView {\n                border: 1px solid #2196F3;\n                selection-background-color: #e3f2fd;\n                selection-color: #2196F3;\n                background-color: white;\n                padding: 4px;\n            }\n            QComboBox QAbstractItemView::item {\n                min-height: 22px;\n                padding: 4px;\n            }\n            QPushButton {\n                padding: 8px 20px;\n                border-radius: 3px;\n                font-size: 13px;\n                min-width: 100px;\n            }\n            QPushButton#saveBtn {\n                background-color: #2196F3;\n                color: white;\n                border: none;\n            }\n            QPushButton#saveBtn:hover {\n                background-color: #1976D2;\n            }\n            QPushButton#cancelBtn {\n                background-color: white;\n                color: #666666;\n                border: 1px solid #cccccc;\n            }\n            QPushButton#cancelBtn:hover {\n                background-color: #f5f5f5;\n            }\n        ')
+        layout = QVBoxLayout(self)
+        layout.setSpacing(15)
+        layout.setContentsMargins(25, 25, 25, 25)
+        title = QLabel('­ƒîÉ Escolha seu Idioma')
+        title.setStyleSheet('\n            font-size: 20px;\n            font-weight: bold;\n            color: #2196F3;\n            margin-bottom: 5px;\n        ')
+        title.setAlignment(Qt.AlignCenter)
+        layout.addWidget(title)
+        subtitle = QLabel('Choose your Language / Elija su Idioma')
+        subtitle.setStyleSheet('\n            font-size: 13px;\n            color: #666666;\n            margin-bottom: 15px;\n        ')
+        subtitle.setAlignment(Qt.AlignCenter)
+        layout.addWidget(subtitle)
+        self.language_combo = QComboBox()
+        self.language_combo.addItem('­ƒçº­ƒçÀ Portugu├¬s', 'pt')
+        self.language_combo.addItem('­ƒç║­ƒç© English', 'en')
+        self.language_combo.addItem('­ƒç¬­ƒç© Espa├▒ol', 'es')
+        current_lang = self.translation_manager.get_current_language()
+        index = self.language_combo.findData(current_lang)
+        if index >= 0:
+            self.language_combo.setCurrentIndex(index)
+        layout.addWidget(self.language_combo, alignment=Qt.AlignCenter)
+        layout.addSpacing(10)
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(10)
+        cancel_btn = QPushButton('Cancelar')
+        cancel_btn.setObjectName('cancelBtn')
+        cancel_btn.clicked.connect(self.reject)
+        cancel_btn.setCursor(Qt.PointingHandCursor)
+        save_btn = QPushButton('Salvar')
+        save_btn.setObjectName('saveBtn')
+        save_btn.clicked.connect(self.save_language)
+        save_btn.setCursor(Qt.PointingHandCursor)
+        button_layout.addWidget(cancel_btn)
+        button_layout.addWidget(save_btn)
+        layout.addLayout(button_layout)
+    def save_language(self):
+        selected_lang = self.language_combo.currentData()
+        self.translation_manager.set_language(selected_lang)
+        self.accept()

@@ -1,0 +1,17 @@
+﻿Inspecting "Tech Union Solutions - Smartphone Solutions" - setup data version 7.0.0.3 (unicode)
+innoextract-1.13.0.exe : Warning: Unexpected data while converting from Windows-1252 to UTF-8.
+No linha:3 caractere:1
++ & $x -i $exe 2>&1 | Out-File "D:\MSO\Projects\union-clone\inno-info.t ...
++ ~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Warning: Unexpe...-1252 to UTF-8.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+Languages:
+ - brazilianportuguese: Portugu├¬s Brasileiro
+
+No GOG.com game ID found!
+
+Setup is not passworded!
+
+Done with 1 warning.

@@ -1,0 +1,145 @@
+﻿INFO  Using log config file: jar:file:/C:/Tools/Ghidra/ghidra_12.1.4_PUBLIC/Ghidra/Framework/Generic/lib/Generic.jar!/generic.log4j.xml (LoggingInitialization)  
+INFO  Using log file: C:\Users\MSO\AppData\Roaming\ghidra\ghidra_12.1.4_PUBLIC\application.log (LoggingInitialization)  
+INFO  Loading user preferences: C:\Users\MSO\AppData\Roaming\ghidra\ghidra_12.1.4_PUBLIC\preferences (Preferences)  
+INFO  Searching for classes... (ClassSearcher)  
+INFO  Class search complete (795 ms) (ClassSearcher)  
+INFO  Initializing SSL Context (DefaultSSLContextInitializer)  
+INFO  Initializing Random Number Generator... (SecureRandomFactory)  
+INFO  Random Number Generator initialization complete: SHA1PRNG (SecureRandomFactory)  
+INFO  Trust manager disabled, cacerts have not been set (DefaultTrustManagerFactory)  
+INFO  Headless startup complete (2544 ms) (AnalyzeHeadless)  
+INFO  Class searcher loaded 59 extension points (20 false positives) (ClassSearcher)  
+analyzeHeadless.bat : WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+No linha:3 caractere:1
++ & $gh "D:\MSO\Projects\union-clone\ghidra-proj" UnionClone -import "D ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING: A term...has been called:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+WARNING: sun.misc.Unsafe::staticFieldOffset has been called by org.apache.felix.framework.util.SecureAction 
+(file:/C:/Tools/Ghidra/ghidra_12.1.4_PUBLIC/Ghidra/Features/Base/lib/org.apache.felix.framework-7.0.5.jar)
+WARNING: Please consider reporting this to the maintainers of class org.apache.felix.framework.util.SecureAction
+WARNING: sun.misc.Unsafe::staticFieldOffset will be removed in a future release
+INFO  HEADLESS Script Paths:
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Processors\8051\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\BytePatterns\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\PyGhidra\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Processors\JVM\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Processors\Atmel\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\GnuDemangler\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\SwiftDemangler\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\SystemEmulation\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Processors\PIC\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\Base\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\MicrosoftCodeAnalyzer\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\PDB\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\BSim\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\VersionTracking\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Debug\Debugger\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\WildcardAssembler\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Processors\DATA\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\DecompilerDependent\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\FileFormats\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\Decompiler\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Debug\Debugger-rmi-trace\ghidra_scripts
+    C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\FunctionID\ghidra_scripts
+    D:\MSO\Projects\union-clone\ghidra-scripts (HeadlessAnalyzer)  
+INFO  HEADLESS: execution starts (HeadlessAnalyzer)  
+INFO  Creating temporary project: D:\MSO\Projects\union-clone\ghidra-proj\UnionClone (HeadlessAnalyzer)  
+INFO  Creating project: D:\MSO\Projects\union-clone\ghidra-proj\UnionClone (DefaultProject)  
+INFO  REPORT: Processing input files:  (HeadlessAnalyzer)  
+INFO       project: D:\MSO\Projects\union-clone\ghidra-proj\UnionClone (HeadlessAnalyzer)  
+INFO  IMPORTING: file:///D:/MSO/Projects/union-clone/extracted/app/app/utils/_security_crypto.cp313-win_amd64.pyd (HeadlessAnalyzer)  
+INFO  Using Loader: Portable Executable (PE) (ProgramLoader)  
+INFO  Using Language/Compiler: x86:LE:64:default:windows (ProgramLoader)  
+INFO  Using Library Search Path: [., C:\WINDOWS\SysWOW64, C:\Program Files\Eclipse Adoptium\jdk-25.0.4.101-hotspot\bin, C:\WINDOWS\Sun\Java\bin, C:\WINDOWS\system32, C:\WINDOWS, C:\Python314\Scripts\, C:\Python314\, C:\WINDOWS\System32\Wbem, C:\WINDOWS\System32\WindowsPowerShell\v1.0\, C:\WINDOWS\System32\OpenSSH\, C:\Program Files\nodejs\, C:\ProgramData\chocolatey\bin, C:\Program Files\dotnet\, C:\Users\MSO\AppData\Local\Microsoft\WindowsApps, C:\Users\MSO\AppData\Local\Programs\Microsoft VS Code\bin, C:\Users\MSO\AppData\Local\GitHubDesktop\bin, C:\Users\MSO\AppData\Roaming\npm, C:\Users\MSO\AppData\Local\Programs\DockerDesktop\resources\bin, C:\Users\MSO\AppData\Local\Programs\Microsoft VS Code\bin\copilot-shim] (ProgramLoader)  
+INFO  Additional info:
+Loading file:///D:/MSO/Projects/union-clone/extracted/app/app/utils/_security_crypto.cp313-win_amd64.pyd?MD5=d8b085d4deb0894e1ba9671997204ff5...
+------------------------------------------------
+
+Searching 19 paths for library API-MS-WIN-CRT-RUNTIME-L1-1-0.DLL...
+Loading file:///C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/api-ms-win-crt-runtime-l1-1-0.dll?MD5=bbaa58e9e1abdf7d8c4c69652d29d789...
+Using existing exports file: C:\Users\MSO\AppData\Roaming\ghidra\ghidra_12.1.4_PUBLIC\symbols\win64\api-ms-win-crt-runtime-l1-1-0.exports
+Library not saved to project.
+------------------------------------------------
+
+Searching 19 paths for library KERNEL32.DLL...
+Skipping library which is the wrong architecture: file:///C:/Windows/SysWOW64/kernel32.dll
+Loading file:///C:/Windows/System32/kernel32.dll?MD5=f5c1a53820926a317adde8a0eccf31ca...
+Using existing exports file: C:\Users\MSO\AppData\Roaming\ghidra\ghidra_12.1.4_PUBLIC\symbols\win64\kernel32.exports
+Library not saved to project.
+------------------------------------------------
+
+Searching 19 paths for library PYTHON313.DLL...
+Library not found.
+------------------------------------------------
+
+Searching 19 paths for library VCRUNTIME140.DLL...
+Skipping library which is the wrong architecture: file:///C:/Windows/SysWOW64/vcruntime140.dll
+Loading file:///C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/vcruntime140.dll?MD5=caf9edded91c1f6c0022b278c16679aa...
+Using existing exports file: C:\Users\MSO\AppData\Roaming\ghidra\ghidra_12.1.4_PUBLIC\symbols\win64\vcruntime140.exports
+Library not saved to project.
+------------------------------------------------
+
+Applying C:\Users\MSO\AppData\Roaming\ghidra\ghidra_12.1.4_PUBLIC\symbols\win64\kernel32.exports
+Applying C:\Users\MSO\AppData\Roaming\ghidra\ghidra_12.1.4_PUBLIC\symbols\win64\vcruntime140.exports
+Applying C:\Users\MSO\AppData\Roaming\ghidra\ghidra_12.1.4_PUBLIC\symbols\win64\api-ms-win-crt-runtime-l1-1-0.exports
+Linking the External Programs of '_security_crypto.cp313-win_amd64.pyd' to imported libraries...
+  [PYTHON313.DLL] -> not found in project
+  [KERNEL32.DLL] -> not found in project
+  [VCRUNTIME140.DLL] -> not found in project
+  [API-MS-WIN-CRT-RUNTIME-L1-1-0.DLL] -> not found in project
+------------------------------------------------
+
+ (ProgramLoader)  
+INFO  IMPORTING: Loaded 0 additional files (HeadlessAnalyzer)  
+INFO  ANALYZING all memory and code: file:///D:/MSO/Projects/union-clone/extracted/app/app/utils/_security_crypto.cp313-win_amd64.pyd (HeadlessAnalyzer)  
+WARN  Ignoring leading '_' chars on no-return name '___raise_securityfailure' specified in file: C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\Base\data\PEFunctionsThatDoNotReturn (NoReturnFunctionAnalyzer)  
+WARN  Ignoring leading '_' chars on no-return name '___report_rangecheckfailure' specified in file: C:\Tools\Ghidra\ghidra_12.1.4_PUBLIC\Ghidra\Features\Base\data\PEFunctionsThatDoNotReturn (NoReturnFunctionAnalyzer)  
+INFO  Skipping PDB processing: missing PDB information in program metadata (PdbUniversalAnalyzer)  
+INFO  Packed database cache: C:\Users\MSO\AppData\Local\ghidra\packed-db-cache (PackedDatabaseCache)  
+INFO  Applied data type archive: windows_vs12_64 (ApplyDataArchiveAnalyzer)  
+INFO  -----------------------------------------------------
+    ASCII Strings                              0.375 secs
+    Apply Data Archives                        0.689 secs
+    Call Convention ID                         0.006 secs
+    Call-Fixup Installer                       0.005 secs
+    Create Address Tables                      0.014 secs
+    Create Address Tables - One Time           0.024 secs
+    Create Function                            0.019 secs
+    Data Reference                             0.050 secs
+    Decompiler Parameter ID                    3.763 secs
+    Decompiler Switch Analysis                 3.819 secs
+    Demangler Microsoft                        0.020 secs
+    Disassemble Entry Points                   0.935 secs
+    Embedded Media                             0.004 secs
+    External Entry References                  0.000 secs
+    Function ID                                0.277 secs
+    Function Start Search                      0.021 secs
+    Non-Returning Functions - Discovered       0.065 secs
+    Non-Returning Functions - Known            0.006 secs
+    PDB Universal                              0.001 secs
+    Reference                                  0.073 secs
+    Scalar Operand References                  0.177 secs
+    Shared Return Calls                        0.044 secs
+    Stack                                      0.772 secs
+    Subroutine References                      0.029 secs
+    Subroutine References - One Time           0.019 secs
+    Windows x86 PE Exception Handling          0.006 secs
+    Windows x86 PE RTTI Analyzer               0.007 secs
+    Windows x86 Thread Environment Block (TEB) Analyzer     0.010 secs
+    WindowsResourceReference                   0.466 secs
+    x86 Constant Reference Analyzer            1.078 secs
+-----------------------------------------------------
+     Total Time   12 secs
+-----------------------------------------------------
+ (AutoAnalysisManager)  
+INFO  REPORT: Analysis succeeded for file: file:///D:/MSO/Projects/union-clone/extracted/app/app/utils/_security_crypto.cp313-win_amd64.pyd (HeadlessAnalyzer)  
+INFO  REPORT: Execute script: DumpAll.java 'D:\MSO\Projects\union-clone\decomp\native\_security_crypto.c'  (HeadlessAnalyzer)  
+INFO  SCRIPT: D:\MSO\Projects\union-clone\ghidra-scripts\DumpAll.java (HeadlessAnalyzer)  
+INFO  DumpAll.java> OK, funcoes: 171 -> D:\MSO\Projects\union-clone\decomp\native\_security_crypto.c (GhidraScript)  
+INFO  ANALYZING changes made by post scripts: file:///D:/MSO/Projects/union-clone/extracted/app/app/utils/_security_crypto.cp313-win_amd64.pyd (HeadlessAnalyzer)  
+INFO  REPORT: Post-analysis succeeded for file: file:///D:/MSO/Projects/union-clone/extracted/app/app/utils/_security_crypto.cp313-win_amd64.pyd (HeadlessAnalyzer)  
+INFO  /_security_crypto.cp313-win_amd64.pyd: file created (MSO) (LocalFileSystem)  
+INFO  REPORT: Save succeeded for: /_security_crypto.cp313-win_amd64.pyd (UnionClone:/_security_crypto.cp313-win_amd64.pyd) (HeadlessAnalyzer)  
+INFO  REPORT: Import succeeded (HeadlessAnalyzer)  

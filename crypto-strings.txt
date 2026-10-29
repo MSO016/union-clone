@@ -1,0 +1,1379 @@
+﻿strings: 1378
+!This program cannot be run in DOS mode.
+pRich.
+.text
+`.rdata
+@.data
+.pdata
+@.rsrc
+@.reloc
+@USVWATAUAVAWH
+t$0H
+t$(D
+t$ H
+H;=p
+D$8H
+Hxfff
+t.H;
+A96|
+M)>u
+$93|
+L)?u
+A94$|
+M)<$u
+A96|
+A97|
+D$0M
+D=%T
+@tcA
+A96|
+A94$|
+t$8L
+|$(L
+A96|
+A94$|
+A96|
+A97|
+d$(M
+t$8M
+\$(I
+A96|
+D$ L
+L$ 91|
+t$ I9F
+A96|
+A97|
+Mo91|
+A96|#I
+A96|
+D$ H
+D$ H
+D$8H
+D$0H
+D$0H
+L$(H
+A96|
+A94$|
+L$ H
+A94$|
+D$8H
+097|
+L$0H
+A_A^A]A\_^[]
+t$ WH
+\$xI
+D$PH
+\$XM
+L$xH
+D$xI
+t$8H
+D$0L
+D$PH
+|$(H
+|$0L
+D$(H
+|$0L
+D$(L
+\$`I
+VWATAVAWH
+y PA
+D9#|
+D9#|
+\$PH
+l$XH
+ A_A^A\_^
+UVWATAUAVAWH
+IpE3
+D9>|
+D9?|
+\$pH
+0A_A^A]A\_^]
+D99|
+D99|
+D9?|
+tYD9;|
+t-E9>|
+D9?|
+D9>|
+D9;|
+E9>|
+D$xL9xp
+D9;|
+\$pH
+{ D99|
+UATH
+D$xL
+y  M
+T$0E
+l$HL
+d$8A
+D$8L
+H;-q
+H;-]
+D$(H
+t+L;
+A9<$|
+|$`H
+D$pH
+l$HL
+d$8H
+|$(H
+T$pI
+T$`H
+\$HH
+D$HH
+d$8H
+T$@E3
+D$(H
+L$XH
+L$xH3
+t$ WH
+\$xI
+D$PH
+\$XM
+L$xH
+D$xI
+t$8H
+D$0L
+D$PH
+|$(H
+|$0L
+D$(H
+|$0L
+D$(L
+\$`I
+VWATAVAWH
+y PA
+D9#|
+D9#|
+\$PH
+l$XH
+ A_A^A\_^
+UVWATAUAVAWH
+IpE3
+D9>|
+D9?|
+\$pH
+0A_A^A]A\_^]
+D99|
+D99|
+D9?|
+tYD9;|
+t-E9>|
+D9?|
+D9>|
+D9;|
+E9>|
+D$xL9xp
+D9;|
+\$pH
+{ D99|
+SATH
+E9.|
+D9/|
+D9.|
+T$(H
+l$ H
+D$(H
+D9+|
+D9)|
+\$0H
+l$8H
+D$0H
+D9+|
+H)+u
+D9/|
+H)/u
+D9.|
+H).u
+T$HE3
+l$@I
+D9+|
+H)+u
+A96|
+I).u
+H)+u
+|$PH
+l$XH
+T$PA
+A97|
+|$`L
+t$hL
+l$pH
+|$xH
+\$xI
+D$PH
+\$XM
+L$xH
+D$xI
+t$8H
+D$0L
+D$PH
+|$(H
+|$0L
+D$(H
+|$0L
+D$(L
+\$pH
+\$pH
+AUAVH
+L;5|
+l$PH
+t$HH
+|$@L
+d$8L
+D$xH
+t)H;
+D$p|
+D$pA
+|$ H
+t$(H
+D$ H
+D$xM
+D$xH
+D$pL
+l$xH
+L$pD
+|$0I
+d$8H
+|$@H
+t$HH
+l$PH
+XA^A]
+\$xI
+D$PH
+\$XM
+L$xH
+D$xI
+t$8H
+D$0L
+D$PH
+|$(H
+|$0L
+D$(H
+|$0L
+D$(L
+\$pH
+\$pH
+l$8H
+t$@H
+|$HE
+|$HH
+t$@H
+l$8H
+t$ WAVAWH
+tX93|
+l$ H
+t$(H
+T$ H
+T$0E3
+\$0I
+\$hH
+l$pH
+t$xH
+@A_A^_
+t$ WH
+\$xI
+D$PH
+\$XM
+L$xH
+D$xI
+t$8H
+D$0L
+D$PH
+|$(H
+|$0L
+D$(H
+|$0L
+D$(L
+\$`I
+USWH
+|$pH
+|$@H
+|$PH
+|$HH
+|$8H
+|$XH
+D9!|
+D9'|
+D9&|
+D9#|
+D9#|
+d$8L
+D9&|
+T$PH
+D9#|
+E9&|
+D9&|
+D9'|
+9;|"H
+\$xH
+d$`H
+D$0H
+E94$|
+T$PH
+E94$|
+D9&|
+A96|
+D$0H
+D$`H
+L$8H
+\$890|
+L$HL
+D97|
+T$xH
+D$0E3
+D$8E3
+D$09
+D$03
+D$0E3
+D$0E3
+D9'|
+|$HH
+L$@H
+D9'|
+d$0H9C
+D9#|
+t$`H
+t$hH
+D$`H
+D9&|
+E9&|
+D9#|
+D9#|
+D9&|
+T$PI
+E9&|
+U E3
+D9&|
+E9&|
+D9'|
+l$PH
+|$XL
+|$0H
+L$XM
+|$8D
+l$PL
+d$pH
+D$HH
+D$HH
+D$@H
+L$XH
+D$@H
+|$XM
+L$@L
+L$HL
+L$8H
+t$ WH
+\$xI
+D$PH
+\$XM
+L$xH
+D$xI
+t$8H
+D$0L
+D$PH
+|$(H
+|$0L
+D$(H
+|$0L
+D$(L
+\$`I
+USVATAUAVAWH
+|$HA
+|$`H;
+|$hH;
+|$8L
+|$@A
+D$PL
+A97|
+A96|
+D$xH
+D$HI
+D$`I
+D9#|
+D9'|
+t$83
+L$8I
+$D9+|
+D9.|
+A94$|
+93|"H
+A96|
+\$@I
+l$8L
+|$@H
+D9'|
+T$xH
+D9+|
+E9,$|
+D9'|
+D9&|
+93|"H
+D$PH
+L$pH
+d$pH
+A9<$|
+T$xH
+A9<$|
+MpE3
+D9#|
+D9'|
+E9&|
+D9&|
+D9&|
+A97|
+A9>|
+L$XL
+\$PH
+UxE3
+L$PL
+uxE3
+uxE3
+UxE3
+t$XH
+UxE3
+EpE3
+l$8L
+|$@H
+A9>|
+D$@H
+t$XL
+l$8H
+D$@H
+D$hH
+D$hH
+D$`H
+D$`H
+D$HH
+L$H3
+|$@H
+L$`H
+L$hH
+A_A^A]A\^[]
+\$xI
+D$PH
+\$XM
+L$xH
+D$xI
+t$8H
+D$0L
+D$PH
+|$(H
+|$0L
+D$(H
+|$0L
+D$(L
+\$pH
+\$pH
+@SWAVH
+l$HH
+D96|
+D97|
+D93|}H
+lD96|
+D97|
+t$PH
+l$HH
+ A^_[
+H9H0u
+|$8t
+H9H0u
+{ 99|
+{(99|
+{099|
+{899|
+|$8t
+\$0H
+t$8H
+\$0H
+t$8H
+H9H0u
+|$8t
+H9H0u
+{ 99|
+{(99|
+{099|
+{899|
+|$8t
+\$@H
+l$HH
+|$(L
+|$(H
+l$HH
+\$@L
+t$ H
+t;H;
+t-H;
+L$@H
+D$0H
+T$p3
+H);u
+D$PH
+\$PH
+H);u
+H);u
+H);u
+H);u
+H);u
+H);u
+t$`H
+T$`I
+H)>u
+I)>u
+H);u
+D$0H
+D$(H
+H);u
+D$0H
+D$(H
+H);u
+D$0H
+D$(H
+H);u
+D$0H
+D$(H
+H);u
+D$0H
+D$(H
+H);u
+D$0H
+D$(H
+H);u
+D$0H
+D$(H
+H);u
+D$0H
+D$(H
+H);u
+D$0H
+D$(H
+H);u
+D$0H
+D$(H
+H);u
+|<L)#u7H
+UVWATAUAVAWH
+u!D9?
+E9<$|
+D9?|
+D9;|
+E9>|
+D9>|
+D$( 
+fD9>|\H
+D9;|
+E9>|
+A_A^A]A\_^]
+|$(H
+|$(H
+|$(H
+|$(H
+|$(H
+|$(H
+|$(H
+|$(H
+D$ H
+|$(H
+D$ H
+|$(H
+|$(H
+|$(H
+|$ AVH
+@t`H
+@tbH;
+\$0H
+l$8H
+t$@H
+|$HH
+D$0H
+D$0H
+\$0H
+l$8H
+t$@H
+\$0H
+t$8H
+t$8H
+\$0H
+\$0H
+l$8H
+|$@H
+UVWATAUAVAWH
+D$p3
+\$ H
+D$pH
+0A_A^A]A\_^]
+WAVAWH
+ t+E
+\$@H
+l$HH
+t$PH
+ A_A^_
+D$`L
+t$ ATAVAWH
+D$0E3
+T$8E3
+d$8L
+d$0L
+\$pH
+|$xH
+D$0H9
+|$0L
+d$@H
+L$@H
+l$ L
+t,ff
+uPE3
+D$0H
+T$8I
+L$0L
+\$pH
+|$xL
+\$PI
+A_A^A\
+L$ UVWATAUAVAWH
+L$pf
+tTH98tLH
+l$ M
+\$xH
+0A_A^A]A\_^]
+L$ UAVH
+hA^]
+l$XM
+d$`L
+|$PL
+H93u
+d$`H
+|$PL
+hA^]
+H;56U
+\$@H
+l$HH
+t$PH
+@UWH
+H_]I
+\$hH
+t$@H
+D$`H
+\$`H
+\$hH
+t$@H
+|$8E3
+t$0I
+T$8H
+@SUH
+t$@H
+|$PH
+t$ H
+t$ H
+|$PH
+t$@H
+(][H
+t$@H
+UVWH
+t$@H
+\$HH
+ _^]H
+@t*L;
+tyE3
+t$@H
+\$HH
+ _^]
+VWAVH
+H)3u
+\$ L
+H)3u
+\$PH
+l$XH
+0A^_^
+\$8A
+|$ H
+|$ H
+\$0H
+\$0t
+t$8H
+L9A t
+SUATAVAWH
+0A_A^A\][
+D$hH
+ujMcF
+t$`|
+|$x|
+D$hI
+0A_A^A\][
+D$hL
+L$pH
+D$hH
+t$pI;
+D$hM
+SWAUAVAWH
+\$8I
+|$@K
+`A_A^A]_[
+t$XL
+t$X3
+`A_A^A]_[
+d$PO
+\$0H
+L$ H
+D$ H
+|$@|
+d$PH
+t$XH
+`A_A^A]_[
+\$0H
+u*H9
+\$0H
+u*H9
+tEH;
+ u!H
+\$XH
+|$8L
+|$8H
+l$`H
+\$XL
+t$0H
+{h99|
+{ 99|
+{@99|
+{H99|
+{P99|
+{X99|
+{`99|
+{p99|
+\$83
+\$0H
+t$8H
+\$0H
+t$8H
+D$ M
+D$ M
+\$@H
+l$HH
+t$PH
+t$ WH
+l$ L
+l$PH
+t$XH
+l$PH
+t$XH
+\$H<
+\$HH
+l$PH
+t$XH
+T$ M
+T$ M
+Y8L#
+\$@H
+\$@H
+\$ L
+\$@H
+L$XH
+L$`H
+\$0H
+l$8H
+t$@H
+SVWAVH
+(A^_^[
+l$XL
+}1F9t
+d$`D
+d$`H
+l$XL
+|$ H
+(A^_^[
+WATAUAVAWH
+H9^(t
+\$`H
+l$hH
+t$pH
+0A_A^A]A\_
+tQI;
+@tqH
+|$ E3
+\$0H
+t$8H
+@tZH;
+|$ A
+t$8H
+\$0H
+@UWAVH
+ApE3
+\$8H
+t$0H
+H9^(t
+\$8H
+t$0H
+@A^_]
+@A^_]
+@VWAWH
+ A__^
+\$HH
+l$PL
+t$XH
+l$PH
+\$HI
+ A__^
+ A__^
+t$PL
+t$ u#E
+l$HH
+t$P3
+t$ H
+D$0H
+\$0H
+\$8H
+D$0H
+D$0H
+\$@H
+T$0L
+\$@H
+|$@H
+L$@L
+tyH;5
+T$ E3
+|$ I
+\$HH
+t$PH
+T$@H
+D$@H
+D$@H
+\$HH
+t$PH
+|$@E3
+\$HH
+t$PH
+\$HH
+l$PH
+t$@H
+tqH;-
+T$ E3
+t$ I
+t$@H
+\$HH
+l$PH
+l$hH
+\$PH9B
+D$XH
+|$XH
+T$(E3
+D$P9
+D$PH
+|$0H
+l$hH
+T$0H
+D$0H
+D$0H
+D$0A
+T$@H
+L$@H
+@SVAVH
+ A^^[
+l$H3
+|$PH
+s891|
+@toH
+H98t5H
+l$HH
+|$PH
+ A^^[
+@UVWATAWH
+t$xH
+D9+|
+o8D9)|
+D$0L
+l$03
+t$ H
+D$0H
+t$8M
+u]D9+|
+o8D9)
+l$HI
+l$PH
+T$PL
+|$XL
+D$0H
+E9.|
+D9+|
+T$0H
+D$0E3
+t$xH
+L$hH3
+A_A\_^]
+\$`H
+L$pH
+D$xH
+T$@H
+\$`H
+\$0H
+t$8H
+{099|
+{899|
+{ 99|
+{`99|
+{h99|
+{H99|
+{P99|
+{X99|
+\$83
+\$HH
+t$PH
+|$(L
+9Upu
+T$@H
+L$@H
+H9^(t
+t$ H
+t$PH
+|$(H
+\$HH
+\$8u
+\$8H
+|$@3
+\$8H
+|$@H
+\$8H
+l$ L
+VWAUAVAWH
+l$hH
+D$`L
+T$XL
+T$PL
+d$HL
+T$@L
+T$8H
+A_A^A]_^
+|$ AVH
+D$@@
+\$0H
+t$8H
+|$HH
+\$@H
+VWAVH
+\$xH
+@A^_^
+\$0H
+t$8H
+D$8H
+D$8H
+D$@H
+@SVWH
+T$`H
+T$`H
+L$hH
+L$0L
+L$pH
+L$(3
+@_^[
+ H3E
+\$PH
+t!eH
+L$PH
+\$0H
+l$8H
+t$@H
+uxHc
+uTL+
+L$0L
+L$(H
+L$ 3
+L$PH
+D$PH
+D$@H
+\$0H
+\$0H
+t$ WH
+ntel
+ineI
+Genu
+t(=`
+t!=p
+ w$H
+D$ $
+D$ "
+D$ "
+D$ H
+\$(3
+l$0H
+t$8H
+T$ L
+_security_crypto.c
+_security_crypto.py
+_machine_key
+_security_crypto._machine_key
+encrypt_blob
+_security_crypto.encrypt_blob
+_security_crypto.encrypt_blob.genexpr
+can't send non-None value to a just-started generator
+genexpr
+decrypt_blob
+_security_crypto.decrypt_blob
+_security_crypto.decrypt_blob.genexpr
+decrypt_blob_safe
+_security_crypto.decrypt_blob_safe
+is_encrypted
+_security_crypto.is_encrypted
+_wipe_key
+_security_crypto._wipe_key
+_pyc_derive_key
+_security_crypto._pyc_derive_key
+encrypt_pyc
+_security_crypto.encrypt_pyc
+decrypt_pyc
+_security_crypto.decrypt_pyc
+is_pyc_encrypted
+_security_crypto.is_pyc_encrypted
+_security_crypto.__pyx_scope_struct__encrypt_blob
+_security_crypto.__pyx_scope_struct_1_genexpr
+_security_crypto.__pyx_scope_struct_2_decrypt_blob
+_security_crypto.__pyx_scope_struct_3_genexpr
+_security_crypto
+Interpreter change detected - this module can only be loaded into one interpreter per process.
+name
+__loader__
+loader
+__file__
+origin
+__package__
+parent
+__path__
+submodule_search_locations
+Module '_security_crypto' has already been imported. Re-initialisation is not supported.
+builtins
+cython_runtime
+__builtins__
+init _security_crypto
+U=l#E
+v86)!
+b#N,
+Z}kl
+e6i`
+iB.s-
+:5~IM
+K2%+
+SeX6
+ka-Z
+GEH1
+)0{6hk'3+
+3'7@
+vj$\A
+vft-*
+name '%U' is not defined
+ while calling a Python object
+NULL result without error in PyObject_Call
+join() result is too long for a Python string
+%s() got multiple values for keyword argument '%U'
+%.200s() keywords must be strings
+%s() got an unexpected keyword argument '%U'
+exactly
+%.200s() takes %.8s %zd positional argument%.1s (%zd given)
+local variable '%s' referenced before assignment
+free variable '%s' referenced before assignment in enclosing scope
+cannot fit '%.200s' into an index-sized integer
+'%.200s' object is not subscriptable
+generator raised StopIteration
+keywords must be strings
+'%.200s' object is unsliceable
+raise: arg 3 must be a traceback or None
+instance exception may not have a separate value
+calling %R should have returned an instance of BaseException, not %R
+raise: exception class must be a subclass of BaseException
+base class '%.200s' is not a heap type
+extension type '%.200s' has no __dict__ slot, but base type '%.200s' has: either add 'cdef dict __dict__' to the extension type or add '__slots__ = [...]' to the base type
+_cython_3_2_4
+Shared Cython type %.200s is not a type object
+Shared Cython type %.200s has the wrong size, try recompiling
+__module__
+_cython_3_2_4._common_types_metatype
+__name__ must be set to a string object
+__qualname__ must be set to a string object
+__defaults__ must be set to a tuple object
+changes to cyfunction.__defaults__ will not currently affect the values used in function calls
+__kwdefaults__ must be set to a dict object
+changes to cyfunction.__kwdefaults__ will not currently affect the values used in function calls
+__annotations__ must be set to a dict object
+%.200s() %s (%zd given)
+%.200s() %s
+func_doc
+__doc__
+func_name
+__name__
+__qualname__
+func_dict
+__dict__
+func_globals
+__globals__
+func_closure
+__closure__
+func_code
+__code__
+func_defaults
+__defaults__
+__kwdefaults__
+__annotations__
+_is_coroutine
+__vectorcalloffset__
+__weaklistoffset__
+__reduce__
+Bad call flags for CyFunction
+<cyfunction %U at %p>
+takes no arguments
+takes exactly one argument
+takes no keyword arguments
+unbound method %.200S() needs an argument
+needs an argument
+_cython_3_2_4.cython_function_or_method
+generator already executing
+generator ignored GeneratorExit
+throw
+cannot pickle '%.200s' object
+send
+send(arg) -> send 'arg' into generator,
+return next yielded value or raise StopIteration.
+throw(typ[,val[,tb]]) -> raise exception in generator,
+return next yielded value or raise StopIteration.
+close
+close() -> raise GeneratorExit inside generator.
+__reduce_ex__
+gi_yieldfrom
+object being iterated by 'yield from', or None
+gi_code
+name of the generator
+qualified name of the generator
+gi_frame
+Frame of the generator
+gi_running
+_cython_3_2_4.generator
+does not match
+compile time Python version %d.%d of module '%.100s' %s runtime version %d.%d
+zlib
+decompress
+Failed to import '%.20s.decompress' - cannot initialise module strings. String compression was configured with the C macro 'CYTHON_COMPRESS_STRINGS=%d'.
+Verifica se dados tem magic header de .pyc encriptado.
+Encripta .pyc completo. Formato: [MAGIC 4][NONCE 16][DATA][TAG 16]
+Limpa chave da memoria.
+Decripta .pyc. Retorna None se integridade falhar ou nao for encriptado.
+GCTL
+.text$mn
+.text$mn$00
+.text$x
+.idata$5
+.00cfg
+.CRT$XCA
+.CRT$XCZ
+.CRT$XIA
+.CRT$XIZ
+.CRT$XPA
+.CRT$XPZ
+.CRT$XTA
+.CRT$XTZ
+.rdata
+.rdata$voltmd
+.rdata$zzzdbg
+.rtc$IAA
+.rtc$IZZ
+.rtc$TAA
+.rtc$TZZ
+.xdata
+.edata
+.idata$2
+.idata$3
+.idata$4
+.idata$6
+.data
+.bss
+.pdata
+.rsrc$01
+.rsrc$02
+_security_crypto.cp313-win_amd64.pyd
+PyInit__security_crypto
+PyUnicode_AsEncodedString
+PyUnicode_CopyCharacters
+PyBaseObject_Type
+PyGC_Enable
+PyObject_SetAttr
+PyUnicode_InternFromString
+PyCFunction_Type
+PyOS_snprintf
+PyThreadState_Get
+PyExc_Exception
+PyException_GetTraceback
+PyErr_SetObject
+PyDict_SetDefault
+PyCode_NewEmpty
+PyErr_GivenExceptionMatches
+PyErr_WarnEx
+PyExc_RuntimeWarning
+PyThreadState_GetFrame
+PyFrame_New
+PyLong_AsSsize_t
+Py_LeaveRecursiveCall
+PyImport_AddModuleRef
+PyImport_ImportModule
+PyBytes_AsString
+PyImport_ImportModuleLevelObject
+PyErr_NormalizeException
+PyObject_SelfIter
+PyErr_Occurred
+PyArg_ValidateKeywordArguments
+PyLong_FromSsize_t
+PyUnicode_DecodeUTF8
+PyNumber_Remainder
+PyObject_GenericGetAttr
+PyTraceBack_Here
+PyExc_RuntimeError
+PyMethod_New
+PyObject_SetAttrString
+PyLong_FromLong
+PyObject_GC_UnTrack
+PyObject_Hash
+PyNumber_Xor
+PyExc_UnboundLocalError
+PyErr_SetNone
+PyInterpreterState_GetID
+PyObject_GetAttr
+_Py_NoneStruct
+PyTuple_New
+PyObject_GenericSetDict
+PyObject_VisitManagedDict
+PyDict_SetItemString
+PyDict_Size
+PyLong_FromLongLong
+PyDict_SetDefaultRef
+PyFloat_FromDouble
+PyGC_Disable
+PyExc_AttributeError
+PyTuple_GetSlice
+PyUnicode_New
+PyErr_SetString
+PyObject_CallFunction
+PyErr_WriteUnraisable
+PyObject_GetIter
+PyNumber_Add
+PyExc_ValueError
+PyUnicode_InternInPlace
+PyDict_Next
+PyErr_Format
+PyDict_Type
+PyThreadState_GetUnchecked
+PyObject_RichCompare
+PyTuple_Type
+_Py_FalseStruct
+PyImport_GetModule
+PyFloat_Type
+PyModule_NewObject
+PyMethod_Type
+PyLong_Type
+PyType_IsSubtype
+PyExc_OverflowError
+_Py_Dealloc
+PyTuple_GetItem
+PyImport_GetModuleDict
+PyModule_GetDict
+PyObject_Format
+PyErr_ExceptionMatches
+PyObject_ClearManagedDict
+PyUnicode_FindChar
+PyObject_GC_Del
+PyObject_CallFunctionObjArgs
+PyObject_GenericGetDict
+PyObject_ClearWeakRefs
+PyObject_Init
+PyObject_Vectorcall
+PyUnicode_FromFormat
+Py_Version
+PyList_New
+PySlice_New
+PyObject_GC_IsFinalized
+PyType_Ready
+PyObject_GetAttrString
+PyErr_Clear
+PyBytes_Type
+PyObject_RichCompareBool
+PyException_SetTraceback
+PyObject_VectorcallDict
+PyDict_SetItem
+PyDict_New
+PyUnicode_Type
+PyNumber_ToBase
+PyObject_CallFinalizerFromDealloc
+_PyDict_GetItem_KnownHash
+PyObject_VectorcallMethod
+PyNumber_Index
+PyMem_Free
+PyExc_StopIteration
+PyObject_GetOptionalAttr
+PyList_Type
+PyErr_NoMemory
+PyDict_GetItemString
+PyObject_GetItem
+PyModuleDef_Init
+PyObject_GC_Track
+PyBytes_FromStringAndSize
+PyUnstable_Code_NewWithPosOnlyArgs
+PyDict_GetItemRef
+PyObject_IsSubclass
+PyExc_TypeError
+PyMem_Realloc
+PyType_FromMetaclass
+PyObject_IsTrue
+PyExc_NameError
+PyTuple_Pack
+PyMem_Malloc
+PyExc_IndexError
+Py_EnterRecursiveCall
+PyExc_ImportError
+_Py_TrueStruct
+PyArg_UnpackTuple
+PyMemoryView_FromMemory
+PyExc_SystemError
+PyObject_SetItem
+_PyObject_GC_New
+PyException_SetCause
+PyTraceBack_Type
+PyExc_GeneratorExit
+PyRange_Type
+PyUnicode_FromString
+PyObject_Size
+PyObject_Call
+PyByteArray_Type
+PyType_Type
+PyUnicode_Substring
+PyUnicode_FromStringAndSize
+PyIter_Check
+python313.dll
+RtlCaptureContext
+RtlLookupFunctionEntry
+RtlVirtualUnwind
+UnhandledExceptionFilter
+SetUnhandledExceptionFilter
+GetCurrentProcess
+TerminateProcess
+IsProcessorFeaturePresent
+QueryPerformanceCounter
+GetCurrentProcessId
+GetCurrentThreadId
+GetSystemTimeAsFileTime
+DisableThreadLibraryCalls
+InitializeSListHead
+IsDebuggerPresent
+KERNEL32.dll
+strrchr
+__C_specific_handler
+__std_type_info_destroy_list
+memset
+VCRUNTIME140.dll
+_initterm
+_initterm_e
+_seh_filter_dll
+_configure_narrow_argv
+_initialize_narrow_environment
+_initialize_onexit_table
+_execute_onexit_table
+_cexit
+api-ms-win-crt-runtime-l1-1-0.dll
+memcmp
+memcpy
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<assembly xmlns='urn:schemas-microsoft-com:asm.v1' manifestVersion='1.0'>
+</assembly>

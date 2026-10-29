@@ -1,0 +1,735 @@
+﻿
+### __init__.py  (1 arq)
+__init__.py
+
+### assets\icons  (5 arq)
+assets\icons\android.png
+assets\icons\clear.png
+assets\icons\play.png
+assets\icons\repair.png
+assets\icons\stop.png
+
+### backups\.gitkeep  (1 arq)
+backups\.gitkeep
+
+### controllers\__init__.py  (1 arq)
+controllers\__init__.py
+
+### controllers\__init__.pyc  (1 arq)
+controllers\__init__.pyc
+
+### controllers\login_controller.pyc  (1 arq)
+controllers\login_controller.pyc
+
+### controllers\main_controller.pyc  (1 arq)
+controllers\main_controller.pyc
+
+### data\migration_backups  (2 arq)
+data\migration_backups\user_solutions_1_backup_20250705_111216.db
+data\migration_backups\user_solutions_1_backup_20250705_111618.db
+
+### data\user_solutions_1.db  (1 arq)
+data\user_solutions_1.db
+
+### data\user_solutions_1.json  (1 arq)
+data\user_solutions_1.json
+
+### database\.key  (1 arq)
+database\.key
+
+### database\__init__.py  (1 arq)
+database\__init__.py
+
+### database\__init__.pyc  (1 arq)
+database\__init__.pyc
+
+### database\base.db  (1 arq)
+database\base.db
+
+### database\blacklist_union_apps_v2.json  (1 arq)
+database\blacklist_union_apps_v2.json
+
+### database\cache_manager.cp313-win_amd64.pyd  (1 arq)
+database\cache_manager.cp313-win_amd64.pyd
+
+### database\conteudos_widget_cache.pyc  (1 arq)
+database\conteudos_widget_cache.pyc
+
+### database\create_tables.cp313-win_amd64.pyd  (1 arq)
+database\create_tables.cp313-win_amd64.pyd
+
+### database\downloads_cache.db.backup  (1 arq)
+database\downloads_cache.db.backup
+
+### database\downloads_cache.pyc  (1 arq)
+database\downloads_cache.pyc
+
+### database\implementar_cache_servidor_arquivos.pyc  (1 arq)
+database\implementar_cache_servidor_arquivos.pyc
+
+### database\init_service_orders_db.cp313-win_amd64.pyd  (1 arq)
+database\init_service_orders_db.cp313-win_amd64.pyd
+
+### database\migration_add_service_value.cp313-win_amd64.pyd  (1 arq)
+database\migration_add_service_value.cp313-win_amd64.pyd
+
+### database\migrations  (5 arq)
+database\migrations\001_initial.pyc
+database\migrations\__init__.py
+database\migrations\__init__.pyc
+database\migrations\add_warranty_text.pyc
+database\migrations\run_migrations.pyc
+
+### database\peliculas_cache.pyc  (1 arq)
+database\peliculas_cache.pyc
+
+### database\service_orders.db  (1 arq)
+database\service_orders.db
+
+### database\service_orders_schema.cp313-win_amd64.pyd  (1 arq)
+database\service_orders_schema.cp313-win_amd64.pyd
+
+### database\servidor_arquivos_cache.db-shm  (1 arq)
+database\servidor_arquivos_cache.db-shm
+
+### database\servidor_arquivos_cache_manager.pyc  (1 arq)
+database\servidor_arquivos_cache_manager.pyc
+
+### database\test.json  (1 arq)
+database\test.json
+
+### logs\.gitkeep  (1 arq)
+logs\.gitkeep
+
+### resources\exploits  (2 arq)
+resources\exploits\exploit_base.apk
+resources\exploits\exploit_classes.dex
+
+### resources\icon.ico  (1 arq)
+resources\icon.ico
+
+### resources\icon.png  (1 arq)
+resources\icon.png
+
+### resources\icons_svg  (63 arq)
+resources\icons_svg\arrow-clockwise.svg
+resources\icons_svg\battery-charging.svg
+resources\icons_svg\broadcast-pin.svg
+resources\icons_svg\camera.svg
+resources\icons_svg\card-checklist.svg
+resources\icons_svg\caret-down-square.svg
+resources\icons_svg\caret-left-fill.svg
+resources\icons_svg\caret-right-fill.svg
+resources\icons_svg\caret-up-square.svg
+resources\icons_svg\check2-all.svg
+resources\icons_svg\clipboard2-pulse-fill.svg
+resources\icons_svg\clipboard2-pulse.svg
+resources\icons_svg\cloud-arrow-down.svg
+resources\icons_svg\cpu.svg
+resources\icons_svg\file-bar-graph.svg
+resources\icons_svg\folder-check.svg
+resources\icons_svg\folder-fill.svg
+resources\icons_svg\folder2-open.svg
+resources\icons_svg\gear-wide-connected.svg
+resources\icons_svg\globe.svg
+resources\icons_svg\graph-up.svg
+resources\icons_svg\hdd.svg
+resources\icons_svg\hxd.svg
+resources\icons_svg\keyboard.svg
+resources\icons_svg\lightning-charge.svg
+resources\icons_svg\lightning.svg
+resources\icons_svg\motherboard.svg
+resources\icons_svg\pc-display-horizontal.svg
+resources\icons_svg\pc-display.svg
+resources\icons_svg\pc.svg
+resources\icons_svg\pci-card-network.svg
+resources\icons_svg\pelicula.svg
+resources\icons_svg\phone-flip.svg
+resources\icons_svg\plugin.svg
+resources\icons_svg\power.svg
+resources\icons_svg\printer-fill.svg
+resources\icons_svg\printer.svg
+resources\icons_svg\question-circle.svg
+resources\icons_svg\reception-4.svg
+resources\icons_svg\robot.svg
+resources\icons_svg\seta_down.svg
+resources\icons_svg\shield-check.svg
+resources\icons_svg\shield-fill-check.svg
+resources\icons_svg\shield-lock.svg
+resources\icons_svg\shield-shaded.svg
+resources\icons_svg\sidebar.svg
+resources\icons_svg\sidebar1.svg
+resources\icons_svg\sidebar2.svg
+resources\icons_svg\sim-fill.svg
+resources\icons_svg\sim.svg
+resources\icons_svg\terminal.svg
+resources\icons_svg\thermometer-half.svg
+resources\icons_svg\tools.svg
+resources\icons_svg\trash.svg
+resources\icons_svg\upc-scan.svg
+resources\icons_svg\usb-plug.svg
+resources\icons_svg\usb-symbol.svg
+resources\icons_svg\virus.svg
+resources\icons_svg\virus2.svg
+resources\icons_svg\volume-up-fill.svg
+... +3
+
+### resources\login.gif  (1 arq)
+resources\login.gif
+
+### resources\login.jpg  (1 arq)
+resources\login.jpg
+
+### resources\login.png  (1 arq)
+resources\login.png
+
+### resources\login1.jpg  (1 arq)
+resources\login1.jpg
+
+### resources\logo.bmp  (1 arq)
+resources\logo.bmp
+
+### resources\logos  (20 arq)
+resources\logos\android.png
+resources\logos\apple.png
+resources\logos\cpu.png
+resources\logos\desbloqueios.png
+resources\logos\drill.png
+resources\logos\esquema.png
+resources\logos\estudo.png
+resources\logos\huawei.png
+resources\logos\infinix.png
+resources\logos\isp.png
+resources\logos\motorola.png
+resources\logos\oppo.png
+resources\logos\realme.png
+resources\logos\samsung.png
+resources\logos\software.png
+resources\logos\tecno.png
+resources\logos\telas.png
+resources\logos\testpoint.png
+resources\logos\vivo.png
+resources\logos\xiaomi.png
+
+### resources\parceiros  (17 arq)
+resources\parceiros\bionic.jpg
+resources\parceiros\daple.jpg
+resources\parceiros\driphone.png
+resources\parceiros\ibrafix.jpg
+resources\parceiros\icon.ico
+resources\parceiros\jotacell.jpg
+resources\parceiros\jt.jpg
+resources\parceiros\maiconcell.jpg
+resources\parceiros\marcosmodera.jpeg
+resources\parceiros\martech.jpg
+resources\parceiros\meta.jpg
+resources\parceiros\mf.jpg
+resources\parceiros\ramon.jpg
+resources\parceiros\restorecell.png
+resources\parceiros\victorcell.png
+resources\parceiros\vipcell.jpg
+resources\parceiros\willian.jpg
+
+### resources\tech_union_logo.png  (1 arq)
+resources\tech_union_logo.png
+
+### resources\wizard.bmp  (1 arq)
+resources\wizard.bmp
+
+### templates\service_orders  (1 arq)
+templates\service_orders\.gitkeep
+
+### translations\__init__.py  (1 arq)
+translations\__init__.py
+
+### translations\en.py  (1 arq)
+translations\en.py
+
+### translations\es.py  (1 arq)
+translations\es.py
+
+### translations\pt.py  (1 arq)
+translations\pt.py
+
+### utils\.state  (1 arq)
+utils\.state
+
+### utils\__init__.py  (1 arq)
+utils\__init__.py
+
+### utils\__init__.pyc  (1 arq)
+utils\__init__.pyc
+
+### utils\_app_cfg.cp313-win_amd64.pyd  (1 arq)
+utils\_app_cfg.cp313-win_amd64.pyd
+
+### utils\_cfg_probe.cp313-win_amd64.pyd  (1 arq)
+utils\_cfg_probe.cp313-win_amd64.pyd
+
+### utils\_ci_sentinel.pyc  (1 arq)
+utils\_ci_sentinel.pyc
+
+### utils\_import_hook.pyc  (1 arq)
+utils\_import_hook.pyc
+
+### utils\_lsv_cfg.cp313-win_amd64.pyd  (1 arq)
+utils\_lsv_cfg.cp313-win_amd64.pyd
+
+### utils\_pkg_defs.pyc  (1 arq)
+utils\_pkg_defs.pyc
+
+### utils\_res_loader.cp313-win_amd64.pyd  (1 arq)
+utils\_res_loader.cp313-win_amd64.pyd
+
+### utils\_security_crypto.cp313-win_amd64.pyd  (1 arq)
+utils\_security_crypto.cp313-win_amd64.pyd
+
+### utils\_upd_core.cp313-win_amd64.pyd  (1 arq)
+utils\_upd_core.cp313-win_amd64.pyd
+
+### utils\adb_app_manager.pyc  (1 arq)
+utils\adb_app_manager.pyc
+
+### utils\adb_manager.pyc  (1 arq)
+utils\adb_manager.pyc
+
+### utils\adb_pkg_utils.pyc  (1 arq)
+utils\adb_pkg_utils.pyc
+
+### utils\adb_system_monitor.pyc  (1 arq)
+utils\adb_system_monitor.pyc
+
+### utils\adware_advanced_detector.pyc  (1 arq)
+utils\adware_advanced_detector.pyc
+
+### utils\adware_csi.pyc  (1 arq)
+utils\adware_csi.pyc
+
+### utils\adware_hardening.pyc  (1 arq)
+utils\adware_hardening.pyc
+
+### utils\arquivos_manager.cp313-win_amd64.pyd  (1 arq)
+utils\arquivos_manager.cp313-win_amd64.pyd
+
+### utils\backup_manager.pyc  (1 arq)
+utils\backup_manager.pyc
+
+### utils\company_data_loader.cp313-win_amd64.pyd  (1 arq)
+utils\company_data_loader.cp313-win_amd64.pyd
+
+### utils\compartilhamento_seguro.pyc  (1 arq)
+utils\compartilhamento_seguro.pyc
+
+### utils\correcao_wdef.pyc  (1 arq)
+utils\correcao_wdef.pyc
+
+### utils\database_manager.pyc  (1 arq)
+utils\database_manager.pyc
+
+### utils\frp_erase_xiaomi.pyc  (1 arq)
+utils\frp_erase_xiaomi.pyc
+
+### utils\frp_mtk_manager.pyc  (1 arq)
+utils\frp_mtk_manager.pyc
+
+### utils\hwparam.json  (1 arq)
+utils\hwparam.json
+
+### utils\marcas_sistema.cp313-win_amd64.pyd  (1 arq)
+utils\marcas_sistema.cp313-win_amd64.pyd
+
+### utils\mtk_manager.pyc  (1 arq)
+utils\mtk_manager.pyc
+
+### utils\os_manager.pyc  (1 arq)
+utils\os_manager.pyc
+
+### utils\painel_administrativo.pyc  (1 arq)
+utils\painel_administrativo.pyc
+
+### utils\painel_integration.cp313-win_amd64.pyd  (1 arq)
+utils\painel_integration.cp313-win_amd64.pyd
+
+### utils\path_manager.cp313-win_amd64.pyd  (1 arq)
+utils\path_manager.cp313-win_amd64.pyd
+
+### utils\pkg_utils.pyc  (1 arq)
+utils\pkg_utils.pyc
+
+### utils\premium_services_manager.pyc  (1 arq)
+utils\premium_services_manager.pyc
+
+### utils\report_printer.pyc  (1 arq)
+utils\report_printer.pyc
+
+### utils\samsung_advanced.pyc  (1 arq)
+utils\samsung_advanced.pyc
+
+### utils\samsung_android16_frp.pyc  (1 arq)
+utils\samsung_android16_frp.pyc
+
+### utils\samsung_manager.pyc  (1 arq)
+utils\samsung_manager.pyc
+
+### utils\samsung_qrcode_viewer.pyc  (1 arq)
+utils\samsung_qrcode_viewer.pyc
+
+### utils\scrcpy_manager.pyc  (1 arq)
+utils\scrcpy_manager.pyc
+
+### utils\screen_protection_config.cp313-win_amd64.pyd  (1 arq)
+utils\screen_protection_config.cp313-win_amd64.pyd
+
+### utils\service_order_pdf.cp313-win_amd64.pyd  (1 arq)
+utils\service_order_pdf.cp313-win_amd64.pyd
+
+### utils\service_order_thermal_pdf.cp313-win_amd64.pyd  (1 arq)
+utils\service_order_thermal_pdf.cp313-win_amd64.pyd
+
+### utils\solucoes_window.pyc  (1 arq)
+utils\solucoes_window.pyc
+
+### utils\tools_android.pyc  (1 arq)
+utils\tools_android.pyc
+
+### utils\translation_manager.pyc  (1 arq)
+utils\translation_manager.pyc
+
+### utils\translation_validator.cp313-win_amd64.pyd  (1 arq)
+utils\translation_validator.cp313-win_amd64.pyd
+
+### utils\unlock_tools_manager.pyc  (1 arq)
+utils\unlock_tools_manager.pyc
+
+### utils\usb_requirements_manager.pyc  (1 arq)
+utils\usb_requirements_manager.pyc
+
+### utils\user_database.cp313-win_amd64.pyd  (1 arq)
+utils\user_database.cp313-win_amd64.pyd
+
+### utils\user_solutions_manager.cp313-win_amd64.pyd  (1 arq)
+utils\user_solutions_manager.cp313-win_amd64.pyd
+
+### utils\web_view_widget.pyc  (1 arq)
+utils\web_view_widget.pyc
+
+### utils\webhook_client.cp313-win_amd64.pyd  (1 arq)
+utils\webhook_client.cp313-win_amd64.pyd
+
+### utils\window_protection.pyc  (1 arq)
+utils\window_protection.pyc
+
+### utils\xiaomi_manager.pyc  (1 arq)
+utils\xiaomi_manager.pyc
+
+### views\__init__.py  (1 arq)
+views\__init__.py
+
+### views\__init__.pyc  (1 arq)
+views\__init__.pyc
+
+### views\_uart_health_widget.pyc  (1 arq)
+views\_uart_health_widget.pyc
+
+### views\_uart_parser.cp313-win_amd64.pyd  (1 arq)
+views\_uart_parser.cp313-win_amd64.pyd
+
+### views\_uart_parser_exynos.cp313-win_amd64.pyd  (1 arq)
+views\_uart_parser_exynos.cp313-win_amd64.pyd
+
+### views\_uart_parser_qcom.cp313-win_amd64.pyd  (1 arq)
+views\_uart_parser_qcom.cp313-win_amd64.pyd
+
+### views\adb_app_manager_view.pyc  (1 arq)
+views\adb_app_manager_view.pyc
+
+### views\adb_system_monitor_view.pyc  (1 arq)
+views\adb_system_monitor_view.pyc
+
+### views\add_knowledge.pyc  (1 arq)
+views\add_knowledge.pyc
+
+### views\adware_tools.pyc  (1 arq)
+views\adware_tools.pyc
+
+### views\client_details.pyc  (1 arq)
+views\client_details.pyc
+
+### views\client_form.pyc  (1 arq)
+views\client_form.pyc
+
+### views\close_service_order.pyc  (1 arq)
+views\close_service_order.pyc
+
+### views\company_settings.pyc  (1 arq)
+views\company_settings.pyc
+
+### views\components  (5 arq)
+views\components\__init__.py
+views\components\__init__.pyc
+views\components\_upd_dialog.pyc
+views\components\image_preview_label.pyc
+views\components\solution_filters_widget.pyc
+
+### views\daily_report.pyc  (1 arq)
+views\daily_report.pyc
+
+### views\dashboard.pyc  (1 arq)
+views\dashboard.pyc
+
+### views\device_completer.pyc  (1 arq)
+views\device_completer.pyc
+
+### views\diag_formatters.pyc  (1 arq)
+views\diag_formatters.pyc
+
+### views\diag_formatters_v2.pyc  (1 arq)
+views\diag_formatters_v2.pyc
+
+### views\diag_parser_v2.pyc  (1 arq)
+views\diag_parser_v2.pyc
+
+### views\diag_report_pdf.pyc  (1 arq)
+views\diag_report_pdf.pyc
+
+### views\diagnostico_android.pyc  (1 arq)
+views\diagnostico_android.pyc
+
+### views\dialogs  (3 arq)
+views\dialogs\__init__.py
+views\dialogs\__init__.pyc
+views\dialogs\view_solution_dialog.pyc
+
+### views\downloads  (7 arq)
+views\downloads\__init__.py
+views\downloads\__init__.pyc
+views\downloads\arquivo_gratuito_dialog.pyc
+views\downloads\arquivos_lista_window.pyc
+views\downloads\categorias_window.pyc
+views\downloads\detalhe_arquivo_window.pyc
+views\downloads\downloads_window.pyc
+
+### views\edit_client.pyc  (1 arq)
+views\edit_client.pyc
+
+### views\edit_service_order.pyc  (1 arq)
+views\edit_service_order.pyc
+
+### views\knowledge_base_search.pyc  (1 arq)
+views\knowledge_base_search.pyc
+
+### views\language_selector.pyc  (1 arq)
+views\language_selector.pyc
+
+### views\list_clients.pyc  (1 arq)
+views\list_clients.pyc
+
+### views\login_window.pyc  (1 arq)
+views\login_window.pyc
+
+### views\main_view.pyc  (1 arq)
+views\main_view.pyc
+
+### views\main_window.pyc  (1 arq)
+views\main_window.pyc
+
+### views\manual_android.pyc  (1 arq)
+views\manual_android.pyc
+
+### views\minhas_solucoes_view.pyc  (1 arq)
+views\minhas_solucoes_view.pyc
+
+### views\monthly_report.pyc  (1 arq)
+views\monthly_report.pyc
+
+### views\mtk  (1 arq)
+views\mtk\hwparam.json
+
+### views\open_service_orders.pyc  (1 arq)
+views\open_service_orders.pyc
+
+### views\ordem_servico  (255 arq)
+views\ordem_servico\.env
+views\ordem_servico\.flaskenv
+views\ordem_servico\.gitignore
+views\ordem_servico\__init__.py
+views\ordem_servico\__init__.pyc
+views\ordem_servico\app\__init__.py
+views\ordem_servico\app\__init__.pyc
+views\ordem_servico\app\config.pyc
+views\ordem_servico\app\database\servidor_arquivos_cache.db
+views\ordem_servico\app\docs\__init__.py
+views\ordem_servico\app\docs\__init__.pyc
+views\ordem_servico\app\docs\swagger.pyc
+views\ordem_servico\app\locale_config.pyc
+views\ordem_servico\app\migrations\__init__.py
+views\ordem_servico\app\migrations\__init__.pyc
+views\ordem_servico\app\migrations\auto_migrate.pyc
+views\ordem_servico\app\models.pyc
+views\ordem_servico\app\routes\__init__.py
+views\ordem_servico\app\routes\__init__.pyc
+views\ordem_servico\app\routes\api.pyc
+views\ordem_servico\app\routes\auth.pyc
+views\ordem_servico\app\routes\calendar.pyc
+views\ordem_servico\app\routes\checklists.pyc
+views\ordem_servico\app\routes\clients.pyc
+views\ordem_servico\app\routes\finance.pyc
+views\ordem_servico\app\routes\inventory.pyc
+views\ordem_servico\app\routes\license.pyc
+views\ordem_servico\app\routes\main.pyc
+views\ordem_servico\app\routes\orders.pyc
+views\ordem_servico\app\routes\peliculas.pyc
+views\ordem_servico\app\routes\reports.pyc
+views\ordem_servico\app\routes\settings.pyc
+views\ordem_servico\app\routes\technicians.pyc
+views\ordem_servico\app\routes\users.pyc
+views\ordem_servico\app\static\__init__.py
+views\ordem_servico\app\static\__init__.pyc
+views\ordem_servico\app\static\css\__init__.py
+views\ordem_servico\app\static\css\__init__.pyc
+views\ordem_servico\app\static\css\bootstrap-icons.css
+views\ordem_servico\app\static\css\bootstrap.min.css
+views\ordem_servico\app\static\css\clients-modern.css
+views\ordem_servico\app\static\css\combobox.css
+views\ordem_servico\app\static\css\custom.css
+views\ordem_servico\app\static\css\dashboard-modern.css
+views\ordem_servico\app\static\css\dashboard-shell.css
+views\ordem_servico\app\static\css\fonts\bootstrap-icons.woff
+views\ordem_servico\app\static\css\fonts\bootstrap-icons.woff2
+views\ordem_servico\app\static\css\forms-modern.css
+views\ordem_servico\app\static\css\inventory-modern.css
+views\ordem_servico\app\static\css\login-modern.css
+views\ordem_servico\app\static\css\navbar-modern.css
+views\ordem_servico\app\static\css\orders-modern.css
+views\ordem_servico\app\static\css\sales-modern.css
+views\ordem_servico\app\static\css\style.css
+views\ordem_servico\app\static\css\theme-toggle.css
+views\ordem_servico\app\static\css\view-modern.css
+views\ordem_servico\app\static\img\__init__.py
+views\ordem_servico\app\static\img\__init__.pyc
+views\ordem_servico\app\static\img\company\.keep
+views\ordem_servico\app\static\img\company\logo_20241229_212226_logo.jpeg
+... +195
+
+### views\parceiros_view.pyc  (1 arq)
+views\parceiros_view.pyc
+
+### views\peliculas  (4 arq)
+views\peliculas\__init__.py
+views\peliculas\__init__.pyc
+views\peliculas\peliculas_cache.pyc
+views\peliculas\peliculas_window.pyc
+
+### views\perfil_window.pyc  (1 arq)
+views\perfil_window.pyc
+
+### views\protection_certificate.pyc  (1 arq)
+views\protection_certificate.pyc
+
+### views\samsung_tools.pyc  (1 arq)
+views\samsung_tools.pyc
+
+### views\service_order_details.pyc  (1 arq)
+views\service_order_details.pyc
+
+### views\service_order_form.pyc  (1 arq)
+views\service_order_form.pyc
+
+### views\service_order_history.pyc  (1 arq)
+views\service_order_history.pyc
+
+### views\service_order_window.pyc  (1 arq)
+views\service_order_window.pyc
+
+### views\solucoes_view.pyc  (1 arq)
+views\solucoes_view.pyc
+
+### views\tools_android.pyc  (1 arq)
+views\tools_android.pyc
+
+### views\uart_monitor.pyc  (1 arq)
+views\uart_monitor.pyc
+
+### views\ui  (8 arq)
+views\ui\__init__.py
+views\ui\__init__.pyc
+views\ui\brand_card_widget.pyc
+views\ui\diag_theme.pyc
+views\ui\header_status_cards.pyc
+views\ui\sidebar.pyc
+views\ui\tools_tabs_theme.pyc
+views\ui\usb_device_widget.pyc
+
+### views\union_unlock  (498 arq)
+views\union_unlock\__init__.py
+views\union_unlock\__init__.pyc
+views\union_unlock\dmiti\__init__.py
+views\union_unlock\dmiti\__init__.pyc
+views\union_unlock\dmiti\_dmiti_core.cp313-win_amd64.pyd
+views\union_unlock\dmiti\_dmiti_partition_core.pyc
+views\union_unlock\dmiti\dmiti_engine.pyc
+views\union_unlock\dmiti\dmiti_partition_engine.pyc
+views\union_unlock\dmiti\dmiti_partition_widget.pyc
+views\union_unlock\dmiti\dmiti_widget.pyc
+views\union_unlock\edl\__init__.py
+views\union_unlock\edl\__init__.pyc
+views\union_unlock\edl\_qcom_io.pyc
+views\union_unlock\edl\auto.pyc
+views\union_unlock\edl\config.pyc
+views\union_unlock\edl\edl_ativo.pyc
+views\union_unlock\edl\edl_auth.cp313-win_amd64.pyd
+views\union_unlock\edl\edl_auth_config.pyc
+views\union_unlock\edl\edl_auth_oneplus.pyc
+views\union_unlock\edl\edl_main.pyc
+views\union_unlock\edl\edl_sync.pyc
+views\union_unlock\edl\firehose_ops.pyc
+views\union_unlock\edl\frp_oppo_vip.pyc
+views\union_unlock\edl\frp_samsung.pyc
+views\union_unlock\edl\frp_xiaomi_auth.pyc
+views\union_unlock\edl\gpt_parser.pyc
+views\union_unlock\edl\manual.pyc
+views\union_unlock\edl\micloud_edl.pyc
+views\union_unlock\edl\partitions.pyc
+views\union_unlock\edl_ativo.pyc
+views\union_unlock\exy\__init__.py
+views\union_unlock\exy\__init__.pyc
+views\union_unlock\exy\engine\__init__.py
+views\union_unlock\exy\engine\__init__.pyc
+views\union_unlock\exy\engine\_cfg.pyc
+views\union_unlock\exy\engine\adb_ops.pyc
+views\union_unlock\exy\engine\device_detector.pyc
+views\union_unlock\exy\engine\exynos_engine.pyc
+views\union_unlock\exy\engine\exynos_sync.pyc
+views\union_unlock\exy\engine\exynos_tools_loader.pyc
+views\union_unlock\exy\engine\preset_manager.pyc
+views\union_unlock\exy\gui\__init__.py
+views\union_unlock\exy\gui\__init__.pyc
+views\union_unlock\exy\gui\main_widget.pyc
+views\union_unlock\exy\gui\tema.pyc
+views\union_unlock\exy\models\__init__.py
+views\union_unlock\exy\models\__init__.pyc
+views\union_unlock\exy\models\device.pyc
+views\union_unlock\exy\models\preset.pyc
+views\union_unlock\flash\__init__.py
+views\union_unlock\flash\__init__.pyc
+views\union_unlock\flash\motorola\__init__.py
+views\union_unlock\flash\motorola\__init__.pyc
+views\union_unlock\flash\motorola\motorola_flash_gui.pyc
+views\union_unlock\flash\samsung\__init__.py
+views\union_unlock\flash\samsung\__init__.pyc
+views\union_unlock\flash\samsung\samsung_flash_gui.pyc
+views\union_unlock\flash\xiaomi\__init__.py
+views\union_unlock\flash\xiaomi\__init__.pyc
+views\union_unlock\flash\xiaomi\xiaomi_flash_gui.pyc
+... +438
+
+### views\visualizar_perfil_window.pyc  (1 arq)
+views\visualizar_perfil_window.pyc
+
+### views\welcome_wizard.pyc  (1 arq)
+views\welcome_wizard.pyc
+
+### views\xiaomi_tools.pyc  (1 arq)
+views\xiaomi_tools.pyc
+
+TOTAL: 1042

@@ -1,0 +1,313 @@
+﻿
+===== URL (1381) =====
+https://www.apkmirror.com/apk/sony-mobile-communications/photos-and-videos/photos-and-videos-2-2-a-0-8-release/photos-and-videos-2-2-a-0-8-android-apk-download   << database\test.json
+https://www.apkmirror.com/apk/sony-mobile-communications/photo-editor   << database\test.json
+https://play.google.com/store/apps/details?id=com.sony.tvsideview.phone   << database\test.json
+https://www.zdnet.fr/actualites/les-smartphones-samsung-huawei-lg-et-sony-vulnerables-a-des-attaques-par-provisioning-39890045.htm   << database\test.json
+https://www.csoonline.com/article/3435729/sms-based-provisioning-messages-enable-advanced-phishing-on-android-phones.html   << database\test.json
+https://support.sonymobile.com/global-en/xperiaz2/userguide/backing-up-and-restoring-content-on-a-device/   << database\test.json
+https://play.google.com/store/apps/details?id=com.sonyericsson.music   << database\test.json
+https://www.telecomhall.net/t/parameter-timing-advance-ta/6390   << database\test.json
+https://play.google.com/store/apps/details?id=com.sonymobile.androidapp.cameraaddon.areffect   << database\test.json
+https://tamingthedroid.com/what-apn-settings-mean   << database\test.json
+https://play.google.com/store/apps/details?id=com.sonymobile.assist   << database\test.json
+https://en.wikipedia.org/wiki/Cell_Broadcast   << database\test.json
+https://www.androidcentral.com/amber-alerts-and-android-what-you-need-know   << database\test.json
+https://en.wikipedia.org/wiki/Demo_mode   << database\test.json
+https://knowledge.protektoid.com/apps/com.sonymobile.deviceconfigtool/91e44f1e19b364411776d758ff3b27f703bd4b60c9399c43c124f37d0c30df27   << database\test.json
+https://play.google.com/store/apps/details?id=com.sonymobile.getmore.client   << database\test.json
+https://support.sonymobile.com/global-en/xperiaxz/userguide/xperia-actions/   << database\test.json
+https://developers.google.com/analytics/solutions/google-analytics-super-proxy   << database\test.json
+https://en.wikipedia.org/wiki/Geo-fence   << database\test.json
+https://support.sonymobile.com/global-en/xperiaxz/userguide/smart-call-handling/   << database\test.json
+https://play.google.com/store/apps/details?id=com.sonymobile.lifelog   << database\test.json
+https://play.google.com/store/apps/details?id=com.sonymobile.moviecreator.rmm   << database\test.json
+https://www.mobilefun.co.uk/blog/2008/06/software-updates-sony-ericsson/   << database\test.json
+https://developer.android.com/guide/topics/ui/picture-in-picture   << database\test.json
+https://support.sonymobile.com/global-en/xperiaxz1compact/faq/apps-&-settings/8019307455ff6184015e92f63324005926/   << database\test.json
+https://www.sonycsl.co.jp/project/402/   << database\test.json
+https://play.google.com/store/apps/details?id=com.sonymobile.scan3d   << database\test.json
+https://www.sonymobile.com/global-en/apps-services/3d-creator/   << database\test.json
+https://support.sonymobile.com/gb/xperiaxz/userguide/battery-and-power-management/   << database\test.json
+https://play.google.com/store/apps/details?id=com.sonymobile.support   << database\test.json
+https://support.sonymobile.com/global-en/xperia10/faq/apps-&-settings/801930747866b72a016b307df3b6007faf/   << database\test.json
+https://www.phonearena.com/news/Sony-Xperia-Lounge-shutting-down_id118252   << database\test.json
+https://play.google.com/store/apps/details?id=com.sonymobile.xperiatransfermobile   << database\test.json
+https://play.google.com/store/apps/details?id=com.sonymobile.xperiaweather   << database\test.json
+https://play.google.com/store/apps/details?id=com.sonyericsson.album   << database\test.json
+https://www.apkmirror.com/apk/sony-mobile-communications/messaging-sony-mobile-communications/messaging-sony-mobile-communications-29-3-a-6-12-release/messaging-29-3-a-6-12-android-apk-download   << database\test.json
+https://en.wikipedia.org/wiki/MobiTV   << database\test.json
+https://play.google.com/store/apps/details?id=nl.tmobiletv.vinson&hl=en   << database\test.json
+https://play.google.com/store/apps/details?id=com.tmobile.pr.mytmobile   << database\test.json
+https://techcrunch.com/2019/08/09/many-robocall-blocking-apps-send-your-private-data-without-permission/   << database\test.json
+https://support.t-mobile.com/docs/DOC-14011   << database\test.json
+https://play.google.com/store/apps/details?id=com.tmobile.vvm.application   << database\test.json
+https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/issues/1110   << database\test.json
+https://hyperosupdates.com/apps/com.xiaomi.aicr/   << database\test.json
+https://plus.miui.com   << database\test.json
+https://www.whitepages.com/   << database\test.json
+https://www.fiercewireless.com/wireless/t-mobile-to-offer-name-id-service-from-whitepages   << database\test.json
+https://www.geekwire.com/2016/whitepages-spins-caller-id-spam-blocking-app-startup-hiya/   << database\test.json
+https://play.google.com/store/apps/details?id=com.asurion.android.verizon.vms   << database\test.json
+https://thehackernews.com/2024/08/google-pixel-devices-shipped-with.html   << database\test.json
+https://www.reddit.com/r/lgv20/comments/6u0wnf/what_is_mobile_services_manager_did_i_catch_a/   << database\test.json
+https://en.wikipedia.org/wiki/Voltari   << database\test.json
+https://www.lightreading.com/motricity-holds-on-to-verizon-account/d/d-id/678478?   << database\test.json
+https://play.google.com/store/apps/details?id=com.securityandprivacy.android.verizon.vms&hl=en   << database\test.json
+https://play.google.com/store/apps/details?id=com.vcast.mediamanager   << database\test.json
+https://play.google.com/store/apps/details?id=com.verizon.messaging.vzmsgs   << database\test.json
+https://knowledge.protektoid.com/apps/com.verizon.obdm/d48680955d8d58bade2e6620ccb1e30b9bf23cb8e50055e10de3466da558c0ee   << database\test.json
+https://play.google.com/store/apps/details?id=com.verizontelematics.verizonhum   << database\test.json
+https://play.google.com/store/apps/details?id=com.vznavigator.Generic   << database\test.json
+https://developer.android.com/reference/android/telephony/data/ApnSetting   << database\test.json
+https://www.droid-life.com/2013/02/12/verizon-introduces-my-infozone-widget-allows-easy-access-to-tips-device-info-and-account-information/   << database\test.json
+https://play.google.com/store/apps/details?id=com.motorola.mot5gmod   << database\test.json
+https://android.stackexchange.com/questions/226580/how-is-verizon-suddenly-tracking-my-hot-spot-usage-on-android-and-how-do-i-disab   << database\test.json
+https://en.wikipedia.org/wiki/OMA_Device_Management   << database\test.json
+https://www.androidpolice.com/2015/03/10/android-5-1-includes-new-carrier-provisioning-api-allows-carriers-easier-methods-of-setting-up-services-on-devices-they-dont-control/   << database\test.json
+https://play.google.com/store/apps/details?id=com.motorola.visualvoicemail   << database\test.json
+https://bestcellular.com/dial-codes/   << database\test.json
+https://play.google.com/store/apps/details?id=com.asurion.home.sprint   << database\test.json
+https://play.google.com/store/apps/details?id=com.hyperlync.Sprint.Backup   << database\test.json
+https://www.reuters.com/companies/EDITol.SI   << database\test.json
+https://play.google.com/store/apps/details?id=com.hyperlync.Sprint.CloudBinder   << database\test.json
+https://play.google.com/store/apps/details?id=com.locationlabs.finder.sprint   << database\test.json
+https://www.google.com/search?hl=en&q=avast+privacy+nightmare   << database\test.json
+https://www.vice.com/en_us/article/qjdkq7/avast-antivirus-sells-user-browsing-data-investigation   << database\test.json
+https://www.pcmag.com/news/the-cost-of-avasts-free-antivirus-companies-can-spy-on-your-clicks   << database\test.json
+https://play.google.com/store/apps/details?id=com.sprint.android.musicplus2033   << database\test.json
+https://www.sprint.com/en/support/solutions/services/restrict-your-caller-id-information.html   << database\test.json
+https://play.google.com/store/apps/details?id=com.sprint.care   << database\test.json
+https://community.sprint.com/t5/Samsung/How-to-stop-quot-Mobile-Installer-quot-from-pushing-apps-to/td-p/1036387   << database\test.json
+https://play.google.com/store/apps/details?id=com.sprint.fng   << database\test.json
+https://onezero.medium.com/dont-put-your-work-email-on-your-personal-phone-ef7fef956c2f   << database\test.json
+https://blog.cdemi.io/never-accept-an-mdm-policy-on-your-personal-phone/   << database\test.json
+https://en.wikipedia.org/wiki/Calling_Name_Presentation   << database\test.json
+https://play.google.com/store/apps/details?id=com.sprint.ms.smf.services   << database\test.json
+https://play.google.com/store/apps/details?id=com.sprint.safefound   << database\test.json
+https://www.sprint.com/en/support/solutions/services/safe-and-found.html   << database\test.json
+https://play.google.com/store/apps/details?id=com.sprintpay   << database\test.json
+https://en.wikipedia.org/wiki/AetherPal   << database\test.json
+https://play.google.com/store/apps/details?id=com.asurion.android.protech.att   << database\test.json
+https://play.google.com/store/apps/details?id=com.att.android.attsmartwifi   << database\test.json
+https://www.europol.europa.eu/activities-services/public-awareness-and-prevention-guides/risks-of-using-public-wi-fi   << database\test.json
+https://www.eff.org/deeplinks/2020/01/why-public-wi-fi-lot-safer-you-think   << database\test.json
+https://thatoneprivacysite.net/choosing-the-best-vpn-for-you/   << database\test.json
+https://play.google.com/store/apps/details?id=com.att.callprotect   << database\test.json
+https://itmunch.com/robocall-caught-sending-customers-confidential-data-without-consent/   << database\test.json
+https://play.google.com/store/apps/details?id=com.att.csoiam.mobilekey   << database\test.json
+https://play.google.com/store/apps/details?id=com.att.dh   << database\test.json
+https://play.google.com/store/apps/details?id=com.att.dtv.shaderemote   << database\test.json
+https://en.wikipedia.org/wiki/DirecTV#Consumer_protection_lawsuits_and_violations   << database\test.json
+https://en.wikipedia.org/wiki/Carrier_IQ   << database\test.json
+https://en.wikipedia.org/wiki/Carrier_IQ#Rootkit_discovery_and_media_attention   << database\test.json
+https://play.google.com/store/apps/details?id=com.att.myWireless   << database\test.json
+https://play.google.com/store/apps/details?id=com.att.mobilesecurity   << database\test.json
+https://play.google.com/store/apps/details?id=com.att.mobile.android.vvm   << database\test.json
+https://play.google.com/store/apps/details?id=com.att.personalcloud   << database\test.json
+https://beta.pithus.org/report/bc54b5e2446ace90d9f992278d0ec320befe4983a76cb4fdcf47e565366e67b6   << database\test.json
+https://play.google.com/store/apps/details?id=com.att.tv   << database\test.json
+https://play.google.com/store/apps/details?id=com.att.tv.watchtv   << database\test.json
+https://www.cordcuttersnews.com/att-tv-vs-att-tv-now-whats-the-difference/   << database\test.json
+https://knowledge.protektoid.com/apps/com.dti.att/7a36d4f5f00bae044566221400719c75ea2f4f33bc2578a7f8210f36d718a8d6   << database\test.json
+https://m.att.com/shopmobile/wireless/features/smart-limits.html   << database\test.json
+https://asecare.att.com/tutorials/adding-and-deleting-an-extension-on-your-officehand-mobile-app-2990/?product=AT&T%20Office@Hand   << database\test.json
+https://www.att.com/shop/wireless/features/wifi-calling.html   << database\test.json
+https://play.google.com/store/apps/details?id=com.wavemarket.waplauncher   << database\test.json
+https://reports.exodus-privacy.eu.org/en/reports/com.wavemarket.waplauncher/latest/   << database\test.json
+https://developer.samsung.com/galaxy-store/galaxy-store-statistics/user-attribution.html   << database\test.json
+https://play.google.com/store/apps/details?id=fr.bouyguestelecom.ecm.android   << database\test.json
+https://play.google.com/store/apps/details?id=fr.bouyguestelecom.tv.android   << database\test.json
+https://play.google.com/store/apps/details?id=com.orange.mail.fr   << database\test.json
+https://play.google.com/store/apps/details?id=com.orange.mylivebox.fr   << database\test.json
+... +1261
+
+===== WSS (0) =====
+
+
+===== IP (7) =====
+2.0.202.0   << database\test.json
+42.120.153.17   << database\test.json
+172.217.168.14   << database\test.json
+1.0.1.0   << database\test.json
+3.3.7.1   << views\ordem_servico\requirements.txt
+0.0.0.0   << views\union_unlock\samsung\data\nsec_and_16\ATCommandConsole.deps.json
+10.0.0.1   << views\union_unlock\samsung\data\nsec_and_16\ATCommandConsole.deps.json
+
+===== HOST (5361) =====
+gpt.bot   << database\blacklist_union_apps_v2.json
+office.viewer   << database\blacklist_union_apps_v2.json
+web.gallery   << database\blacklist_union_apps_v2.json
+sportingbet.livescore   << database\blacklist_union_apps_v2.json
+bubble.games   << database\blacklist_union_apps_v2.json
+water.puzzle   << database\blacklist_union_apps_v2.json
+chroma.rush   << database\blacklist_union_apps_v2.json
+br.biblia   << database\blacklist_union_apps_v2.json
+b2c.app   << database\blacklist_union_apps_v2.json
+capemisatc.trilegaltche   << database\blacklist_union_apps_v2.json
+devmaker.superradiotupi   << database\blacklist_union_apps_v2.json
+fogas.service   << database\blacklist_union_apps_v2.json
+app.ptc   << database\blacklist_union_apps_v2.json
+honda.hsfdigital   << database\blacklist_union_apps_v2.json
+com.meupag   << database\blacklist_union_apps_v2.json
+portaldoconsignado.scc   << database\blacklist_union_apps_v2.json
+sinnqa.copadobrasil   << database\blacklist_union_apps_v2.json
+sky.selfcare   << database\blacklist_union_apps_v2.json
+br.lgfelicio   << database\blacklist_union_apps_v2.json
+mobilibus.jaraguatem   << database\blacklist_union_apps_v2.json
+apphcjds.activity   << database\blacklist_union_apps_v2.json
+value4u.play   << database\blacklist_union_apps_v2.json
+clean.cleanify   << database\blacklist_union_apps_v2.json
+xxx.cleaner   << database\blacklist_union_apps_v2.json
+abroad.lite   << database\blacklist_union_apps_v2.json
+xiaofengkj.fitpro   << database\blacklist_union_apps_v2.json
+thewordlab.luzia   << database\blacklist_union_apps_v2.json
+blendoku.game   << database\blacklist_union_apps_v2.json
+Music.Player   << database\blacklist_union_apps_v2.json
+airFire.Game   << database\blacklist_union_apps_v2.json
+BingoStudio.ComboDigitsGame   << database\blacklist_union_apps_v2.json
+Bloodpressurerecorder.uill   << database\blacklist_union_apps_v2.json
+Celltop.SpiralRoll   << database\blacklist_union_apps_v2.json
+DefaultCompany.SushiTile   << database\blacklist_union_apps_v2.json
+Lucky.Dragon   << database\blacklist_union_apps_v2.json
+Happy.Video   << database\blacklist_union_apps_v2.json
+LoopGames.Domino   << database\blacklist_union_apps_v2.json
+MeTVfuteblao.vivo   << database\blacklist_union_apps_v2.json
+PtronPlayDigital.EtiketTofask   << database\blacklist_union_apps_v2.json
+TapTapTales.Octonauts   << database\blacklist_union_apps_v2.json
+Puzzle.Matching   << database\blacklist_union_apps_v2.json
+cleaner.tool   << database\blacklist_union_apps_v2.json
+adfone.timfun   << database\blacklist_union_apps_v2.json
+clear.more   << database\blacklist_union_apps_v2.json
+brasil.calendario   << database\blacklist_union_apps_v2.json
+com.aisecurity   << database\blacklist_union_apps_v2.json
+app.bubblecrush   << database\blacklist_union_apps_v2.json
+cute.animaltile   << database\blacklist_union_apps_v2.json
+alibaba.aliexpresshd   << database\blacklist_union_apps_v2.json
+galaxy.attack   << database\blacklist_union_apps_v2.json
+alldocument.plus   << database\blacklist_union_apps_v2.json
+almalinternet1.quickdlbrowser   << database\blacklist_union_apps_v2.json
+merge.game   << database\blacklist_union_apps_v2.json
+amazon.appmanager   << database\blacklist_union_apps_v2.json
+avod.thirdpartyclient   << database\blacklist_union_apps_v2.json
+android.shopping   << database\blacklist_union_apps_v2.json
+aminsekt.statussaver   << database\blacklist_union_apps_v2.json
+android.keyverifier   << database\blacklist_union_apps_v2.json
+android.safetycore   << database\blacklist_union_apps_v2.json
+cleaner.super   << database\blacklist_union_apps_v2.json
+cashgame.merge   << database\blacklist_union_apps_v2.json
+animic.aigenerator   << database\blacklist_union_apps_v2.json
+virus.security   << database\blacklist_union_apps_v2.json
+com.antivirus   << database\blacklist_union_apps_v2.json
+max.security   << database\blacklist_union_apps_v2.json
+viruscleaner.mobilesecurity   << database\blacklist_union_apps_v2.json
+ape.performances   << database\blacklist_union_apps_v2.json
+ape.personalize   << database\blacklist_union_apps_v2.json
+ape.soundrecorder   << database\blacklist_union_apps_v2.json
+apphub.samsung   << database\blacklist_union_apps_v2.json
+appxy.tinyscanner   << database\blacklist_union_apps_v2.json
+note.drink   << database\blacklist_union_apps_v2.json
+aquatracker.app   << database\blacklist_union_apps_v2.json
+aquatracker.health   << database\blacklist_union_apps_v2.json
+asdvru.rthrew   << database\blacklist_union_apps_v2.json
+shoot.airplane   << database\blacklist_union_apps_v2.json
+labrador.daycare   << database\blacklist_union_apps_v2.json
+android.mobilesecurity   << database\blacklist_union_apps_v2.json
+myworld.mywonder   << database\blacklist_union_apps_v2.json
+avatarmaker.avatarstoryvirtual   << database\blacklist_union_apps_v2.json
+axiswalk.stepcountergo   << database\blacklist_union_apps_v2.json
+babybus.clean   << database\blacklist_union_apps_v2.json
+baliuapps.superapp   << database\blacklist_union_apps_v2.json
+baset.battleblades   << database\blacklist_union_apps_v2.json
+cooler.clean   << database\blacklist_union_apps_v2.json
+car.chase   << database\blacklist_union_apps_v2.json
+bblskk.block   << database\blacklist_union_apps_v2.json
+match.furniture   << database\blacklist_union_apps_v2.json
+beatmanner.infomat   << database\blacklist_union_apps_v2.json
+beatwatch.fitness   << database\blacklist_union_apps_v2.json
+beint.zangi   << database\blacklist_union_apps_v2.json
+bemore.health   << database\blacklist_union_apps_v2.json
+bestplay.app   << database\blacklist_union_apps_v2.json
+cs.contractsniper   << database\blacklist_union_apps_v2.json
+bgg.jump   << database\blacklist_union_apps_v2.json
+reading.daily   << database\blacklist_union_apps_v2.json
+prayer.audiobiblekjv   << database\blacklist_union_apps_v2.json
+bigbonus.dragon   << database\blacklist_union_apps_v2.json
+nwdn.international   << database\blacklist_union_apps_v2.json
+ball.pool   << database\blacklist_union_apps_v2.json
+bitdefender.antivirus   << database\blacklist_union_apps_v2.json
+blackout.word   << database\blacklist_union_apps_v2.json
+block.juggle   << database\blacklist_union_apps_v2.json
+blockpuzzle.samsung   << database\blacklist_union_apps_v2.json
+pressure.bptracker   << database\blacklist_union_apps_v2.json
+body.balance   << database\blacklist_union_apps_v2.json
+cache.junk   << database\blacklist_union_apps_v2.json
+speed.cleaner   << database\blacklist_union_apps_v2.json
+wiperight.cleanx   << database\blacklist_union_apps_v2.json
+monitor.xflowr   << database\blacklist_union_apps_v2.json
+sound.ar   << database\blacklist_union_apps_v2.json
+control.flash   << database\blacklist_union_apps_v2.json
+brootrash.trybestscore   << database\blacklist_union_apps_v2.json
+brushpen.craft   << database\blacklist_union_apps_v2.json
+cannon.puzzle   << database\blacklist_union_apps_v2.json
+bunbunstudio.magicblocktiles   << database\blacklist_union_apps_v2.json
+bvieopsueiw.lightwiz   << database\blacklist_union_apps_v2.json
+caomo.bvc   << database\blacklist_union_apps_v2.json
+editor.effects   << database\blacklist_union_apps_v2.json
+photos.scanner   << database\blacklist_union_apps_v2.json
+... +5241
+
+===== REG (0) =====
+
+
+===== SECRET (14) =====
+[arquivo contem keyword de segredo: database\blacklist_union_apps_v2.json]   << database\blacklist_union_apps_v2.json
+[arquivo contem keyword de segredo: database\test.json]   << database\test.json
+[arquivo contem keyword de segredo: translations\en.py]   << translations\en.py
+[arquivo contem keyword de segredo: translations\es.py]   << translations\es.py
+[arquivo contem keyword de segredo: translations\pt.py]   << translations\pt.py
+[arquivo contem keyword de segredo: views\ordem_servico\.env]   << views\ordem_servico\.env
+[arquivo contem keyword de segredo: views\ordem_servico\app\static\js\bootstrap.bundle.min.js]   << views\ordem_servico\app\static\js\bootstrap.bundle.min.js
+[arquivo contem keyword de segredo: views\ordem_servico\app\static\vendor\bootstrap\js\bootstrap.bundle.min.js]   << views\ordem_servico\app\static\vendor\bootstrap\js\bootstrap.bundle.min.js
+[arquivo contem keyword de segredo: views\ordem_servico\app\static\vendor\jquery\jquery.min.js]   << views\ordem_servico\app\static\vendor\jquery\jquery.min.js
+[arquivo contem keyword de segredo: views\ordem_servico\app\templates\auth\login.html]   << views\ordem_servico\app\templates\auth\login.html
+[arquivo contem keyword de segredo: views\ordem_servico\app\templates\auth\register.html]   << views\ordem_servico\app\templates\auth\register.html
+[arquivo contem keyword de segredo: views\ordem_servico\app\templates\settings\index.html]   << views\ordem_servico\app\templates\settings\index.html
+[arquivo contem keyword de segredo: views\ordem_servico\app\templates\users\add.html]   << views\ordem_servico\app\templates\users\add.html
+[arquivo contem keyword de segredo: views\ordem_servico\app\templates\users\form.html]   << views\ordem_servico\app\templates\users\form.html
+
+===== WINPATH (34) =====
+d:\nhttps:   << database\test.json
+e:\nhttps:   << database\test.json
+n:\nhttps:   << database\test.json
+y:\nhttps:   << database\test.json
+o:\nhttps:   << database\test.json
+s:\nWhich   << database\test.json
+t:\n3GPP   << database\test.json
+s:\nNon-system   << database\test.json
+p:\nThe   << database\test.json
+s:\nhttps:   << database\test.json
+n:\nAuto   << database\test.json
+t:\n(This   << database\test.json
+s:\ndpm   << database\test.json
+s:\nSIM   << database\test.json
+g:\nBattery,   << database\test.json
+t:\nhttps:   << database\test.json
+S:\nFIX,   << database\test.json
+y:\nOpenRoaming   << database\test.json
+n:\nDynamically   << database\test.json
+e:\n1.   << database\test.json
+p:\nhttps:   << database\test.json
+r:\nInterface   << database\test.json
+g:\nhttps:   << database\test.json
+t:\n(Your   << database\test.json
+s:\nLarge   << database\test.json
+s:\nBluetooth,   << database\test.json
+s:\nsetSavePassword,   << database\test.json
+e:\nFace   << database\test.json
+a:\nhttps:   << database\test.json
+n:\n\n-   << translations\en.py
+s:\n\n-   << translations\es.py
+e:\n├ó┬Ç┬ó   << translations\pt.py
+F:\n\n{}\n\nTente   << translations\pt.py
+e:\n\n-   << translations\pt.py

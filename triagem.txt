@@ -1,0 +1,57 @@
+﻿file: union_v1.3.4.5-17-09-2026-BT08U.exe
+size: 345,991,869
+
+--- COFF/OPTIONAL ---
+machine: 0x8664 (x64)
+sections: 11
+timestamp: 2026-07-11T11:02:52.000Z  (0x6a5222dc)
+linker: 8.0
+imageBase: 0x400000
+entryRVA: 0xfd170
+subsystem: 2 (GUI)
+dllChars: 0x8160
+checksum: 0x0
+
+--- SECOES ---
+  ".text"        va=0x  1000 v=  1062936 raw=  1063424 off=0x    400 chars=0x60000020
+  ".data"        va=0x105000 v=    96024 raw=    96256 off=0x 103e00 chars=0xc0000040
+  ".bss"         va=0x11d000 v=    55048 raw=        0 off=0x      0 chars=0xc0000000
+  ".idata"       va=0x12b000 v=     5472 raw=     5632 off=0x 11b600 chars=0xc0000040
+  ".didata"      va=0x12d000 v=      556 raw=     1024 off=0x 11cc00 chars=0xc0000040
+  ".edata"       va=0x12e000 v=      113 raw=      512 off=0x 11d000 chars=0x40000040
+  ".tls"         va=0x12f000 v=      568 raw=        0 off=0x      0 chars=0xc0000000
+  ".rdata"       va=0x130000 v=      109 raw=      512 off=0x 11d200 chars=0x40000040
+  ".reloc"       va=0x131000 v=    61864 raw=    61952 off=0x 11d400 chars=0x42000040
+  ".pdata"       va=0x141000 v=    53292 raw=    53760 off=0x 12c600 chars=0x40000040
+  ".rsrc"        va=0x14f000 v=   179372 raw=   179712 off=0x 139800 chars=0x40000040
+
+--- OVERLAY (dados apos ultima secao) ---
+fim da ultima secao: 0x165600  overlay = 344,528,061 bytes (99.6% do arquivo)
+
+--- IMPORTS (DLLs) ---
+  kernel32.dll (106)
+  comctl32.dll (1)
+  user32.dll (16)
+  oleaut32.dll (15)
+  advapi32.dll (13)
+
+--- EXPORTS ---
+  dllname: SetupLdr.e64  count=2
+    __dbk_fcall_wrapper
+    dbkFCallWrapperAddr
+
+--- DATA DIRECTORIES ---
+  export         rva=0x  12e000 size=113
+  import         rva=0x  12b000 size=5,472
+  resource       rva=0x  14f000 size=179,372
+  exception      rva=0x  141000 size=53,292
+  basereloc      rva=0x  131000 size=61,864
+  tls            rva=0x  130000 size=40
+  iat            rva=0x  12b558 size=1,248
+  delayimport    rva=0x  12d000 size=556
+
+--- TECH MAGICS (scan) ---
+  HIT MEI temp                 @ 0x4cae29 (5,025,321)
+  HIT Inno Setup               @ 0x11a1fc (1,155,580)
+  HIT Java/JAR                 @ 0x34b7a6f (55,278,191)
+  HIT MFC                      @ 0x5bbcc0 (6,012,096)
