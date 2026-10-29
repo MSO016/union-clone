@@ -1,0 +1,794 @@
+{% extends "finance/base.html" %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Força a visibilidade do item ativo no menu */
+    .nav-link.active[href*="reports"] {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Garante que o item pai também fique visível */
+    .nav-item:has(.nav-link.active[href*="reports"]) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Mantém o estilo do item ativo */
+    .sidebar .nav-link.active[href*="reports"] {
+        background-color: var(--bs-primary);
+        color: white !important;
+        border-radius: 0.25rem;
+        margin: 0.25rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Adiciona o JS do módulo financeiro -->
+<script src="{{ url_for('static', filename='js/finance.js') }}"></script>
+{% endblock %}
+
+{% block finance_content %}
+<div class="container-fluid">
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Filtros</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="start_date">Data Inicial</label>
+                        <input type="text" class="form-control date-mask" id="start_date" name="start_date" placeholder="DD/MM/AAAA">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="end_date">Data Final</label>
+                        <input type="text" class="form-control date-mask" id="end_date" name="end_date" placeholder="DD/MM/AAAA">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="payment_method">Forma de Pagamento</label>
+                        <select class="form-control" id="payment_method" name="payment_method">
+                            <option value="todos">Todos</option>
+                            <option value="dinheiro">Dinheiro</option>
+                            <option value="cartao_credito">Cartão de Crédito</option>
+                            <option value="cartao_debito">Cartão de Débito</option>
+                            <option value="pix">PIX</option>
+                            <option value="boleto">Boleto</option>
+                            <option value="transferencia">Transferência</option>
+                            <option value="outros">Outros</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button type="button" class="btn btn-primary" onclick="generateReport()">
+                        <i class="fas fa-sync"></i> Gerar Relatório
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="exportPDF()">
+                        <i class="fas fa-file-pdf"></i> Exportar PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards com totais e métricas -->
+    <div class="row">
+        <!-- Total OS -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-3">
+                            <i class="fas fa-tools fa-2x"></i>
+                        </div>
+                        <div class="col-9 text-right">
+                            <h5 class="card-title mb-1">Total OS</h5>
+                            <h3 class="mb-0" id="total_os">R$ 0,00</h3>
+                            <small id="total_os_count" class="text-white-50">0 ordens</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span id="os_percentage" class="text-white-50">0% do total</span>
+                    <div id="os_trend"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Total Vendas -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-3">
+                            <i class="fas fa-shopping-cart fa-2x"></i>
+                        </div>
+                        <div class="col-9 text-right">
+                            <h5 class="card-title mb-1">Total Vendas</h5>
+                            <h3 class="mb-0" id="total_vendas">R$ 0,00</h3>
+                            <small id="total_vendas_count" class="text-white-50">0 vendas</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span id="vendas_percentage" class="text-white-50">0% do total</span>
+                    <div id="vendas_trend"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Total Estoque -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-info text-white mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-3">
+                            <i class="fas fa-box fa-2x"></i>
+                        </div>
+                        <div class="col-9 text-right">
+                            <h5 class="card-title mb-1">Total Estoque</h5>
+                            <h3 class="mb-0" id="total_estoque">R$ 0,00</h3>
+                            <small id="total_estoque_count" class="text-white-50">0 itens</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span id="estoque_percentage" class="text-white-50">0% do total</span>
+                    <div id="estoque_trend"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Total Geral -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-white mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-3">
+                            <i class="fas fa-chart-line fa-2x"></i>
+                        </div>
+                        <div class="col-9 text-right">
+                            <h5 class="card-title mb-1">Total Geral</h5>
+                            <h3 class="mb-0" id="total_geral">R$ 0,00</h3>
+                            <small id="ticket_medio" class="text-white-50">Ticket Médio: R$ 0,00</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span id="total_items" class="text-white-50">0 itens no total</span>
+                    <div id="total_trend"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos principais -->
+    <div class="row">
+        <!-- Distribuição por Forma de Pagamento -->
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-credit-card me-1"></i>
+                        Distribuição por Forma de Pagamento
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="paymentMethodChart"></canvas>
+                </div>
+                <div class="card-footer small text-muted" id="payment_method_summary">
+                    Forma de pagamento mais utilizada: -
+                </div>
+            </div>
+        </div>
+        
+        <!-- Evolução Mensal -->
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-1"></i>
+                        Evolução Mensal
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="monthlyEvolutionChart"></canvas>
+                </div>
+                <div class="card-footer small text-muted" id="evolution_summary">
+                    Melhor período: -
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos adicionais -->
+    <div class="row">
+        <!-- Status das OS -->
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tasks me-1"></i>
+                        Status das OS
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="osStatusChart"></canvas>
+                </div>
+                <div class="card-footer small text-muted" id="os_status_summary">
+                    Status mais comum: -
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comparativo Mensal -->
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-1"></i>
+                        Comparativo Mensal
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="monthlyComparisonChart"></canvas>
+                </div>
+                <div class="card-footer small text-muted" id="comparison_summary">
+                    Comparativo entre OS, Vendas e Estoque
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let paymentMethodChart = null;
+let monthlyEvolutionChart = null;
+let osStatusChart = null;
+let monthlyComparisonChart = null;
+
+// Função para formatar valores em reais
+function formatCurrency(value) {
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    }).format(value);
+}
+
+// Função para formatar números com separador de milhares
+function formatNumber(value) {
+    return new Intl.NumberFormat('pt-BR').format(value);
+}
+
+// Função para formatar data do formato ISO para DD/MM/YYYY
+function formatDateBR(isoDate) {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString('pt-BR');
+}
+
+// Função para converter data de DD/MM/YYYY para YYYY-MM-DD
+function formatDateForBackend(brDate) {
+    if (!brDate) return '';
+    
+    const parts = brDate.split('/');
+    if (parts.length !== 3) {
+        console.error('Data inválida:', brDate);
+        return '';
+    }
+    
+    const day = parts[0].padStart(2, '0');
+    const month = parts[1].padStart(2, '0');
+    const year = parts[2];
+    
+    return `${year}-${month}-${day}`;
+}
+
+// Função para atualizar os cards com os totais e métricas
+function updateTotals(data) {
+    // Atualiza valores principais
+    document.getElementById('total_os').textContent = formatCurrency(data.totals.total_os);
+    document.getElementById('total_vendas').textContent = formatCurrency(data.totals.total_vendas);
+    document.getElementById('total_estoque').textContent = formatCurrency(data.totals.total_estoque);
+    document.getElementById('total_geral').textContent = formatCurrency(data.totals.total_geral);
+
+    // Calcula e atualiza contadores
+    const totalOS = data.os_data.reduce((sum, item) => sum + item.total_os, 0);
+    const totalVendas = data.sales_data.reduce((sum, item) => sum + item.total_vendas, 0);
+    const totalItems = totalOS + totalVendas;
+
+    document.getElementById('total_os_count').textContent = `${formatNumber(totalOS)} ordens`;
+    document.getElementById('total_vendas_count').textContent = `${formatNumber(totalVendas)} vendas`;
+    document.getElementById('total_items').textContent = `${formatNumber(totalItems)} itens no total`;
+
+    // Calcula e atualiza percentuais
+    const total = data.totals.total_geral;
+    if (total > 0) {
+        const osPercentage = (data.totals.total_os / total * 100).toFixed(1);
+        const vendasPercentage = (data.totals.total_vendas / total * 100).toFixed(1);
+        const estoquePercentage = (data.totals.total_estoque / total * 100).toFixed(1);
+
+        document.getElementById('os_percentage').textContent = `${osPercentage}% do total`;
+        document.getElementById('vendas_percentage').textContent = `${vendasPercentage}% do total`;
+        document.getElementById('estoque_percentage').textContent = `${estoquePercentage}% do total`;
+    }
+
+    // Calcula e atualiza ticket médio
+    if (totalItems > 0) {
+        const ticketMedio = total / totalItems;
+        document.getElementById('ticket_medio').textContent = `Ticket Médio: ${formatCurrency(ticketMedio)}`;
+    }
+}
+
+// Função para atualizar o gráfico de distribuição por forma de pagamento
+function updatePaymentMethodChart(data) {
+    const paymentMethods = {};
+    data.os_data.forEach(item => {
+        const method = item.payment_method || 'Não informado';
+        const methodLower = method.toLowerCase();
+        paymentMethods[methodLower] = (paymentMethods[methodLower] || 0) + parseFloat(item.valor_total);
+    });
+
+    const methodLabels = {
+        'dinheiro': 'Dinheiro',
+        'cartao_credito': 'Cartão de Crédito',
+        'cartao_debito': 'Cartão de Débito',
+        'pix': 'PIX',
+        'boleto': 'Boleto',
+        'transferencia': 'Transferência',
+        'outros': 'Outros',
+        'não informado': 'Não informado'
+    };
+
+    const labels = Object.keys(paymentMethods).map(method => methodLabels[method] || method);
+    const values = Object.values(paymentMethods);
+
+    if (paymentMethodChart) {
+        paymentMethodChart.destroy();
+    }
+
+    const ctx = document.getElementById('paymentMethodChart').getContext('2d');
+    paymentMethodChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: [
+                    '#4e73df', // Azul
+                    '#1cc88a', // Verde
+                    '#36b9cc', // Ciano
+                    '#f6c23e', // Amarelo
+                    '#e74a3b', // Vermelho
+                    '#858796', // Cinza
+                    '#5a5c69', // Cinza escuro
+                    '#2c9faf'  // Azul claro
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.raw;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value * 100) / total).toFixed(1);
+                            return `${context.label}: ${formatCurrency(value)} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Atualiza o resumo do método de pagamento mais utilizado
+    const maxMethod = Object.entries(paymentMethods).reduce((a, b) => a[1] > b[1] ? a : b);
+    const maxMethodLabel = methodLabels[maxMethod[0]];
+    const maxMethodPercentage = ((maxMethod[1] * 100) / values.reduce((a, b) => a + b, 0)).toFixed(1);
+    document.getElementById('payment_method_summary').textContent = 
+        `Forma de pagamento mais utilizada: ${maxMethodLabel} (${maxMethodPercentage}% do total)`;
+}
+
+// Função para atualizar o gráfico de evolução mensal
+function updateMonthlyEvolutionChart(data) {
+    const monthlyData = {};
+    data.os_data.forEach(item => {
+        const date = item.data.split('T')[0];
+        monthlyData[date] = (monthlyData[date] || 0) + parseFloat(item.valor_total);
+    });
+
+    const sortedDates = Object.keys(monthlyData).sort();
+    const values = sortedDates.map(date => monthlyData[date]);
+    const labels = sortedDates.map(date => formatDateBR(date));
+
+    if (monthlyEvolutionChart) {
+        monthlyEvolutionChart.destroy();
+    }
+
+    const ctx = document.getElementById('monthlyEvolutionChart').getContext('2d');
+    monthlyEvolutionChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Valor Total',
+                data: values,
+                borderColor: '#4e73df',
+                backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                tension: 0.1,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Total: ${formatCurrency(context.raw)}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return formatCurrency(value);
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Atualiza o resumo da evolução
+    const maxValue = Math.max(...values);
+    const maxIndex = values.indexOf(maxValue);
+    const maxDate = formatDateBR(sortedDates[maxIndex]);
+    document.getElementById('evolution_summary').textContent = 
+        `Melhor período: ${maxDate} com ${formatCurrency(maxValue)}`;
+}
+
+// Função para atualizar o gráfico de status das OS
+function updateOSStatusChart(data) {
+    try {
+        // Verifica se o canvas existe
+        const canvas = document.getElementById('osStatusChart');
+        if (!canvas) {
+            console.error('Canvas do gráfico de status não encontrado');
+            return;
+        }
+
+        // Destrói o gráfico anterior se existir
+        const chartInstance = Chart.getChart(canvas);
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        // Mapeia os status para nomes mais amigáveis
+        const statusLabels = {
+            'aguardando_diagnostico': 'Aguardando Diagnóstico',
+            'aguardando_aprovacao': 'Aguardando Aprovação',
+            'aguardando_peca': 'Aguardando Peça',
+            'em_manutencao': 'Em Manutenção',
+            'concluido_sucesso': 'Concluído com Sucesso',
+            'concluido_falha': 'Concluído com Falha',
+            'nao_autorizado': 'Não Autorizado',
+            'finalizada': 'Finalizada',
+            'cancelada': 'Cancelada'
+        };
+
+        // Mapeia cores para cada status
+        const statusColors = {
+            'aguardando_diagnostico': '#FFB74D',  // Laranja
+            'aguardando_aprovacao': '#64B5F6',    // Azul claro
+            'aguardando_peca': '#81C784',        // Verde claro
+            'em_manutencao': '#BA68C8',           // Roxo
+            'concluido_sucesso': '#4CAF50',       // Verde
+            'concluido_falha': '#F44336',         // Vermelho
+            'nao_autorizado': '#9E9E9E',          // Cinza
+            'finalizada': '#2196F3',              // Azul
+            'cancelada': '#FF5722'                // Laranja escuro
+        };
+
+        // Prepara os dados para o gráfico
+        const chartData = {
+            labels: data.os_data.map(item => statusLabels[item.status] || item.status),
+            datasets: [{
+                data: data.os_data.map(item => item.total_os),
+                backgroundColor: data.os_data.map(item => statusColors[item.status] || '#999999'),
+                borderWidth: 1
+            }]
+        };
+
+        // Configurações do gráfico
+        const config = {
+            type: 'doughnut',
+            data: chartData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        // Cria o novo gráfico
+        const ctx = canvas.getContext('2d');
+        window.osStatusChart = new Chart(ctx, config);
+
+        // Atualiza o status mais comum
+        const mostCommonStatus = data.os_data.reduce((a, b) => a.total_os > b.total_os ? a : b, { total_os: 0 });
+        const statusElement = document.getElementById('mostCommonStatus');
+        if (statusElement) {
+            statusElement.textContent = statusLabels[mostCommonStatus.status] || mostCommonStatus.status;
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar gráfico de status:', error);
+    }
+}
+
+// Função para atualizar o gráfico de comparativo mensal
+function updateMonthlyComparisonChart(data) {
+    // Agrupa dados por mês
+    const monthlyOS = {};
+    const monthlySales = {};
+    const monthlyInventory = {};
+
+    // Processa OS
+    data.os_data.forEach(item => {
+        const date = item.data.split('T')[0].substring(0, 7); // YYYY-MM
+        monthlyOS[date] = (monthlyOS[date] || 0) + parseFloat(item.valor_total);
+    });
+
+    // Processa Vendas
+    data.sales_data.forEach(item => {
+        const date = item.data.split('T')[0].substring(0, 7); // YYYY-MM
+        monthlySales[date] = (monthlySales[date] || 0) + parseFloat(item.valor_total);
+    });
+
+    // Processa Estoque
+    data.inventory_data.forEach(item => {
+        const date = new Date().toISOString().substring(0, 7); // Mês atual
+        monthlyInventory[date] = (monthlyInventory[date] || 0) + parseFloat(item.valor_total);
+    });
+
+    // Combina todos os meses únicos
+    const allMonths = [...new Set([
+        ...Object.keys(monthlyOS),
+        ...Object.keys(monthlySales),
+        ...Object.keys(monthlyInventory)
+    ])].sort();
+
+    const labels = allMonths.map(month => {
+        const [year, monthNum] = month.split('-');
+        return new Date(year, monthNum - 1).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+    });
+
+    if (monthlyComparisonChart) {
+        monthlyComparisonChart.destroy();
+    }
+
+    const ctx = document.getElementById('monthlyComparisonChart').getContext('2d');
+    monthlyComparisonChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'OS',
+                    data: allMonths.map(month => monthlyOS[month] || 0),
+                    backgroundColor: '#4e73df'
+                },
+                {
+                    label: 'Vendas',
+                    data: allMonths.map(month => monthlySales[month] || 0),
+                    backgroundColor: '#1cc88a'
+                },
+                {
+                    label: 'Estoque',
+                    data: allMonths.map(month => monthlyInventory[month] || 0),
+                    backgroundColor: '#36b9cc'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${formatCurrency(context.raw)}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return formatCurrency(value);
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Atualiza o resumo do comparativo
+    const totalOS = Object.values(monthlyOS).reduce((a, b) => a + b, 0);
+    const totalSales = Object.values(monthlySales).reduce((a, b) => a + b, 0);
+    const totalInventory = Object.values(monthlyInventory).reduce((a, b) => a + b, 0);
+    
+    document.getElementById('comparison_summary').textContent = 
+        `Total no período - OS: ${formatCurrency(totalOS)}, Vendas: ${formatCurrency(totalSales)}, Estoque: ${formatCurrency(totalInventory)}`;
+}
+
+// Função para gerar o relatório
+function generateReport() {
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+    const paymentMethod = document.getElementById('payment_method').value;
+
+    // Valida o formato das datas (DD/MM/YYYY)
+    const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    
+    if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
+        alert('Por favor, verifique o formato das datas (DD/MM/AAAA)');
+        return;
+    }
+
+    // Converte as datas para o formato do backend
+    const startDateFormatted = formatDateForBackend(startDate);
+    const endDateFormatted = formatDateForBackend(endDate);
+
+    // Verifica se a conversão foi bem sucedida
+    if (!startDateFormatted || !endDateFormatted) {
+        alert('Erro ao converter as datas. Por favor, verifique o formato (DD/MM/AAAA).');
+        return;
+    }
+
+    console.log('Gerando relatório:', { startDate, endDate, startDateFormatted, endDateFormatted });
+
+    // Busca dados do gráfico de status das OS
+    fetch(`/reports/os-status-data?start_date=${startDateFormatted}&end_date=${endDateFormatted}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                updateOSStatusChart(data);
+            } else {
+                console.error('Erro nos dados:', data.error);
+                alert('Erro ao carregar dados do gráfico de status.');
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao buscar dados:', error);
+            alert('Erro ao carregar dados do gráfico. Verifique o console para mais detalhes.');
+        });
+
+    // Busca dados financeiros
+    fetch(`/finance/reports/financial-dashboard?start_date=${startDateFormatted}&end_date=${endDateFormatted}&payment_method=${paymentMethod}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            updateTotals(data);
+            updatePaymentMethodChart(data);
+            updateMonthlyEvolutionChart(data);
+            updateMonthlyComparisonChart(data);
+        })
+        .catch(error => {
+            console.error('Erro ao gerar relatório:', error);
+            alert('Erro ao gerar relatório. Verifique o console para mais detalhes.');
+        });
+}
+
+// Função para exportar para PDF
+function exportPDF() {
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+    const paymentMethod = document.getElementById('payment_method').value;
+
+    // Valida o formato das datas (DD/MM/YYYY)
+    const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    
+    if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
+        alert('Por favor, verifique o formato das datas (DD/MM/AAAA)');
+        return;
+    }
+
+    // Converte as datas para o formato do backend
+    const startDateFormatted = formatDateForBackend(startDate);
+    const endDateFormatted = formatDateForBackend(endDate);
+
+    // Verifica se a conversão foi bem sucedida
+    if (!startDateFormatted || !endDateFormatted) {
+        alert('Erro ao converter as datas. Por favor, verifique o formato (DD/MM/AAAA).');
+        return;
+    }
+
+    console.log('Exportando PDF:', { startDate, endDate, startDateFormatted, endDateFormatted });
+
+    // Constrói a URL para PDF
+    const url = `/reports/finance/export-pdf?start_date=${startDateFormatted}&end_date=${endDateFormatted}&payment_method=${paymentMethod}`;
+    
+    // Faz o download do arquivo PDF
+    window.location.href = url;
+}
+
+// Inicialização quando o documento estiver pronto
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializa os campos de data como datepicker
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+    
+    // Adiciona a classe datepicker para usar a configuração centralizada
+    startDateInput.classList.add('datepicker');
+    endDateInput.classList.add('datepicker');
+    
+    // Define as datas iniciais (primeiro e último dia do mês atual)
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    
+    // Formata as datas no padrão brasileiro
+    startDateInput.value = firstDay.toLocaleDateString('pt-BR');
+    endDateInput.value = today.toLocaleDateString('pt-BR');
+    
+    // Gera o relatório inicial
+    generateReport();
+});
+</script>
+{% endblock %}

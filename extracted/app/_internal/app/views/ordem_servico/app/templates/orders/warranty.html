@@ -1,0 +1,437 @@
+{% extends "base.html" %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .warranty-header {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 0.5rem 0.5rem 0 0;
+        margin-bottom: 2rem;
+    }
+
+    .warranty-card {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .warranty-info {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .warranty-actions {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        padding: 1rem;
+        box-shadow: 0 -0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border-top: 1px solid #dee2e6;
+        margin-top: 2rem;
+        z-index: 1000;
+    }
+
+    @media (max-width: 768px) {
+        .warranty-header {
+            padding: 1rem;
+        }
+        
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .btn-group .btn {
+            margin-bottom: 0.5rem;
+            border-radius: 0.375rem !important;
+        }
+    }
+
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Cabeçalho -->
+    <div class="warranty-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">
+                <i class="fas fa-shield-alt"></i> 
+                {% if order.is_warranty %}
+                    Gerenciar OS em Garantia #{{ order.id }}
+                {% else %}
+                    Reabrir OS #{{ order.id }} em Garantia
+                {% endif %}
+            </h2>
+            <a href="{{ url_for('orders.view', id=order.id) }}" class="btn btn-light">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- Informações da OS Original -->
+    <div class="card warranty-card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Informações da OS Original</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-sm">
+                        <tr>
+                            <th width="30%">Cliente:</th>
+                            <td>{{ order.client.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Equipamento:</th>
+                            <td>{{ order.equipment }}</td>
+                        </tr>
+                        <tr>
+                            <th>Marca/Modelo:</th>
+                            <td>{{ order.brand }} {{ order.model }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nº Série:</th>
+                            <td>{{ order.serial_number }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-sm">
+                        <tr>
+                            <th width="30%">Data Finalização:</th>
+                            <td>{{ order.closed_at.strftime('%d/%m/%Y') if order.closed_at else '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Garantia:</th>
+                            <td>{{ order.warranty_days }} dias</td>
+                        </tr>
+                        <tr>
+                            <th>Válida até:</th>
+                            <td>
+                                {{ order.warranty_end_date.strftime('%d/%m/%Y') if order.warranty_end_date else '-' }}
+                                {% if order.warranty_end_date %}
+                                    {% if order.is_in_warranty() %}
+                                        <span class="badge bg-success">Em Garantia</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Expirada</span>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Último Serviço:</th>
+                            <td>{{ order.solution or '-' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if not order.is_warranty %}
+    <!-- Formulário de Reabertura em Garantia -->
+    <div class="card warranty-card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Reabrir em Garantia</h5>
+        </div>
+        <div class="card-body">
+            <form id="warrantyForm" method="POST" action="{{ url_for('orders.reopen_warranty', id=order.id) }}" novalidate>
+                <!-- Técnico Responsável -->
+                <div class="mb-3">
+                    <label for="technician_id" class="form-label">Técnico Responsável</label>
+                    <select class="form-select" id="technician_id" name="technician_id">
+                        <option value="">Selecione o técnico responsável pelo atendimento...</option>
+                        {% for technician in technicians %}
+                        <option value="{{ technician.id }}">{{ technician.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text">Selecione o técnico que irá atender esta OS</div>
+                </div>
+
+                <!-- Problema Relatado -->
+                <div class="mb-3">
+                    <label for="problem" class="form-label required">Problema Relatado *</label>
+                    <textarea class="form-control" id="problem" name="problem" rows="3" required 
+                              placeholder="Descreva detalhadamente o problema que motivou o retorno em garantia. Ex: Equipamento voltou a apresentar o mesmo defeito, não liga, etc."></textarea>
+                    <div class="invalid-feedback">Por favor, descreva o problema que motivou o retorno em garantia</div>
+                    <div class="form-text">Descreva o problema que motivou o retorno em garantia</div>
+                </div>
+
+                <!-- Observações -->
+                <div class="mb-3">
+                    <label for="observations" class="form-label">Observações</label>
+                    <textarea class="form-control" id="observations" name="observations" rows="2"
+                              placeholder="Informações adicionais importantes sobre o retorno em garantia. Ex: Cliente relatou que o problema começou após uma queda, etc."></textarea>
+                    <div class="form-text">Informações adicionais relevantes (opcional)</div>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <!-- Formulário de Encerramento de Garantia -->
+    <div class="card warranty-card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Encerrar OS em Garantia</h5>
+        </div>
+        <div class="card-body">
+            <form id="warrantyCloseForm" method="POST" action="{{ url_for('orders.close_warranty', id=order.id) }}">
+                <!-- Status do Serviço -->
+                <div class="mb-3">
+                    <label class="form-label required">Status do Serviço *</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="service_status" value="success" checked>
+                        <label class="form-check-label">Reparo Concluído com Sucesso</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="service_status" value="failure">
+                        <label class="form-check-label">Reparo Não Foi Possível</label>
+                    </div>
+                </div>
+
+                <!-- Solução Aplicada -->
+                <div class="mb-3 success-fields">
+                    <label for="solution" class="form-label required">Solução Aplicada *</label>
+                    <textarea class="form-control" id="solution" name="solution" rows="3"
+                              placeholder="Descreva detalhadamente a solução aplicada para resolver o problema. Ex: Substituição da placa principal, reparo no circuito de alimentação, etc."></textarea>
+                    <div class="form-text">Descreva a solução aplicada para resolver o problema</div>
+                </div>
+
+                <!-- Motivo da Falha -->
+                <div class="mb-3 failure-fields" style="display: none;">
+                    <label for="failure_reason" class="form-label required">Motivo da Falha *</label>
+                    <textarea class="form-control" id="failure_reason" name="failure_reason" rows="3"
+                              placeholder="Explique detalhadamente por que não foi possível realizar o reparo. Ex: Peça descontinuada pelo fabricante, custo do reparo superior ao valor do equipamento, etc."></textarea>
+                    <div class="form-text">Explique por que não foi possível realizar o reparo</div>
+                </div>
+
+                <!-- Valor Adicional -->
+                <div class="mb-3">
+                    <label class="form-label">Houve valor adicional?</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="has_additional" value="no" checked>
+                        <label class="form-check-label">Não</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="has_additional" value="yes">
+                        <label class="form-check-label">Sim</label>
+                    </div>
+                </div>
+
+                <!-- Campos de Valor Adicional -->
+                <div id="additionalValueFields" style="display: none;">
+                    <div class="mb-3">
+                        <label class="form-label required">Valor Adicional (R$) *</label>
+                        <input type="number" class="form-control" name="additional_value" step="0.01" min="0"
+                               placeholder="Digite o valor adicional a ser cobrado. Ex: 50.00">
+                        <div class="form-text">Informe o valor adicional a ser cobrado</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label required">Forma de Pagamento *</label>
+                        <select class="form-select" name="payment_method">
+                            <option value="">Selecione a forma de pagamento...</option>
+                            <option value="dinheiro">Dinheiro</option>
+                            <option value="cartao_credito">Cartão de Crédito</option>
+                            <option value="cartao_debito">Cartão de Débito</option>
+                            <option value="pix">PIX</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Observações -->
+                <div class="mb-3">
+                    <label for="observations" class="form-label">Observações</label>
+                    <textarea class="form-control" id="observations" name="observations" rows="2"
+                              placeholder="Observações adicionais sobre o encerramento da garantia. Ex: Cliente foi orientado sobre o uso correto do equipamento, etc."></textarea>
+                    <div class="form-text">Observações adicionais sobre o encerramento (opcional)</div>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Botões de Ação -->
+    <div class="warranty-actions">
+        <div class="d-flex justify-content-between">
+            <a href="{{ url_for('orders.view', id=order.id) }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+            {% if not order.is_warranty %}
+            <button type="button" class="btn btn-success" onclick="reopenWarranty()">
+                <i class="fas fa-shield-alt"></i> Reabrir em Garantia
+            </button>
+            {% else %}
+            <button type="button" class="btn btn-primary btn-lg" onclick="closeWarranty()">
+                <i class="fas fa-check"></i> Finalizar Garantia
+            </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Controle de campos baseado no status do serviço
+        const serviceStatusRadios = document.querySelectorAll('input[name="service_status"]');
+        if (serviceStatusRadios) {
+            serviceStatusRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const successFields = document.querySelectorAll('.success-fields');
+                    const failureFields = document.querySelectorAll('.failure-fields');
+                    
+                    if (this.value === 'success') {
+                        successFields.forEach(field => field.style.display = 'block');
+                        failureFields.forEach(field => field.style.display = 'none');
+                    } else {
+                        successFields.forEach(field => field.style.display = 'none');
+                        failureFields.forEach(field => field.style.display = 'block');
+                    }
+                });
+            });
+        }
+
+        // Controle dos campos adicionais baseado no radio button
+        const radioButtons = document.querySelectorAll('input[name="has_additional"]');
+        const additionalFields = document.getElementById('additionalValueFields');
+
+        if (radioButtons && additionalFields) {
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    additionalFields.style.display = this.value === 'yes' ? 'block' : 'none';
+                });
+            });
+        }
+    });
+
+    // Função para reabrir em garantia
+    function reopenWarranty() {
+        const form = document.getElementById('warrantyForm');
+        const submitButton = document.querySelector('button[onclick="reopenWarranty()"]');
+        
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
+        
+        // Previne múltiplos cliques
+        if (submitButton.disabled) {
+            return;
+        }
+        
+        // Desabilita o botão
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+        
+        // Envia o formulário
+        fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro na requisição');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                window.location.href = data.redirect_url;
+            } else {
+                showAlert('danger', data.message || 'Erro ao reabrir OS em garantia');
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-shield-alt"></i> Reabrir em Garantia';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('danger', 'Erro ao reabrir OS em garantia');
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-shield-alt"></i> Reabrir em Garantia';
+        });
+    }
+
+    // Função para encerrar garantia
+    function closeWarranty() {
+        const form = document.getElementById('warrantyCloseForm');
+        const submitButton = document.querySelector('button[onclick="closeWarranty()"]');
+        
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
+        
+        // Previne múltiplos cliques
+        if (submitButton.disabled) {
+            return;
+        }
+        
+        const formData = new FormData(form);
+        const hasAdditional = form.querySelector('input[name="has_additional"]:checked').value;
+        
+        // Validações específicas
+        if (hasAdditional === 'yes') {
+            const additionalValue = form.querySelector('input[name="additional_value"]').value;
+            const paymentMethod = form.querySelector('select[name="payment_method"]').value;
+            
+            if (!additionalValue || parseFloat(additionalValue) <= 0) {
+                showAlert('warning', 'Por favor, informe um valor adicional válido');
+                return;
+            }
+            if (!paymentMethod) {
+                showAlert('warning', 'Por favor, selecione a forma de pagamento');
+                return;
+            }
+        }
+        
+        // Desabilita o botão
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+        
+        // Envia o formulário
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro na requisição');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                window.location.href = data.redirect_url;
+            } else {
+                showAlert('danger', data.message || 'Erro ao finalizar OS em garantia');
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-check"></i> Finalizar Garantia';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('danger', 'Erro ao finalizar OS em garantia');
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-check"></i> Finalizar Garantia';
+        });
+    }
+</script>
+{% endblock %} 

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Novo Técnico</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Dica:</strong> Técnicos também são criados automaticamente quando você cadastra um novo usuário com a função "Técnico".
+                    </div>
+                    
+                    <form action="{{ url_for('technicians.new') }}" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nome *</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contact" class="form-label">Contato</label>
+                            <input type="text" class="form-control" id="contact" name="contact" 
+                                   data-inputmask="'mask': '(99) 99999-9999'" required>
+                            <div class="form-text">Digite apenas números</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="commission_rate" class="form-label">Porcentagem de Comissão (%)</label>
+                            <input type="number" class="form-control" id="commission_rate" name="commission_rate" 
+                                   step="0.01" min="0" max="100" value="0">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="photo" class="form-label">Foto</label>
+                            <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
+                            <div class="form-text">Formatos aceitos: JPG, PNG. Tamanho máximo: 2MB</div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Salvar
+                            </button>
+                            <a href="{{ url_for('technicians.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
+<script>
+document.getElementById('photo').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        // Verifica o tamanho (2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            alert('A foto deve ter no máximo 2MB');
+            this.value = '';
+            return;
+        }
+        
+        // Verifica o tipo
+        if (!file.type.match('image.*')) {
+            alert('Por favor, selecione apenas imagens');
+            this.value = '';
+            return;
+        }
+    }
+});
+
+$(document).ready(function() {
+    $('#contact').inputmask();
+});
+</script>
+{% endblock %} 

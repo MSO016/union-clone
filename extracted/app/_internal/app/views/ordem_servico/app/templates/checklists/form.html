@@ -1,0 +1,730 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.template-selector {
+    min-width: 300px;
+}
+
+/* Adicionando novos estilos para o seletor de status */
+.status-selector {
+    display: flex;
+    gap: 8px;
+    padding: 5px 0;
+    flex-wrap: wrap;
+}
+
+.status-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid #dee2e6;
+    font-size: 0.85em;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.status-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.status-option.selected {
+    border-color: currentColor;
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.status-option.ok-option {
+    color: #198754;
+}
+
+.status-option.problema-option {
+    color: #dc3545;
+}
+
+.status-option.na-option {
+    color: #6c757d;
+}
+
+.status-option i {
+    font-size: 1.2em;
+}
+
+.status-option span {
+    font-weight: 500;
+}
+
+.checklist-item {
+    transition: all 0.3s ease;
+    border-left: 4px solid #dee2e6;
+    margin-bottom: 1rem;
+}
+
+.checklist-item:hover {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.checklist-item.border-danger {
+    border-left-color: #dc3545;
+}
+
+.badge {
+    font-size: 0.85em;
+}
+
+.image-preview {
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.image-preview .position-relative {
+    display: inline-block;
+    margin: 5px;
+}
+
+.image-preview .btn-danger {
+    padding: 0 6px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 50%;
+}
+
+.loading-indicator {
+    display: none;
+    text-align: center;
+    padding: 1rem;
+}
+
+.loading-indicator.active {
+    display: block;
+}
+
+.template-info {
+    display: none;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+}
+
+.template-info.active {
+    display: block;
+}
+
+.category-header {
+    background-color: #f8f9fa;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+/* Adicionando estilo para a legenda dos botões */
+.status-legend {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.status-legend-title {
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #495057;
+}
+
+.status-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    color: #6c757d;
+}
+</style>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="card-title mb-0">
+                        {% if edit_mode %}
+                        Editar Checklist de {{ 'Entrada' if checklist_type == 'entrada' else 'Saída' }}
+                        {% else %}
+                        Novo Checklist de {{ 'Entrada' if checklist_type == 'entrada' else 'Saída' }}
+                        {% endif %}
+                    </h5>
+                    <div class="mt-1">
+                        <span class="badge bg-light text-dark">OS #{{ order.id }}</span>
+                        <span class="badge bg-light text-dark">Cliente: {{ order.client.name }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <!-- Seleção de Template -->
+            {% if templates %}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <label class="form-label">Selecione um Modelo de Checklist</label>
+                    <select class="form-select" id="templateSelect" onchange="loadTemplate(this.value)">
+                        <option value="">Criar checklist do zero</option>
+                        {% for template in templates %}
+                        <option value="{{ template.id }}" 
+                                {% if selected_template and selected_template.id == template.id %}selected{% endif %}>
+                            {{ template.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div id="templateInfo" class="template-info">
+                        <p class="mb-2">Este template irá carregar itens pré-definidos para você preencher:</p>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle text-success"></i> Itens organizados por categoria</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Indicadores de itens críticos</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Campos para status e observações</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Indicador de Carregamento -->
+            <div id="loadingIndicator" class="loading-indicator">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Carregando...</span>
+                </div>
+                <p class="mt-2">Carregando template...</p>
+            </div>
+
+            <form id="checklistForm" method="POST" 
+                  action="{% if edit_mode and checklist %}{{ url_for('checklists.edit_checklist', checklist_id=checklist.id) }}{% else %}{{ url_for('checklists.save_checklist', order_id=order.id, type=checklist_type) }}{% endif %}">
+                
+                <!-- Observações Gerais -->
+                <div class="mb-3">
+                    <label for="comments" class="form-label">Observações Gerais</label>
+                    <textarea class="form-control" id="comments" name="comments" rows="3" 
+                              placeholder="Descreva o estado geral do equipamento, acessórios recebidos, condições físicas...">{{ checklist.comments if checklist else '' }}</textarea>
+                </div>
+                
+                <!-- Lista de Itens -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Itens do Checklist</h6>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="addCustomItem()">
+                            <i class="bi bi-plus"></i> Adicionar Item
+                        </button>
+                    </div>
+                    
+                    <!-- Legenda dos botões de status -->
+                    <div class="status-legend">
+                        <div class="status-legend-title">
+                            <i class="bi bi-info-circle"></i> Como usar os botões de status:
+                        </div>
+                        <div class="status-legend-item">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            <span><strong>OK</strong> - Item verificado e funcionando normalmente</span>
+                        </div>
+                        <div class="status-legend-item">
+                            <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                            <span><strong>Problema</strong> - Item com defeito ou necessitando atenção</span>
+                        </div>
+                        <div class="status-legend-item">
+                            <i class="bi bi-dash-circle-fill text-secondary"></i>
+                            <span><strong>N/A</strong> - Não se aplica a este equipamento</span>
+                        </div>
+                    </div>
+                    
+                    <div id="itemsList">
+                        <!-- Os itens serão adicionados aqui -->
+                    </div>
+                </div>
+                
+                <!-- Botões -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{{ url_for('orders.view', id=order.id) }}" class="btn btn-secondary">
+                        <i class="bi bi-x"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Salvar Checklist
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Template para novos itens -->
+<div id="itemTemplate" style="display: none;">
+    <div class="card mb-3 checklist-item">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="flex-grow-1">
+                    <!-- Aqui vai o badge de item crítico quando necessário -->
+                </div>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeChecklistItem(this)">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label class="form-label">Descrição do Item</label>
+                        <input type="text" class="form-control" name="items[][description]" required
+                               placeholder="Ex: Verificar tela quebrada, Testar alto-falante...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="form-label">Status <span class="text-danger">*</span></label>
+                        <div class="status-selector">
+                            <div class="status-option ok-option" data-value="ok">
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span>OK</span>
+                            </div>
+                            <div class="status-option problema-option" data-value="problema">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                <span>Problema</span>
+                            </div>
+                            <div class="status-option na-option" data-value="nao_aplicavel">
+                                <i class="bi bi-dash-circle-fill"></i>
+                                <span>N/A</span>
+                            </div>
+                            <input type="hidden" name="items[][status]" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Observações</label>
+                        <textarea class="form-control" name="items[][observations]" rows="2"
+                                 placeholder="Descreva aqui: 
+• Detalhes do problema encontrado
+• Estado atual do item
+• Informações relevantes para o reparo"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-12">
+                    <label class="form-label">
+                        <i class="bi bi-camera"></i> Fotos do Item
+                        <small class="text-muted">(opcional)</small>
+                    </label>
+                    <input type="file" class="form-control" accept="image/*" multiple onchange="handleFileSelect(this)">
+                    <div class="image-preview mt-2 d-flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Itens ja existentes (somente no modo edicao). Cada item carrega
+// descricao, status, observacoes e imagens (URL para exibir + caminho
+// relativo para o re-salvamento religar o anexo sem duplicar/perder).
+window.__existingItems = [
+{% if edit_mode and checklist %}
+    {% for item in checklist.items %}
+    {
+        "description": {{ item.description|tojson }},
+        "status": {{ (item.status or '')|tojson }},
+        "observations": {{ (item.observations or '')|tojson }},
+        "images": [
+            {% for att in item.attachments %}{{ ('/static/' ~ att.file_path)|tojson }}{% if not loop.last %},{% endif %}{% endfor %}
+        ],
+        "imagePaths": [
+            {% for att in item.attachments %}{{ att.file_path|tojson }}{% if not loop.last %},{% endif %}{% endfor %}
+        ]
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+{% endif %}
+];
+
+document.addEventListener('DOMContentLoaded', function() {
+    // A inicializacao dos itens (existentes no modo edicao OU 1 item em branco
+    // no modo criacao) acontece NO FINAL deste handler, apos a sobrescrita de
+    // window.addCustomItem que inicializa os seletores de status.
+    
+    // Adiciona handler para o formulário
+    const form = document.getElementById('checklistForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Coleta todos os itens do checklist
+            const items = [];
+            let hasError = false;
+            
+            // Coleta e valida os itens
+            document.querySelectorAll('.checklist-item').forEach((itemElement, index) => {
+                // Pega os elementos de input
+                const descriptionInput = itemElement.querySelector('[name="items[][description]"]');
+                const statusInput = itemElement.querySelector('[name="items[][status]"]');
+                const observationsInput = itemElement.querySelector('[name="items[][observations]"]');
+                
+                // Pega os valores e remove espaços em branco
+                const description = descriptionInput?.value?.trim() || '';
+                const status = statusInput?.value?.trim() || '';
+                const observations = observationsInput?.value?.trim() || '';
+                
+                // Coleta as imagens do item.
+                // - Imagens existentes (modo edicao): envia o caminho RELATIVO
+                //   (data-existing-path) para o backend religar o anexo.
+                // - Imagens novas: envia o data URL (base64) para salvar.
+                const images = [];
+                itemElement.querySelectorAll('.image-preview img').forEach(img => {
+                    if (img.dataset && img.dataset.existingPath) {
+                        images.push(img.dataset.existingPath);
+                    } else if (img.src) {
+                        images.push(img.src);
+                    }
+                });
+                
+                // Se for o primeiro item ou se tiver algum campo preenchido, valida
+                if (index === 0 || description || status || observations) {
+                    if (!description || !status) {
+                        hasError = true;
+                        const itemDesc = description || `Item ${index + 1}`;
+                        alert(`Por favor, preencha a descrição e o status para o item: ${itemDesc}`);
+                        
+                        // Destaca campos vazios
+                        if (!description) descriptionInput?.classList.add('is-invalid');
+                        if (!status) statusInput?.classList.add('is-invalid');
+                        return false;
+                    }
+                    
+                    // Remove destaque de erro
+                    descriptionInput?.classList.remove('is-invalid');
+                    statusInput?.classList.remove('is-invalid');
+                    
+                    // Adiciona o item à lista com as imagens
+                    items.push({
+                        description: description,
+                        status: status,
+                        observations: observations,
+                        images: images
+                    });
+                }
+            });
+            
+            if (hasError) return;
+            
+            // Verifica se há itens para enviar
+            if (items.length === 0) {
+                alert('Por favor, adicione pelo menos um item ao checklist');
+                return;
+            }
+            
+            console.log('Itens a serem enviados:', items);
+            
+            // Prepara os dados do formulário
+            const formData = new FormData();
+            const comments = document.getElementById('comments')?.value || '';
+            formData.append('comments', comments);
+            formData.append('items', JSON.stringify(items));
+            
+            // Mostra indicador de carregamento
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Salvando...';
+            
+            // Envia o formulário
+            fetch(this.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = "{{ url_for('orders.view', id=order.id) }}";
+                } else {
+                    alert('Erro ao salvar checklist: ' + (data.message || 'Erro desconhecido'));
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalText;
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao salvar checklist:', error);
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+            });
+        });
+    }
+
+    // Função para inicializar os seletores de status em um elemento
+    function initializeStatusSelectors(element) {
+        const statusOptions = element.querySelectorAll('.status-option');
+        const statusInput = element.querySelector('input[name="items[][status]"]');
+
+        statusOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove seleção anterior
+                statusOptions.forEach(opt => opt.classList.remove('selected'));
+                // Adiciona seleção ao clicado
+                this.classList.add('selected');
+                // Atualiza o input hidden
+                statusInput.value = this.dataset.value;
+                // Remove classe de erro se existir
+                statusInput.classList.remove('is-invalid');
+            });
+        });
+    }
+
+    // Inicializa o template
+    const template = document.getElementById('itemTemplate');
+    if (template) {
+        initializeStatusSelectors(template);
+    }
+
+    // Modifica a função addCustomItem para inicializar os seletores
+    const originalAddCustomItem = window.addCustomItem;
+    window.addCustomItem = function(templateData = null) {
+        const newItem = originalAddCustomItem(templateData);
+        if (newItem) {
+            initializeStatusSelectors(newItem);
+        }
+    };
+
+    // Adiciona um item existente (modo edicao) preservando status/observacoes/imagens.
+    // Usa window.addCustomItem (ja com seletores inicializados) e depois preenche.
+    window.addExistingItem = function(itemData) {
+        const newItem = window.addCustomItem();
+        if (!newItem) return null;
+
+        const descriptionInput = newItem.querySelector('[name="items[][description]"]');
+        const statusInput = newItem.querySelector('input[name="items[][status]"]');
+        const observationsInput = newItem.querySelector('[name="items[][observations]"]');
+
+        if (descriptionInput) descriptionInput.value = itemData.description || '';
+        if (observationsInput) observationsInput.value = itemData.observations || '';
+        if (statusInput && itemData.status) {
+            statusInput.value = itemData.status;
+            const opt = newItem.querySelector('.status-option[data-value="' + itemData.status + '"]');
+            if (opt) opt.classList.add('selected');
+        }
+
+        // Imagens ja salvas: exibe pela URL estatica e guarda o caminho relativo
+        // em data-existing-path para o re-salvamento religar o anexo (sem perder).
+        const preview = newItem.querySelector('.image-preview');
+        if (preview && Array.isArray(itemData.images)) {
+            itemData.images.forEach(function(url, idx) {
+                const relPath = (itemData.imagePaths && itemData.imagePaths[idx]) || '';
+                const container = document.createElement('div');
+                container.className = 'position-relative';
+                const img = document.createElement('img');
+                img.src = url;
+                img.className = 'img-thumbnail';
+                img.style.maxHeight = '100px';
+                if (relPath) img.dataset.existingPath = relPath;
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'btn btn-danger btn-sm position-absolute top-0 end-0';
+                removeBtn.innerHTML = '×';
+                removeBtn.onclick = function() { container.remove(); };
+                container.appendChild(img);
+                container.appendChild(removeBtn);
+                preview.appendChild(container);
+            });
+        }
+        return newItem;
+    };
+
+    // Inicializacao dos itens (apos a sobrescrita acima).
+    if (Array.isArray(window.__existingItems) && window.__existingItems.length > 0) {
+        window.__existingItems.forEach(function(itemData) {
+            window.addExistingItem(itemData);
+        });
+    } else if (document.querySelectorAll('.checklist-item').length === 0) {
+        window.addCustomItem();
+    }
+});
+
+// Função para carregar o template
+async function loadTemplate(templateId) {
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const itemsList = document.getElementById('itemsList');
+    const templateInfo = document.getElementById('templateInfo');
+    
+    try {
+        if (!templateId) {
+            itemsList.innerHTML = '';
+            templateInfo.classList.remove('active');
+            addCustomItem();
+            return;
+        }
+
+        loadingIndicator.classList.add('active');
+        templateInfo.classList.add('active');
+        
+        // Busca os itens do template
+        const response = await fetch(`/checklists/templates/${templateId}/json`);
+        if (!response.ok) {
+            throw new Error('Erro ao carregar template');
+        }
+
+        const data = await response.json();
+        console.log('Template carregado:', data);
+        
+        if (data.success && data.template && data.template.items) {
+            // Limpa os itens existentes
+            itemsList.innerHTML = '';
+            
+            // Agrupa itens por categoria
+            const itemsByCategory = {};
+            data.template.items.forEach(item => {
+                if (!itemsByCategory[item.category]) {
+                    itemsByCategory[item.category] = [];
+                }
+                itemsByCategory[item.category].push(item);
+            });
+            
+            // Adiciona itens agrupados por categoria
+            Object.entries(itemsByCategory).forEach(([category, items]) => {
+                // Adiciona cabeçalho da categoria
+                const categoryHeader = document.createElement('div');
+                categoryHeader.className = 'category-header';
+                categoryHeader.innerHTML = `<i class="bi bi-folder"></i> ${category}`;
+                itemsList.appendChild(categoryHeader);
+                
+                // Adiciona itens da categoria
+                items.forEach(item => addCustomItem(item));
+            });
+        } else {
+            throw new Error('Dados do template inválidos');
+        }
+    } catch (error) {
+        console.error('Erro ao carregar template:', error);
+        alert('Erro ao carregar template. Por favor, tente novamente.');
+        itemsList.innerHTML = '';
+        templateInfo.classList.remove('active');
+        addCustomItem();
+    } finally {
+        loadingIndicator.classList.remove('active');
+    }
+}
+
+function removeChecklistItem(button) {
+    const item = button.closest('.checklist-item');
+    if (item) {
+        item.remove();
+    }
+}
+
+// Função para processar as imagens selecionadas
+function handleFileSelect(input) {
+    const files = input.files;
+    const preview = input.closest('.col-12').querySelector('.image-preview');
+    
+    Array.from(files).forEach(file => {
+        if (!file.type.startsWith('image/')) {
+            console.error('Arquivo não é uma imagem:', file.type);
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const container = document.createElement('div');
+            container.className = 'position-relative';
+            
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'img-thumbnail';
+            img.style.maxHeight = '100px';
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-danger btn-sm position-absolute top-0 end-0';
+            removeBtn.innerHTML = '×';
+            removeBtn.onclick = function() {
+                container.remove();
+            };
+            
+            container.appendChild(img);
+            container.appendChild(removeBtn);
+            preview.appendChild(container);
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    input.value = '';
+}
+
+// Função para adicionar item manualmente ou do template
+function addCustomItem(templateData = null) {
+    const itemsList = document.getElementById('itemsList');
+    const template = document.getElementById('itemTemplate');
+    
+    if (!template) {
+        console.error('Template de item não encontrado');
+        return;
+    }
+    
+    // Clona o template
+    const newItem = template.cloneNode(true);
+    newItem.style.display = 'block';
+    newItem.removeAttribute('id');
+    
+    if (templateData) {
+        const descriptionInput = newItem.querySelector('[name="items[][description]"]');
+        const statusInput = newItem.querySelector('input[name="items[][status]"]');
+        const observationsInput = newItem.querySelector('[name="items[][observations]"]');
+        
+        if (descriptionInput) {
+            descriptionInput.value = templateData.description || '';
+            descriptionInput.readOnly = true;
+        }
+        
+        // Limpa o status e observações para forçar o preenchimento
+        if (statusInput) {
+            statusInput.value = '';
+            statusInput.required = true;
+        }
+        
+        if (observationsInput) {
+            observationsInput.value = '';
+        }
+        
+        // Se o item for crítico, adiciona a classe e o badge
+        if (templateData.is_critical) {
+            const itemCard = newItem.querySelector('.checklist-item');
+            if (itemCard) {
+                itemCard.classList.add('border-danger');
+                const criticalBadge = document.createElement('span');
+                criticalBadge.className = 'badge bg-danger ms-2';
+                criticalBadge.textContent = 'Item Crítico';
+                itemCard.querySelector('.card-body').insertBefore(
+                    criticalBadge,
+                    itemCard.querySelector('.row')
+                );
+            }
+        }
+    }
+    
+    // Adiciona eventos para validação em tempo real
+    const inputs = newItem.querySelectorAll('input[required]');
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            if (this.value.trim()) {
+                this.classList.remove('is-invalid');
+            } else {
+                this.classList.add('is-invalid');
+            }
+        });
+    });
+    
+    itemsList.appendChild(newItem);
+    return newItem;
+}
+</script>
+
+{% endblock %}

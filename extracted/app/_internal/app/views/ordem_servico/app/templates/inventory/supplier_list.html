@@ -1,0 +1,293 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center bg-white">
+            <div class="d-flex align-items-center">
+                <a href="{{ url_for('inventory.index') }}" class="btn btn-secondary btn-sm me-3">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+                <h5 class="mb-0">
+                    <i class="bi bi-truck me-2"></i>Fornecedores
+                </h5>
+            </div>
+            <div>
+                <button type="button" class="btn btn-secondary btn-sm me-2" data-bs-toggle="collapse" data-bs-target="#filtros">
+                    <i class="bi bi-funnel"></i> Filtros
+                </button>
+                <a href="{{ url_for('inventory.novo_fornecedor') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-lg"></i> Novo Fornecedor
+                </a>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="collapse" id="filtros">
+            <div class="card-body border-bottom">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="busca" class="form-label">Buscar</label>
+                        <input type="text" class="form-control form-control-sm" id="busca" name="busca" 
+                               placeholder="Nome do fornecedor" value="{{ request.args.get('busca', '') }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="categoria" class="form-label">Categoria</label>
+                        <select class="form-select form-select-sm" id="categoria" name="categoria">
+                            <option value="">Todas as categorias</option>
+                            {% for value, label in Inventory.CATEGORY_CHOICES.items() %}
+                            <option value="{{ value }}" {% if request.args.get('categoria') == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary btn-sm me-2">
+                            <i class="bi bi-search"></i> Filtrar
+                        </button>
+                        <a href="{{ url_for('inventory.listar_fornecedores') }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-x-lg"></i> Limpar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card-body">
+            {% if fornecedores %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome</th>
+                            <th>Categoria Principal</th>
+                            <th class="text-center">Total de Produtos</th>
+                            <th class="text-center">Contatos</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fornecedor in fornecedores %}
+                        <tr>
+                            <td>
+                                <strong>{{ fornecedor.supplier }}</strong>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">
+                                    {{ fornecedor.get_category_display() }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-link p-0" 
+                                        onclick="verProdutos('{{ fornecedor.supplier }}')"
+                                        title="Ver produtos">
+                                    <span class="badge bg-info">
+                                        {{ fornecedor.total_produtos }} produtos
+                                    </span>
+                                </button>
+                            </td>
+                            <td class="text-center">
+                                {% if fornecedor.telefone %}
+                                <a href="tel:{{ fornecedor.telefone }}" class="btn btn-outline-secondary btn-sm me-1" title="Ligar">
+                                    <i class="bi bi-telephone"></i>
+                                </a>
+                                {% endif %}
+                                {% if fornecedor.email %}
+                                <a href="mailto:{{ fornecedor.email }}" class="btn btn-outline-secondary btn-sm" title="Enviar e-mail">
+                                    <i class="bi bi-envelope"></i>
+                                </a>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <button type="button" class="btn btn-outline-primary btn-sm me-1" 
+                                        onclick="verProdutos('{{ fornecedor.supplier }}')"
+                                        title="Ver produtos">
+                                    <i class="bi bi-box"></i>
+                                </button>
+                                <a href="{{ url_for('inventory.novo_fornecedor', nome=fornecedor.supplier) }}" 
+                                   class="btn btn-outline-secondary btn-sm me-1"
+                                   title="Editar fornecedor">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                {% if current_user.role in ['admin', 'developer'] %}
+                                <button type="button" class="btn btn-outline-danger btn-sm"
+                                        onclick="confirmarExclusao('{{ fornecedor.supplier }}', {{ fornecedor.total_produtos }})"
+                                        title="Excluir fornecedor">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox display-1 text-muted mb-3"></i>
+                <p class="text-muted">Nenhum fornecedor cadastrado.</p>
+                <a href="{{ url_for('inventory.novo_fornecedor') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i> Cadastrar Fornecedor
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmacao de exclusao -->
+<div class="modal fade" id="modalExcluir" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o fornecedor <strong id="nomeExcluir"></strong>?</p>
+                <div id="avisoVinculados" class="alert alert-warning d-none">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Este fornecedor possui <strong id="qtdVinculados"></strong> produto(s) vinculado(s).
+                    Os produtos <strong>não serão excluídos</strong>, apenas perderão a associação com este fornecedor.
+                </div>
+                <p class="text-muted small mb-0">Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formExcluir" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i>Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para visualizar produtos -->
+<div class="modal fade" id="modalProdutos" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Produtos do Fornecedor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover" id="tabelaProdutos">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Produto</th>
+                                <th>Categoria</th>
+                                <th class="text-center">Estoque</th>
+                                <th class="text-end">Preço</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function verProdutos(fornecedor) {
+    // Limpa a tabela
+    $('#tabelaProdutos tbody').empty();
+    
+    // Mostra loading
+    $('#tabelaProdutos tbody').html(`
+        <tr>
+            <td colspan="4" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Carregando...</span>
+                </div>
+            </td>
+        </tr>
+    `);
+    
+    // Mostra o modal
+    const modal = new bootstrap.Modal(document.getElementById('modalProdutos'));
+    modal.show();
+    
+    // Busca os produtos do fornecedor
+    $.get('/api/inventory/items', { search: fornecedor, type: 'supplier' })
+        .done(function(produtos) {
+            if (produtos.length === 0) {
+                $('#tabelaProdutos tbody').html(`
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-muted">
+                            Nenhum produto encontrado para este fornecedor.
+                        </td>
+                    </tr>
+                `);
+                return;
+            }
+            
+            $('#tabelaProdutos tbody').empty();
+            produtos.forEach(function(produto) {
+                const estoqueClass = produto.quantity <= 0 ? 'text-danger' : 
+                                   produto.quantity <= produto.minimum_quantity ? 'text-warning' : 'text-success';
+                
+                $('#tabelaProdutos tbody').append(`
+                    <tr>
+                        <td>${produto.name}</td>
+                        <td>${produto.category}</td>
+                        <td class="text-center">
+                            <span class="badge bg-${estoqueClass.replace('text-', '')}">${produto.quantity}</span>
+                        </td>
+                        <td class="text-end">R$ ${produto.sale_price.toFixed(2)}</td>
+                    </tr>
+                `);
+            });
+        })
+        .fail(function() {
+            $('#tabelaProdutos tbody').html(`
+                <tr>
+                    <td colspan="4" class="text-center py-4 text-danger">
+                        Erro ao carregar os produtos. Tente novamente.
+                    </td>
+                </tr>
+            `);
+        });
+}
+
+function confirmarExclusao(nome, totalProdutos) {
+    document.getElementById('nomeExcluir').textContent = nome;
+    document.getElementById('formExcluir').action = '/fornecedores/excluir/' + encodeURIComponent(nome);
+    
+    const aviso = document.getElementById('avisoVinculados');
+    const qtd = document.getElementById('qtdVinculados');
+    
+    // Desconta 1 porque o placeholder "Cadastro do Fornecedor" conta como produto
+    const reais = Math.max(0, totalProdutos - 1);
+    if (reais > 0) {
+        qtd.textContent = reais;
+        aviso.classList.remove('d-none');
+    } else {
+        aviso.classList.add('d-none');
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalExcluir'));
+    modal.show();
+}
+
+// Inicializa os tooltips do Bootstrap
+$(document).ready(function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+});
+</script>
+{% endblock %} 

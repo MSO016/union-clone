@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-link"></i> Anexar Checklist Existente
+                    </h5>
+                    <small class="text-muted">OS #{{ order.id }} - {{ order.client.name }}</small>
+                </div>
+                <div class="card-body">
+                    {% if checklists %}
+                    <form method="POST">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;"></th>
+                                        <th>Tipo</th>
+                                        <th>Data de Criação</th>
+                                        <th>Criado por</th>
+                                        <th>Itens</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for checklist in checklists %}
+                                    <tr>
+                                        <td>
+                                            <input type="radio" name="checklist_id" 
+                                                   value="{{ checklist.id }}" 
+                                                   class="form-check-input"
+                                                   required>
+                                        </td>
+                                        <td>
+                                            {% if checklist.checklist_type == 'entrada' %}
+                                            <span class="badge bg-primary">Entrada</span>
+                                            {% else %}
+                                            <span class="badge bg-success">Saída</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ checklist.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                        <td>{{ checklist.created_by.username }}</td>
+                                        <td>
+                                            {{ checklist.items|length }} itens
+                                            {% set critical = checklist.items|selectattr('template_item.is_critical', 'true')|list %}
+                                            {% if critical %}
+                                            <span class="badge bg-danger" title="Itens críticos">
+                                                {{ critical|length }} críticos
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% set problems = checklist.items|selectattr('status', 'equalto', 'problema')|list %}
+                                            {% if problems %}
+                                            <span class="badge bg-warning">
+                                                {{ problems|length }} problemas
+                                            </span>
+                                            {% else %}
+                                            <span class="badge bg-success">OK</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-link"></i> Anexar Checklist
+                            </button>
+                            <a href="{{ url_for('orders.view', id=order.id) }}" 
+                               class="btn btn-secondary">
+                                <i class="bi bi-x"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        Não há checklists disponíveis para anexar.
+                    </div>
+                    <a href="{{ url_for('orders.view', id=order.id) }}" 
+                       class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Voltar
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

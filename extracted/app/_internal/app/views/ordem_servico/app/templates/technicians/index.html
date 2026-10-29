@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" style="padding-top: 2rem;">
+    <div class="d-flex align-items-center mb-4">
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-primary me-3 px-3 py-2">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+        <h4 class="mb-0">Técnicos</h4>
+        {% if current_user.role in ['admin', 'developer'] %}
+        <a href="{{ url_for('technicians.new') }}" class="btn btn-primary ms-auto">
+            <i class="bi bi-plus-circle"></i> Novo Técnico
+        </a>
+        {% endif %}
+    </div>
+
+    {% if current_user.role in ['admin', 'developer'] %}
+    <div class="alert alert-info mb-4">
+        <i class="bi bi-info-circle"></i> 
+        <strong>Dica:</strong> Técnicos são criados e atualizados automaticamente quando você gerencia usuários com a função "Técnico".
+        Isso permite que o técnico acesse o sistema e veja suas ordens de serviço.
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Foto</th>
+                            <th>Nome</th>
+                            <th>Contato</th>
+                            <th>Comissão (%)</th>
+                            <th>Status</th>
+                            <th>OS Concluídas</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for technician in technicians %}
+                        <tr>
+                            <td>
+                                {% if technician.photo %}
+                                    <img src="{{ technician.photo }}" alt="{{ technician.name }}" 
+                                         class="rounded-circle" width="40" height="40">
+                                {% else %}
+                                    <i class="bi bi-person-circle fs-3"></i>
+                                {% endif %}
+                            </td>
+                            <td>{{ technician.name }}</td>
+                            <td>{{ technician.contact }}</td>
+                            <td>{{ "%.2f"|format(technician.commission_rate or 0) }}%</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if technician.active else 'danger' }}">
+                                    {{ 'Ativo' if technician.active else 'Inativo' }}
+                                </span>
+                            </td>
+                            <td>{{ technician.orders|selectattr('status', 'equalto', 'finalizada')|list|length }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    {% if current_user.role in ['admin', 'developer'] or (current_user.role == 'tecnico' and technician.name == current_user.username) %}
+                                    <a href="{{ url_for('technicians.show', id=technician.id) }}" 
+                                       class="btn btn-sm btn-info" title="Ver detalhes">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% endif %}
+                                    
+                                    {% if current_user.role in ['admin', 'developer'] %}
+                                    <a href="{{ url_for('technicians.edit', id=technician.id) }}" 
+                                       class="btn btn-sm btn-warning" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button onclick="toggleTechnicianStatus({{ technician.id }})"
+                                            class="btn btn-sm {% if technician.active %}btn-danger{% else %}btn-success{% endif %}"
+                                            title="{{ 'Desativar' if technician.active else 'Ativar' }}">
+                                        <i class="bi {% if technician.active %}bi-person-x{% else %}bi-person-check{% endif %}"></i>
+                                    </button>
+                                    <form action="{{ url_for('technicians.delete', id=technician.id) }}" method="POST" class="d-inline"
+                                          onsubmit="return confirm('Tem certeza que deseja excluir o técnico {{ technician.name }}? Esta ação não pode ser desfeita.');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir técnico">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleTechnicianStatus(id) {
+    fetch(`/technicians/${id}/toggle_status`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            location.reload();
+        } else {
+            alert(data.message || 'Erro ao alterar status do técnico');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+{% endblock %} 

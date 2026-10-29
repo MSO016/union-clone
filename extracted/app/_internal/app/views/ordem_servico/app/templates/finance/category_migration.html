@@ -1,0 +1,132 @@
+{% extends "finance/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Migração de Categorias Financeiras</h2>
+    
+    <div class="alert alert-info">
+        <h4 class="alert-heading">Instruções de Migração:</h4>
+        <ol>
+            <li>Selecione uma categoria apropriada para cada transação na lista abaixo</li>
+            <li>As sugestões de categoria são baseadas na descrição da transação</li>
+            <li>Um backup será criado automaticamente antes da migração</li>
+            <li>Esta operação não pode ser desfeita (será necessário usar o backup se precisar reverter)</li>
+        </ol>
+    </div>
+
+    <form method="POST" id="migrationForm">
+        {% if transactions_without_category %}
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">Transações Sem Categoria</h5>
+            </div>
+            <div class="card-body">
+                <p class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Existem {{ transactions_without_category|length }} transações que precisam ser categorizadas
+                </p>
+                
+                <div class="table-responsive mb-3">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Descrição</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th>Categoria Sugerida</th>
+                                <th width="250">Selecione a Categoria</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions_without_category %}
+                            <tr>
+                                <td>{{ transaction.date.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ transaction.description }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if transaction.type == 'entrada' else 'danger' }}">
+                                        {{ 'Entrada' if transaction.type == 'entrada' else 'Saída' }}
+                                    </span>
+                                </td>
+                                <td>R$ {{ "%.2f"|format(transaction.amount) }}</td>
+                                <td>
+                                    {% if "luz" in transaction.description.lower() %}
+                                        <span class="badge bg-info">Sugestão: Energia</span>
+                                    {% elif "celular" in transaction.description.lower() %}
+                                        <span class="badge bg-info">Sugestão: Serviços</span>
+                                    {% elif "compra" in transaction.description.lower() %}
+                                        <span class="badge bg-info">Sugestão: Material de Escritório</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <select name="transaction_{{ transaction.id }}" class="form-control" required>
+                                        <option value="">Escolha...</option>
+                                        {% if transaction.type == 'entrada' %}
+                                        <optgroup label="Categorias de Entrada">
+                                            {% for cat_name, cat_type in default_categories %}
+                                                {% if cat_type == 'entrada' %}
+                                                <option value="{{ loop.index }}"
+                                                    {% if 
+                                                        (cat_name == 'Serviços' and 'celular' in transaction.description.lower()) or
+                                                        (cat_name == 'Material de Escritório' and 'compra' in transaction.description.lower())
+                                                    %}
+                                                        selected
+                                                    {% endif %}
+                                                >{{ cat_name }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </optgroup>
+                                        {% else %}
+                                        <optgroup label="Categorias de Saída">
+                                            {% for cat_name, cat_type in default_categories %}
+                                                {% if cat_type == 'saida' %}
+                                                <option value="{{ loop.index }}"
+                                                    {% if 
+                                                        (cat_name == 'Energia' and 'luz' in transaction.description.lower()) or
+                                                        (cat_name == 'Material de Escritório' and 'compra' in transaction.description.lower())
+                                                    %}
+                                                        selected
+                                                    {% endif %}
+                                                >{{ cat_name }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </optgroup>
+                                        {% endif %}
+                                    </select>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="form-group mt-4">
+            <button type="submit" class="btn btn-primary btn-lg" onclick="return confirmMigration()">
+                <i class="bi bi-arrow-right-circle"></i> Realizar Migração
+            </button>
+            <a href="{{ url_for('finance.categories') }}" class="btn btn-secondary btn-lg">
+                <i class="bi bi-x-circle"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+function confirmMigration() {
+    // Verifica se todas as categorias foram selecionadas
+    var selects = document.querySelectorAll('select[required]');
+    for (var i = 0; i < selects.length; i++) {
+        if (!selects[i].value) {
+            alert('Por favor, selecione uma categoria para todas as transações antes de continuar.');
+            selects[i].focus();
+            return false;
+        }
+    }
+    
+    return confirm('ATENÇÃO: Esta operação irá migrar todas as transações para as categorias selecionadas. Um backup será criado, mas a operação não pode ser desfeita automaticamente. Deseja continuar?');
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,104 @@
+<div class="card mb-3 checklist-item">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Descrição</label>
+                    <input type="text" class="form-control" name="description" 
+                           value="{{ item.description if item else '' }}" required
+                           placeholder="Ex: Verificar tela quebrada, Testar alto-falante, Avaliar bateria...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" name="status">
+                        <option value="ok" {% if item and item.status == 'ok' %}selected{% endif %}>OK</option>
+                        <option value="problema" {% if item and item.status == 'problema' %}selected{% endif %}>Problema</option>
+                        <option value="na" {% if item and item.status == 'na' %}selected{% endif %}>Não se Aplica</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="form-label">Observações</label>
+                    <input type="text" class="form-control" name="observations" 
+                           value="{{ item.observations if item else '' }}" 
+                           placeholder="Ex: Tela com riscos na parte superior, Botão power com mal contato...">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Área de imagens -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-label">Imagens</label>
+                    <input type="file" class="form-control" accept="image/*" multiple 
+                           onchange="handleFileSelect(this)"
+                           placeholder="Selecione uma ou mais fotos do item">
+                </div>
+                <div class="images-container mt-2">
+                    {% if item and item.attachments %}
+                        {% for attachment in item.attachments %}
+                            {% if attachment.file_type.startswith('image/') %}
+                            <div class="image-preview">
+                                <img src="{{ url_for('static', filename=attachment.file_path) }}" 
+                                     class="img-thumbnail" alt="Imagem do item">
+                                <button type="button" class="btn btn-sm btn-danger remove-image" 
+                                        onclick="removeImage(this)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                <input type="hidden" name="images[]" 
+                                       value="{{ attachment.file_path }}">
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Botão de remover item -->
+        <div class="text-end mt-3">
+            <button type="button" class="btn btn-danger btn-sm" onclick="removeChecklistItem(this)">
+                <i class="bi bi-trash"></i> Remover Item
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.images-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-height: 50px;
+    border: 1px dashed #dee2e6;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.image-preview {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-preview .remove-image {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 2px 5px;
+    background: rgba(255, 255, 255, 0.8);
+}
+</style> 

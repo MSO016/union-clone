@@ -1,0 +1,454 @@
+/* =============================================================================
+   login-modern.css — Estilos cosmeticos exclusivos da tela de Login
+   =============================================================================
+   ESCOPO: TODOS os seletores comecam com .login-modern para nao afetar
+   nenhum outro template do sistema (existem 64 HTMLs no OS Manager).
+
+   FILOSOFIA:
+   - Adiciona uma camada visual moderna sobre o markup existente.
+   - Nao altera form fields, IDs, names ou JS — preserva 100% do contrato.
+   - Maior especificidade (.login-modern .X) sobrescreve o <style> inline legado.
+   - Dark mode automatico via prefers-color-scheme.
+   ============================================================================= */
+
+/* ---------- Tokens locais (nao vazam para outros templates) ---------------- */
+/* Paleta sincronizada com o app principal Union (sidebar.py + main_window.py)*/
+/*   --lg-accent:   #0D47A1  (Material Blue 900 — azul oficial do Union)      */
+/*   --lg-accent-2: #2196F3  (Material Blue 500 — acento usado em gradients)  */
+.login-modern {
+    --lg-accent:        #0D47A1;
+    --lg-accent-2:      #2196F3;
+    --lg-accent-soft:   rgba(13, 71, 161, 0.10);
+    --lg-text:          #0f172a;
+    --lg-text-muted:    #64748b;
+    --lg-bg-card:       rgba(255, 255, 255, 0.96);
+    --lg-bg-input:      #ffffff;
+    --lg-border:        #e2e8f0;
+    --lg-border-strong: #cbd5e1;
+    --lg-radius:        16px;
+    --lg-radius-sm:     10px;
+    --lg-shadow-md:     0 8px 24px rgba(15, 23, 42, 0.08);
+    --lg-shadow-lg:     0 24px 48px rgba(15, 23, 42, 0.18);
+    --lg-danger:        #ef4444;
+    --lg-danger-soft:   #fef2f2;
+    --lg-danger-text:   #991b1b;
+    --lg-success:       #10b981;
+}
+
+@media (prefers-color-scheme: dark) {
+    .login-modern {
+        --lg-text:          #e2e8f0;
+        --lg-text-muted:    #94a3b8;
+        --lg-bg-card:       rgba(30, 41, 59, 0.92);
+        --lg-bg-input:      #1e293b;
+        --lg-border:        #334155;
+        --lg-border-strong: #475569;
+        --lg-danger-soft:   rgba(239, 68, 68, 0.12);
+    }
+}
+
+/* ---------- Background da pagina ----------------------------------------- */
+/* O base.html aplica body { padding-top: 56px } e o Flask-Bootstrap envolve
+   o conteudo num <main class="container"> com fundo herdado do body
+   (var(--bg-light) = cinza-claro). Para garantir que o redesign cubra a tela
+   INTEIRA sem depender do markup do Flask-Bootstrap, usamos position:fixed.   */
+.login-modern.login-container,
+.login-modern .login-container {
+    background:
+        radial-gradient(circle at 15% 15%, rgba(33, 150, 243, 0.25), transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(13, 71, 161, 0.30), transparent 45%),
+        linear-gradient(135deg, #051a3d 0%, #0D47A1 55%, #1565C0 100%);
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1040;          /* acima da navbar do Flask-Bootstrap (1030) */
+    padding: 1.5rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Defesa em profundidade: pinta tambem o body quando a tela de login esta
+   ativa, para o caso de algum browser nao renderizar position:fixed corretamente
+   ou de o usuario fazer screenshot/print incluindo as bordas. */
+body:has(.login-modern) {
+    background: #051a3d !important;
+    padding-top: 0 !important;
+}
+
+/* Animacao decorativa de orbs flutuantes (puro CSS, sem custo de runtime) */
+.login-modern.login-container::before,
+.login-modern.login-container::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
+    animation: lg-float 12s ease-in-out infinite;
+    pointer-events: none;
+}
+.login-modern.login-container::before {
+    width: 380px;
+    height: 380px;
+    background: #2196F3;
+    top: -120px;
+    left: -120px;
+}
+.login-modern.login-container::after {
+    width: 460px;
+    height: 460px;
+    background: #0D47A1;
+    bottom: -180px;
+    right: -180px;
+    animation-delay: -6s;
+}
+
+@keyframes lg-float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(30px, 20px) scale(1.05); }
+}
+
+/* ---------- Caixa do login ----------------------------------------------- */
+.login-modern .login-box {
+    width: 100%;
+    max-width: 440px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ---------- Header (titulo + subtitulo + logo) --------------------------- */
+/* Titulo "UNION OS MANAGER" como chip com background solido —             */
+/* garante legibilidade INDEPENDENTE do que esteja por tras (defesa total). */
+.login-modern .login-box > .text-center.mb-4 h1.display-5 {
+    display: inline-block;
+    color: #ffffff !important;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    font-size: 1.5rem;
+    margin-bottom: 0.6rem !important;
+    padding: 0.55rem 1.4rem;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, var(--lg-accent) 0%, var(--lg-accent-2) 100%);
+    box-shadow: 0 8px 20px rgba(13, 71, 161, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    /* Limpa qualquer efeito de gradient-clip herdado de versoes anteriores */
+    -webkit-background-clip: border-box !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background-clip: border-box !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* Subtitulo "Sistema Profissional..." como chip dark glass —             */
+/* mesmo padrao defensivo dos outros chips: legivel em qualquer fundo.    */
+.login-modern .login-box > .text-center.mb-4 p.text-muted {
+    display: inline-block;
+    color: #ffffff !important;
+    font-size: 0.84rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    margin-bottom: 1.1rem !important;
+    margin-top: 0.15rem;
+    padding: 0.32rem 0.95rem;
+    border-radius: 9999px;
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.login-modern .login-logo {
+    margin: 0.5rem auto 0.75rem !important;
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.35));
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0.5rem 1.25rem;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ---------- Card do formulario (glass effect) --------------------------- */
+.login-modern .card.shadow {
+    background: var(--lg-bg-card) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    border-radius: var(--lg-radius) !important;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.22), 0 8px 16px rgba(15, 23, 42, 0.10) !important;
+    overflow: hidden;
+    animation: lg-slideUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes lg-slideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.login-modern .card-header.bg-primary {
+    background: linear-gradient(135deg, var(--lg-accent) 0%, var(--lg-accent-2) 100%) !important;
+    border: none !important;
+    padding: 1.4rem 1.5rem 1.25rem !important;
+    position: relative;
+}
+
+.login-modern .card-header.bg-primary::before {
+    /* HOTFIX 29-05-2026: o codigo antigo apontava para bi-lightbulb-off nesta
+       versao do bootstrap-icons (1.8.1) — aparecia uma "lampada" no header.
+       Corrigido para bi-shield-lock-fill (escudo de seguranca, decorativo). */
+    content: "\F537"; /* bi-shield-lock-fill */
+    font-family: "bootstrap-icons" !important;
+    position: absolute;
+    right: 1.25rem;
+    top: 1rem;
+    font-size: 1.4rem;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.login-modern .card-header h4 {
+    color: #ffffff !important;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin: 0 !important;
+    font-size: 1.15rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.login-modern .card-body {
+    padding: 1.75rem 1.5rem 1.5rem !important;
+}
+
+/* ---------- Form labels e inputs ---------------------------------------- */
+.login-modern .form-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--lg-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+}
+
+.login-modern .input-group {
+    border-radius: var(--lg-radius-sm);
+    overflow: hidden;
+    border: 1.5px solid var(--lg-border);
+    transition: all 0.18s ease;
+    background: var(--lg-bg-input);
+}
+
+.login-modern .input-group:focus-within {
+    border-color: var(--lg-accent);
+    box-shadow: 0 0 0 4px var(--lg-accent-soft);
+}
+
+.login-modern .input-group-text {
+    background: transparent !important;
+    border: none !important;
+    color: var(--lg-text-muted);
+    padding-left: 0.95rem;
+    padding-right: 0.5rem;
+    font-size: 1.05rem;
+}
+.login-modern .input-group:focus-within .input-group-text {
+    color: var(--lg-accent);
+}
+
+.login-modern .form-control.custom-input {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    color: var(--lg-text) !important;
+    padding: 0.7rem 0.9rem 0.7rem 0.4rem !important;
+    height: auto !important;
+    font-size: 0.95rem;
+}
+
+.login-modern .form-control.custom-input::placeholder {
+    color: var(--lg-text-muted);
+    opacity: 0.7;
+}
+
+.login-modern .form-control.custom-input:focus {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Botao de toggle de senha (preserva o id="togglePassword") */
+.login-modern #togglePassword.btn,
+.login-modern #togglePassword {
+    background: transparent !important;
+    border: none !important;
+    color: var(--lg-text-muted) !important;
+    padding: 0 0.95rem !important;
+    transition: color 0.15s ease;
+}
+.login-modern #togglePassword:hover {
+    color: var(--lg-accent) !important;
+    background: var(--lg-accent-soft) !important;
+}
+
+/* ---------- Checkbox "Lembrar de mim" ----------------------------------- */
+.login-modern .form-check-input {
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-top: 0.2rem;
+    border: 1.5px solid var(--lg-border-strong);
+    cursor: pointer;
+}
+.login-modern .form-check-input:checked {
+    background-color: var(--lg-accent) !important;
+    border-color: var(--lg-accent) !important;
+}
+.login-modern .form-check-label {
+    font-size: 0.88rem;
+    color: var(--lg-text);
+    cursor: pointer;
+    user-select: none;
+}
+
+/* ---------- Botao Entrar ------------------------------------------------ */
+.login-modern .btn-primary.btn-lg {
+    background: linear-gradient(135deg, var(--lg-accent) 0%, var(--lg-accent-2) 100%) !important;
+    border: none !important;
+    border-radius: var(--lg-radius-sm) !important;
+    padding: 0.85rem 1.5rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em !important;
+    font-size: 0.98rem !important;
+    box-shadow: 0 4px 12px rgba(13, 71, 161, 0.30) !important;
+    transition: all 0.2s ease !important;
+}
+.login-modern .btn-primary.btn-lg:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(13, 71, 161, 0.40) !important;
+}
+.login-modern .btn-primary.btn-lg:active {
+    transform: translateY(0) !important;
+}
+
+/* ---------- Mensagem de erro ------------------------------------------- */
+.login-modern .error-message {
+    background: var(--lg-danger-soft) !important;
+    border-left: 4px solid var(--lg-danger) !important;
+    border-radius: var(--lg-radius-sm) !important;
+    padding: 0.85rem 1rem !important;
+    color: var(--lg-danger-text) !important;
+    animation: lg-shake 0.4s ease-out;
+}
+.login-modern .error-message .text-danger {
+    color: var(--lg-danger-text) !important;
+    font-weight: 500;
+}
+
+@keyframes lg-shake {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-6px); }
+    75%      { transform: translateX(6px); }
+}
+
+/* ---------- Dropdown de usuarios salvos -------------------------------- */
+.login-modern .saved-users {
+    margin-top: 0.4rem !important;
+    border: 1px solid var(--lg-border) !important;
+    border-radius: var(--lg-radius-sm) !important;
+    box-shadow: var(--lg-shadow-md) !important;
+    background: var(--lg-bg-card) !important;
+}
+.login-modern .saved-users .dropdown-item {
+    color: var(--lg-text) !important;
+    padding: 0.55rem 1rem !important;
+    font-size: 0.88rem;
+}
+.login-modern .saved-users .dropdown-item:hover {
+    background: var(--lg-accent-soft) !important;
+    color: var(--lg-accent) !important;
+}
+.login-modern .saved-users .dropdown-item i {
+    color: var(--lg-accent) !important;
+}
+
+/* ---------- Rodape (empresa + URL rede) -------------------------------- */
+/* "Tech Union Solutions" com background solido para legibilidade total,  */
+/* mesmo que algum container parent renderize com fundo claro.             */
+.login-modern .company-name h5 {
+    display: inline-block;
+    color: #ffffff !important;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.4rem 1.1rem;
+    border-radius: 9999px;
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    margin-bottom: 0.5rem;
+}
+/* Network access (IP de rede + botao copiar) — chip dark glass.          */
+/* Garante visibilidade tanto sobre background azul escuro do Union quanto */
+/* sobre fundos claros (defesa em profundidade).                           */
+.login-modern .network-access {
+    background: rgba(15, 23, 42, 0.65) !important;
+    border: 1px solid rgba(33, 150, 243, 0.35) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 9999px !important;
+    padding: 0.45rem 0.95rem !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 0.5rem;
+}
+.login-modern .network-access small {
+    color: #ffffff !important;
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+.login-modern .network-access strong {
+    color: #2196F3 !important;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+.login-modern .network-access .btn-outline-secondary {
+    background: rgba(33, 150, 243, 0.22) !important;
+    border: 1px solid rgba(33, 150, 243, 0.55) !important;
+    color: #ffffff !important;
+    padding: 0.2rem 0.55rem !important;
+    border-radius: 9999px !important;
+    transition: all 0.18s ease;
+}
+.login-modern .network-access .btn-outline-secondary:hover {
+    background: #2196F3 !important;
+    border-color: #2196F3 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+}
+.login-modern .network-access .btn-outline-secondary i {
+    color: #ffffff !important;
+}
+
+/* ---------- Responsivo --------------------------------------------------- */
+@media (max-width: 575.98px) {
+    .login-modern .login-box { max-width: 100%; padding: 0 0.75rem; }
+    .login-modern .card-body { padding: 1.25rem 1rem 1rem !important; }
+    .login-modern .login-box > .text-center.mb-4 h1.display-5 { font-size: 1.5rem; }
+    .login-modern.login-container::before,
+    .login-modern.login-container::after { filter: blur(60px); opacity: 0.25; }
+}
+
+/* ---------- Movement reduzido (acessibilidade) -------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .login-modern *,
+    .login-modern *::before,
+    .login-modern *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

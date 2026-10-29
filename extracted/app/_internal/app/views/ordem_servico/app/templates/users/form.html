@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">{{ 'Editar' if user else 'Novo' }} Usuário</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Nome de Usuário *</label>
+                            <input type="text" class="form-control" id="username" name="username"
+                                   value="{{ user.username if user else '' }}"
+                                   required
+                                   pattern="^[A-Za-z0-9._\-]{2,80}$"
+                                   title="Somente letras (sem acento), números, ponto, hífen e underline. Sem espaços."
+                                   autocomplete="off"
+                                   spellcheck="false">
+                            <div class="form-text">
+                                <i class="bi bi-info-circle"></i> Sem espaços ou acentos. Ex.: <code>joao.silva</code>.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{ user.email if user else '' }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">{{ 'Nova Senha' if user else 'Senha' }} {{ '' if user else '*' }}</label>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   {{ '' if user else 'required' }}>
+                            {% if user %}
+                            <small class="form-text text-muted">Deixe em branco para manter a senha atual</small>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Papel *</label>
+                            <select class="form-select" id="role" name="role" required>
+                                <option value="">Selecione...</option>
+                                <option value="admin" {{ 'selected' if user and user.role == 'admin' }}>Administrador</option>
+                                <option value="tecnico" {{ 'selected' if user and user.role == 'tecnico' }}>Técnico</option>
+                                {% if current_user.role == 'developer' %}
+                                <option value="developer" {{ 'selected' if user and user.role == 'developer' }}>Desenvolvedor</option>
+                                {% endif %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="active" name="active" 
+                                   {{ 'checked' if not user or user.active }}>
+                            <label class="form-check-label" for="active">Usuário Ativo</label>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('users.list') }}" class="btn btn-secondary me-md-2">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Auto-strip do username: remove espacos em tempo real, alinhado ao
+    // backend (_normalize_username em routes/users.py) e ao pattern HTML5.
+    var usernameEl = document.getElementById('username');
+    if (!usernameEl) { return; }
+    usernameEl.addEventListener('input', function () {
+        var cleaned = usernameEl.value.replace(/\s+/g, '');
+        if (cleaned !== usernameEl.value) {
+            usernameEl.value = cleaned;
+        }
+    });
+    var formEl = usernameEl.closest('form');
+    if (formEl) {
+        formEl.addEventListener('submit', function (e) {
+            if (/\s/.test(usernameEl.value)) {
+                e.preventDefault();
+                alert('O nome de usuario nao pode conter espacos.');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

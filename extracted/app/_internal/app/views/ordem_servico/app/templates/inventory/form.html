@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+{# Fase 9 - Modernizacao cosmetica do cadastro de produto (escopado em .form-modern).
+   Nao mexe em validacao needs-validation, calcula markup automatico, geracao QR. #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/forms-modern.css') }}?v=20260530-bold">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/combobox.css') }}?v=20260529">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 form-modern">
+    <!-- Botão Voltar -->
+    <div class="mb-3">
+        <a href="{{ url_for('inventory.index') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <h2>{{ 'Editar' if item else 'Novo' }} Item do Estoque</h2>
+
+    {% if errors %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle"></i>
+        {% if errors.get('_general') %}
+            {{ errors['_general'] }}
+        {% else %}
+            Por favor, corrija os erros destacados abaixo.
+        {% endif %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <form method="POST" class="needs-validation" novalidate id="mainForm">
+        <!-- Nome do Item -->
+        <div class="form-group mb-3">
+            <label for="name">Nome do Produto *</label>
+            <input type="text" class="form-control {% if errors.get('name') %}is-invalid{% endif %}" 
+                   id="name" name="name" 
+                   value="{{ form_data.get('name', '') if form_data else (item.name if item else '') }}"
+                   placeholder="Ex: SSD Kingston 240GB" required>
+            <div class="invalid-feedback">
+                {{ errors.get('name', 'Por favor, informe o nome do produto.') }}
+            </div>
+        </div>
+
+        <!-- Categoria -->
+        <div class="form-group mb-3">
+            <label for="category">Categoria *</label>
+            <select class="form-select {% if errors.get('category') %}is-invalid{% endif %}" id="category" name="category" required>
+                <option value="">Selecione uma categoria...</option>
+                {% set current_category = form_data.get('category', '') if form_data else (item.category if item else '') %}
+                {% for value, label in Inventory.CATEGORY_CHOICES.items() %}
+                <option value="{{ value }}" {% if current_category == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <div class="invalid-feedback">
+                Por favor, selecione uma categoria.
+            </div>
+        </div>
+
+        <!-- Fornecedor (datalist: sugere os ja cadastrados, mas aceita texto livre) -->
+        <div class="form-group mb-3">
+            <label for="supplier">Fornecedor</label>
+            <input type="text" class="form-control" 
+                   id="supplier" name="supplier" 
+                   value="{{ form_data.get('supplier', '') if form_data else (item.supplier if item else '') }}"
+                   placeholder="Selecione ou digite o nome do fornecedor"
+                   {% if suppliers %}list="suppliersList" data-combobox{% endif %}
+                   autocomplete="off">
+            {% if suppliers %}
+            <datalist id="suppliersList">
+                {% for s in suppliers %}
+                <option value="{{ s }}"></option>
+                {% endfor %}
+            </datalist>
+            <small class="form-text text-muted">
+                Comece a digitar para ver os fornecedores já cadastrados, ou informe um novo.
+            </small>
+            {% endif %}
+        </div>
+
+        <div class="row">
+            <!-- Quantidade -->
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label for="quantity">Quantidade Inicial *</label>
+                    <input type="number" class="form-control {% if errors.get('quantity') %}is-invalid{% endif %}" 
+                           id="quantity" name="quantity" 
+                           value="{{ form_data.get('quantity', '') if form_data else ("%.2f"|format(item.quantity) if item else '') }}"
+                           placeholder="Ex: 10"
+                           step="0.01" min="0" required>
+                    <div class="invalid-feedback">
+                        {{ errors.get('quantity', 'Por favor, informe a quantidade inicial.') }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quantidade Mínima -->
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label for="minimum_quantity">Estoque Mínimo *</label>
+                    <input type="number" class="form-control {% if errors.get('minimum_quantity') %}is-invalid{% endif %}" 
+                           id="minimum_quantity" name="minimum_quantity" 
+                           value="{{ form_data.get('minimum_quantity', '0') if form_data else ("%.2f"|format(item.minimum_quantity) if item else '0') }}"
+                           placeholder="Ex: 5"
+                           step="0.01" min="0" required>
+                    <div class="invalid-feedback">
+                        {{ errors.get('minimum_quantity', 'Por favor, informe o estoque mínimo.') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Preço de Custo -->
+            <div class="col-md-4">
+                <div class="form-group mb-3">
+                    <label for="price_per_unit">Preço de Custo (R$) *</label>
+                    <input type="number" class="form-control {% if errors.get('price_per_unit') %}is-invalid{% endif %}" 
+                           id="price_per_unit" name="price_per_unit" 
+                           value="{{ form_data.get('price_per_unit', '') if form_data else ("%.2f"|format(item.price_per_unit) if item else '') }}"
+                           placeholder="Ex: 99.90"
+                           step="0.01" min="0" required>
+                    <div class="invalid-feedback">
+                        {{ errors.get('price_per_unit', 'Por favor, informe o preço de custo.') }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preço de Venda -->
+            <div class="col-md-4">
+                <div class="form-group mb-3">
+                    <label for="sale_price">Preço de Venda (R$)</label>
+                    <input type="number" class="form-control {% if errors.get('sale_price') %}is-invalid{% endif %}" 
+                           id="sale_price" name="sale_price" 
+                           value="{{ form_data.get('sale_price', '') if form_data else ("%.2f"|format(item.sale_price) if item and item.sale_price else '') }}"
+                           placeholder="Informe o preço desejado"
+                           step="0.01" min="0">
+                    <div class="invalid-feedback">
+                        {{ errors.get('sale_price', 'O preço de venda não pode ser negativo.') }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Margem de Lucro (somente leitura, calculada) -->
+            <div class="col-md-4">
+                <div class="form-group mb-3">
+                    <label for="markup_percentage">Margem de Lucro</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control bg-light" 
+                               id="markup_percentage" name="markup_percentage" 
+                               value="{{ form_data.get('markup_percentage', '0') if form_data else ("%.2f"|format(item.markup_percentage) if item else '0') }}"
+                               placeholder="Calculada"
+                               step="0.01" readonly>
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <small class="text-muted">Calculada automaticamente</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Tipo de Uso -->
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label for="usage">Tipo de Uso *</label>
+                    {% set current_usage = form_data.get('usage', '') if form_data else (item.usage if item else '') %}
+                    <select class="form-select {% if errors.get('usage') %}is-invalid{% endif %}" id="usage" name="usage" required>
+                        <option value="">Selecione o tipo de uso...</option>
+                        {% for value, label in Inventory.USAGE_CHOICES.items() %}
+                        <option value="{{ value }}" {% if current_usage == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="invalid-feedback">
+                        Por favor, selecione o tipo de uso.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR Code -->
+        {% if item and item.qr_code %}
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>QR Code do Produto</label>
+                <div class="border p-3 text-center">
+                    <img src="{{ url_for('static', filename='qrcodes/' + item.qr_code + '.png') }}" 
+                         alt="QR Code" class="img-fluid" style="max-width: 200px;">
+                    <div class="mt-2">
+                        <small class="text-muted">Código: {{ item.qr_code }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Observações -->
+        <div class="form-group mb-3">
+            <label for="notes">Observações</label>
+            <textarea class="form-control" id="notes" name="notes" rows="3"
+                      placeholder="Informações adicionais sobre o produto">{{ form_data.get('notes', '') if form_data else (item.notes if item else '') }}</textarea>
+        </div>
+
+        <!-- Botões -->
+        <div class="form-group mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Salvar
+            </button>
+            <a href="{{ url_for('inventory.index') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/combobox.js') }}?v=20260529"></script>
+<script>
+// Validação do formulário
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    });
+})();
+
+// Função para calcular a margem de lucro automaticamente
+function calculateMarkup() {
+    var cost = parseFloat(document.getElementById('price_per_unit').value) || 0;
+    var sale = parseFloat(document.getElementById('sale_price').value) || 0;
+    var markupField = document.getElementById('markup_percentage');
+    
+    if (cost > 0 && sale > 0) {
+        var markup = ((sale - cost) / cost) * 100;
+        markupField.value = markup.toFixed(2);
+    } else {
+        markupField.value = '0.00';
+    }
+}
+
+// Recalcula margem quando preço de custo ou preço de venda mudar
+document.getElementById('price_per_unit').addEventListener('input', calculateMarkup);
+document.getElementById('sale_price').addEventListener('input', calculateMarkup);
+
+// Calcula ao carregar a página se já houver valores preenchidos
+calculateMarkup();
+</script>
+{% endblock %}

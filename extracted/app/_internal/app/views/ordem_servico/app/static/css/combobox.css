@@ -1,0 +1,77 @@
+/* =============================================================================
+   combobox.css — Combobox visivel (seta + lista clicavel) para inputs com
+   <datalist>. (B17 / F6a — 29-05-2026)
+   =============================================================================
+   Objetivo: dar um DROPDOWN VISIVEL aos campos que hoje usam <datalist>
+   (equipamento na OS, fornecedor no produto), pois o <datalist> nativo nao
+   exibe seta na maioria dos navegadores ("so escrevendo").
+
+   NAO altera o <input> original (name/required/value preservados). Se o JS
+   (combobox.js) nao rodar, o input continua funcionando com o datalist nativo
+   — degradacao graciosa. Escopo isolado em .union-combo-* para nao vazar.
+   ============================================================================= */
+
+.union-combo-host {
+    position: relative;
+}
+
+/* Espaco para a seta nao cobrir o texto digitado */
+.union-combo-host > input[data-combobox] {
+    padding-right: 2.2rem !important;
+}
+
+.union-combo-caret {
+    position: absolute;
+    width: 2.1rem;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    z-index: 2;
+}
+.union-combo-caret:hover { color: #0D47A1; }
+.union-combo-caret:focus-visible { outline: 2px solid rgba(33,150,243,.5); }
+
+.union-combo-list {
+    position: absolute;
+    z-index: 1056;            /* acima de cards/inputs, abaixo de modais (1060) */
+    max-height: 240px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
+}
+
+.union-combo-item {
+    padding: 0.5rem 0.8rem;
+    cursor: pointer;
+    font-size: 0.92rem;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.union-combo-item:hover,
+.union-combo-item.is-active {
+    background: #e8f0fe;
+    color: #0D47A1;
+}
+
+/* Compatibilidade com tema dark (opt-in) */
+:root.theme-dark .union-combo-list {
+    background: #1e293b;
+    border-color: #334155;
+}
+:root.theme-dark .union-combo-item {
+    color: #e2e8f0;
+}
+:root.theme-dark .union-combo-item:hover,
+:root.theme-dark .union-combo-item.is-active {
+    background: #0f172a;
+    color: #ffffff;
+}

@@ -1,0 +1,631 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<!-- FullCalendar CSS -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
+
+<style>
+    #calendar {
+        margin: 20px auto;
+        padding: 0 10px;
+    }
+    
+    .calendar-container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .fc-event {
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .fc-event:hover {
+        transform: scale(1.02);
+    }
+
+    .event-tooltip {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        max-width: 300px;
+    }
+    
+    .filters {
+        margin-bottom: 20px;
+    }
+    
+    .filter-btn {
+        margin: 0 5px;
+        padding: 5px 15px;
+        border-radius: 20px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .filter-btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .filter-btn.active {
+        border-color: #333;
+    }
+</style>
+{% endblock %}
+
+{% block inner_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Agenda(BETA)</h2>
+                <div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#eventModal">
+                        <i class="bi bi-plus-circle"></i> Novo Evento
+                    </button>
+                    <button class="btn btn-success" onclick="syncServiceOrders(this)" id="syncButton" 
+                            data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                            title="Clique para adicionar automaticamente todas as OS em andamento ao calendário">
+                        <i class="bi bi-sync"></i> Sincronizar OS
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Dica de Sincronização -->
+            <div class="alert alert-light border mb-4" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-lightbulb text-warning me-2" style="font-size: 1.5rem;"></i>
+                    <div>
+                        <strong>(BETA)Dica:</strong> Use o botão "Sincronizar OS" para adicionar automaticamente todas as ordens de serviço em andamento ao calendário.
+                        Isso vai criar eventos para:
+                        <ul class="mb-0 mt-2">
+                            <li>OS em diagnóstico</li>
+                            <li>OS em manutenção</li>
+                            <li>OS aguardando peças</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mini Manual -->
+            <div class="alert alert-info alert-dismissible fade show mb-4" role="alert">
+                <h5><i class="bi bi-info-circle"></i> Guia Rápido da Agenda</h5>
+                <ul class="mb-0">
+                    <li>Clique em um dia para criar um novo evento</li>
+                    <li>Arraste eventos para alterar a data</li>
+                    <li>Clique em um evento para editá-lo</li>
+                    <li>Use os filtros para visualizar tipos específicos de eventos</li>
+                    <li>Use "Sincronizar OS" para incluir automaticamente as ordens de serviço em andamento</li>
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            
+            <!-- Filtros -->
+            <div class="filters">
+                <div class="btn-group" role="group">
+                    <button type="button" class="filter-btn active" data-type="all" style="background-color: #6c757d">
+                        Todos
+                    </button>
+                    <button type="button" class="filter-btn" data-type="os" style="background-color: #007bff">
+                        OS
+                    </button>
+                    <button type="button" class="filter-btn" data-type="meeting" style="background-color: #28a745">
+                        Reuniões
+                    </button>
+                    <button type="button" class="filter-btn" data-type="purchase" style="background-color: #ffc107">
+                        Compras
+                    </button>
+                    <button type="button" class="filter-btn" data-type="marketing" style="background-color: #dc3545">
+                        Marketing
+                    </button>
+                    <button type="button" class="filter-btn" data-type="call" style="background-color: #17a2b8">
+                        Ligações
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Calendário -->
+            <div class="calendar-container">
+                <div id="calendar"></div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Modal de Evento -->
+<div class="modal fade" id="eventModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Novo Evento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="eventForm" method="POST" action="{{ url_for('calendar.new_event') }}">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <label class="form-label">Título</label>
+                            <input type="text" class="form-control" name="title" required 
+                                   placeholder="Ex: Reunião com Cliente, Manutenção de Equipamento">
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Data e Hora</label>
+                            <input type="datetime-local" class="form-control" name="start_date" required>
+                            <small class="text-muted">Selecione quando o evento irá acontecer</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo</label>
+                            <select class="form-select" name="event_type" required>
+                                <option value="">Selecione o tipo do evento...</option>
+                                <option value="os">Ordem de Serviço</option>
+                                <option value="meeting">Reunião</option>
+                                <option value="purchase">Compras</option>
+                                <option value="marketing">Marketing</option>
+                                <option value="call">Ligação</option>
+                                <option value="other">Outro</option>
+                            </select>
+                            <small class="text-muted">O tipo ajuda a organizar e filtrar os eventos</small>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <label class="form-label">Descrição</label>
+                            <textarea class="form-control" name="description" rows="3" 
+                                      placeholder="Detalhes importantes sobre o evento, como: local, participantes, objetivos..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Ordem de Serviço</label>
+                            <select class="form-select" name="service_order_id" onchange="updateClientFromOS(this.value)">
+                                <option value="">Selecione uma OS (opcional)...</option>
+                                {% for order in service_orders %}
+                                <option value="{{ order.id }}" data-client-id="{{ order.client.id if order.client else '' }}">
+                                    OS #{{ order.id }} - {{ order.client.name if order.client else 'Sem cliente' }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <small class="text-muted">Ao selecionar uma OS, o cliente será preenchido automaticamente</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Cliente</label>
+                            <select class="form-select" name="client_id" id="client_select">
+                                <option value="">Selecione um cliente (opcional)...</option>
+                                {% for client in clients %}
+                                <option value="{{ client.id }}">{{ client.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Prioridade</label>
+                            <select class="form-select" name="priority">
+                                <option value="low">Baixa</option>
+                                <option value="medium" selected>Média</option>
+                                <option value="high">Alta</option>
+                            </select>
+                            <small class="text-muted">Define a importância do evento</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Lembrete</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="reminder_time" value="30" min="1">
+                                <select class="form-select" name="reminder_unit">
+                                    <option value="minutes">Minutos</option>
+                                    <option value="hours">Horas</option>
+                                    <option value="days">Dias</option>
+                                </select>
+                            </div>
+                            <small class="text-muted">Quanto tempo antes você quer ser lembrado</small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="submitEvent()">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- FullCalendar JS -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales/pt-br.global.min.js'></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Inicializando calendário...');
+    
+    var calendarEl = document.getElementById('calendar');
+    if (!calendarEl) {
+        console.error('Elemento do calendário não encontrado!');
+        return;
+    }
+    
+    try {
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'pt-br',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            },
+            buttonText: {
+                today: 'Hoje',
+                month: 'Mês',
+                week: 'Semana',
+                day: 'Dia',
+                list: 'Lista'
+            },
+            editable: true,
+            selectable: true,
+            selectMirror: true,
+            dayMaxEvents: true,
+            eventTimeFormat: {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            },
+            
+            // Carrega eventos
+            events: "{{ url_for('calendar.get_events') }}",
+            
+            // Ao clicar em um dia
+            dateClick: function(info) {
+                console.log('Data clicada:', info);
+                var modal = new bootstrap.Modal(document.getElementById('eventModal'));
+                document.querySelector('[name="start_date"]').value = info.dateStr + 'T00:00';
+                modal.show();
+            },
+            
+            // Ao clicar em evento
+            eventClick: function(info) {
+                console.log('Evento clicado:', info.event);
+                window.location.href = "/calendar/event/" + info.event.id + "/edit";
+            },
+            
+            // Ao mover evento
+            eventDrop: function(info) {
+                console.log('Evento movido:', info);
+                fetch("/calendar/event/" + info.event.id + "/move", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        start: info.event.startStr,
+                        end: info.event.endStr
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'error') {
+                        info.revert();
+                        showAlert('danger', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao mover evento:', error);
+                    info.revert();
+                    showAlert('danger', 'Erro ao mover evento');
+                });
+            }
+        });
+        
+        calendar.render();
+        console.log('Calendário inicializado com sucesso!');
+    } catch (error) {
+        console.error('Erro ao inicializar calendário:', error);
+    }
+    
+    // Filtros
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const type = this.dataset.type;
+            
+            // Atualiza botões
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            this.classList.add('active');
+            
+            // Filtra eventos
+            if (type === 'all') {
+                calendar.getEvents().forEach(event => event.setProp('display', 'auto'));
+            } else {
+                calendar.getEvents().forEach(event => {
+                    event.setProp('display', event.extendedProps.type === type ? 'auto' : 'none');
+                });
+            }
+        });
+    });
+});
+
+function updateClientFromOS(osId) {
+    if (!osId) return;
+    
+    const option = document.querySelector(`select[name="service_order_id"] option[value="${osId}"]`);
+    if (!option) return;
+    
+    const clientId = option.dataset.clientId;
+    if (clientId) {
+        document.getElementById('client_select').value = clientId;
+        document.getElementById('client_select').disabled = true;  // Desabilita o select quando vem da OS
+    } else {
+        document.getElementById('client_select').disabled = false;
+    }
+}
+
+function submitEvent() {
+    const form = document.getElementById('eventForm');
+    
+    // Adiciona a data de término como a mesma data inicial
+    const startDate = form.querySelector('[name="start_date"]').value;
+    const endDateInput = document.createElement('input');
+    endDateInput.type = 'hidden';
+    endDateInput.name = 'end_date';
+    endDateInput.value = startDate;
+    form.appendChild(endDateInput);
+    
+    form.submit();
+}
+
+function syncServiceOrders(button) {
+    // Mostra loading com SweetAlert2
+    Swal.fire({
+        title: 'Sincronizando Ordens de Serviço',
+        html: 'Aguarde enquanto buscamos as OS em andamento...',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+    
+    // Desabilita o botão
+    button.disabled = true;
+    
+    // Faz a requisição
+    fetch("{{ url_for('calendar.sync_service_orders') }}")
+        .then(response => response.text())
+        .then(html => {
+            // Fecha o loading
+            Swal.close();
+            
+            // Mostra mensagem de sucesso
+            Swal.fire({
+                icon: 'success',
+                title: 'Sincronização Concluída!',
+                html: `
+                    <div class="text-start">
+                        <p>As ordens de serviço foram sincronizadas com sucesso.</p>
+                        <p><strong>O que foi feito:</strong></p>
+                        <ul>
+                            <li>OS em andamento foram adicionadas ao calendário</li>
+                            <li>Eventos foram criados com as informações das OS</li>
+                            <li>Lembretes foram configurados automaticamente</li>
+                        </ul>
+                    </div>
+                `,
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#28a745'
+            }).then((result) => {
+                // Recarrega a página
+                window.location.reload();
+            });
+        })
+        .catch(error => {
+            console.error('Erro na sincronização:', error);
+            
+            // Fecha o loading
+            Swal.close();
+            
+            // Mostra erro
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro na Sincronização',
+                text: 'Não foi possível sincronizar as ordens de serviço. Tente novamente.',
+                confirmButtonColor: '#dc3545'
+            });
+            
+            // Restaura o botão
+            button.disabled = false;
+        });
+}
+
+// Adiciona tooltips nos botões
+document.addEventListener('DOMContentLoaded', function() {
+    // Tooltip no botão de sincronização
+    new bootstrap.Tooltip(document.getElementById('syncButton'), {
+        title: 'Clique para adicionar automaticamente todas as OS em andamento ao calendário',
+        placement: 'bottom'
+    });
+    
+    // Tooltips nos filtros
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        new bootstrap.Tooltip(button, {
+            title: `Filtrar eventos do tipo: ${button.textContent.trim()}`,
+            placement: 'top'
+        });
+    });
+});
+
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.querySelector('.container-fluid').insertBefore(alertDiv, document.querySelector('.container-fluid').firstChild);
+    
+    setTimeout(() => alertDiv.remove(), 5000);
+}
+
+// Função para verificar permissão de notificações
+function checkNotificationPermission() {
+    if (!("Notification" in window)) {
+        console.log("Este navegador não suporta notificações desktop");
+        return;
+    }
+
+    // Verifica se já pediu permissão antes
+    const askedBefore = localStorage.getItem('notificationPermissionAsked');
+    
+    if (Notification.permission === "granted") {
+        // Se já tem permissão, salva no localStorage
+        localStorage.setItem('notificationPermissionAsked', 'true');
+    } 
+    else if (Notification.permission === "denied") {
+        // Se foi negado, salva no localStorage
+        localStorage.setItem('notificationPermissionAsked', 'true');
+    }
+    else if (!askedBefore) {
+        // Só mostra o diálogo se nunca pediu antes
+        Swal.fire({
+            title: 'Ativar Notificações da Agenda?',
+            html: `
+                <div class="text-start">
+                    <p>Gostaríamos de enviar notificações para te avisar sobre:</p>
+                    <ul>
+                        <li>Eventos próximos</li>
+                        <li>Ordens de serviço agendadas</li>
+                        <li>Reuniões importantes</li>
+                    </ul>
+                    <p class="mb-0"><small class="text-muted">Você pode alterar isso depois nas configurações do navegador</small></p>
+                </div>
+            `,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, ativar!',
+            cancelButtonText: 'Agora não',
+            confirmButtonColor: '#28a745',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Notification.requestPermission().then(permission => {
+                    // Salva que já pediu permissão
+                    localStorage.setItem('notificationPermissionAsked', 'true');
+                    
+                    if (permission === "granted") {
+                        Swal.fire({
+                            title: 'Notificações Ativadas!',
+                            text: 'Você será avisado sobre eventos importantes da agenda.',
+                            icon: 'success',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            } else {
+                // Mesmo se cancelar, marca como já perguntado
+                localStorage.setItem('notificationPermissionAsked', 'true');
+            }
+        });
+    }
+}
+
+// Função para verificar eventos próximos
+function checkUpcomingEvents() {
+    // Só verifica se tiver permissão
+    if (Notification.permission !== "granted") return;
+    
+    fetch("{{ url_for('calendar.check_reminders') }}")
+        .then(response => response.json())
+        .then(events => {
+            events.forEach(event => {
+                // Verifica se já mostrou este lembrete
+                const reminderKey = `reminder_shown_${event.id}_${event.time_until}`;
+                if (localStorage.getItem(reminderKey)) return;
+                
+                // Marca este lembrete como mostrado
+                localStorage.setItem(reminderKey, 'true');
+                
+                // Mostra notificação desktop
+                const notification = new Notification('Lembrete de Evento', {
+                    body: `${event.title}\nEm: ${event.time_until}`,
+                    icon: '/static/img/icon.ico',
+                    tag: `event-${event.id}`,
+                    requireInteraction: true
+                });
+
+                notification.onclick = function() {
+                    window.focus();
+                    window.location.href = `/calendar/event/${event.id}/edit`;
+                };
+
+                // Mostra alerta no sistema também
+                Swal.fire({
+                    title: 'Lembrete de Evento',
+                    html: `
+                        <div class="text-start">
+                            <h6>${event.title}</h6>
+                            <p class="mb-2"><strong>Quando:</strong> ${event.time_until}</p>
+                            ${event.description ? `<p class="mb-2"><strong>Descrição:</strong> ${event.description}</p>` : ''}
+                            ${event.client ? `<p class="mb-2"><strong>Cliente:</strong> ${event.client}</p>` : ''}
+                            ${event.service_order ? `<p class="mb-0"><strong>OS:</strong> #${event.service_order}</p>` : ''}
+                        </div>
+                    `,
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ver Detalhes',
+                    cancelButtonText: 'Fechar',
+                    confirmButtonColor: '#007bff'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = `/calendar/event/${event.id}/edit`;
+                    }
+                });
+            });
+        })
+        .catch(error => console.error('Erro ao verificar eventos:', error));
+}
+
+// Limpa lembretes antigos do localStorage (mantém apenas últimos 7 dias)
+function cleanupOldReminders() {
+    const keys = Object.keys(localStorage);
+    const now = new Date();
+    
+    keys.forEach(key => {
+        if (key.startsWith('reminder_shown_')) {
+            const date = new Date(localStorage.getItem(key));
+            const daysDiff = (now - date) / (1000 * 60 * 60 * 24);
+            
+            if (daysDiff > 7) {
+                localStorage.removeItem(key);
+            }
+        }
+    });
+}
+
+// Inicializa as notificações quando a página carrega
+document.addEventListener('DOMContentLoaded', function() {
+    // Verifica permissão de notificações
+    checkNotificationPermission();
+    
+    // Limpa lembretes antigos
+    cleanupOldReminders();
+    
+    // Verifica eventos a cada minuto
+    checkUpcomingEvents();
+    setInterval(checkUpcomingEvents, 60000);
+    
+    // ... rest of the existing DOMContentLoaded code ...
+});
+</script>
+{% endblock %} 

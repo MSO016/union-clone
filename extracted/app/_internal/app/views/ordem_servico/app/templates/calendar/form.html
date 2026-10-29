@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .debug-info {
+        background: #f8f9fa;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        border: 1px solid #dee2e6;
+    }
+    .debug-info pre {
+        margin: 0;
+        white-space: pre-wrap;
+    }
+</style>
+{% endblock %}
+
+{% block inner_content %}
+<!-- Debug Info -->
+{% if debug %}
+<div class="debug-info">
+    <h4>Debug Information:</h4>
+    <h5>Service Orders ({{ service_orders|length }}):</h5>
+    <pre>{{ service_orders | tojson(indent=2) }}</pre>
+    <h5>Clients ({{ clients|length }}):</h5>
+    <pre>{{ clients | tojson(indent=2) }}</pre>
+</div>
+{% endif %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ 'Editar' if event else 'Novo' }} Evento</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label class="form-label">Título</label>
+                                <input type="text" class="form-control" name="title" value="{{ event.title if event else '' }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Início</label>
+                                <input type="datetime-local" class="form-control" name="start_date" 
+                                       value="{{ event.start_date.strftime('%Y-%m-%dT%H:%M') if event else '' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Fim</label>
+                                <input type="datetime-local" class="form-control" name="end_date" 
+                                       value="{{ event.end_date.strftime('%Y-%m-%dT%H:%M') if event else '' }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Tipo</label>
+                                <select class="form-select" name="event_type" required>
+                                    <option value="os" {{ 'selected' if event and event.event_type == 'os' else '' }}>
+                                        Ordem de Serviço
+                                    </option>
+                                    <option value="meeting" {{ 'selected' if event and event.event_type == 'meeting' else '' }}>
+                                        Reunião
+                                    </option>
+                                    <option value="purchase" {{ 'selected' if event and event.event_type == 'purchase' else '' }}>
+                                        Compras
+                                    </option>
+                                    <option value="marketing" {{ 'selected' if event and event.event_type == 'marketing' else '' }}>
+                                        Marketing
+                                    </option>
+                                    <option value="call" {{ 'selected' if event and event.event_type == 'call' else '' }}>
+                                        Ligação
+                                    </option>
+                                    <option value="other" {{ 'selected' if event and event.event_type == 'other' else '' }}>
+                                        Outro
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Prioridade</label>
+                                <select class="form-select" name="priority">
+                                    <option value="low" {{ 'selected' if event and event.priority == 'low' else '' }}>
+                                        Baixa
+                                    </option>
+                                    <option value="medium" {{ 'selected' if not event or event.priority == 'medium' else '' }}>
+                                        Média
+                                    </option>
+                                    <option value="high" {{ 'selected' if event and event.priority == 'high' else '' }}>
+                                        Alta
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label class="form-label">Descrição</label>
+                                <textarea class="form-control" name="description" rows="3">{{ event.description if event else '' }}</textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Ordem de Serviço</label>
+                                <select class="form-select" name="service_order_id">
+                                    <option value="">Selecione...</option>
+                                    {% for order in service_orders %}
+                                    <option value="{{ order.id }}" {{ 'selected' if event and event.service_order_id == order.id else '' }}>
+                                        OS #{{ order.id }} - {{ order.client.name if order.client else 'Cliente não encontrado' }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Cliente</label>
+                                <select class="form-select" name="client_id">
+                                    <option value="">Selecione...</option>
+                                    {% for client in clients %}
+                                    <option value="{{ client.id }}" {{ 'selected' if event and event.client_id == client.id else '' }}>
+                                        {{ client.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="reminder" id="reminder" 
+                                           {{ 'checked' if not event or event.reminder else '' }}>
+                                    <label class="form-check-label" for="reminder">
+                                        Lembrete
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Minutos antes</label>
+                                <input type="number" class="form-control" name="reminder_time" 
+                                       value="{{ event.reminder_time if event else 30 }}">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12 text-end">
+                                <a href="{{ url_for('calendar.index') }}" class="btn btn-secondary">Cancelar</a>
+                                <button type="submit" class="btn btn-primary">Salvar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Form loaded');
+    console.log('Service Orders:', {{ service_orders | tojson | safe }});
+    console.log('Clients:', {{ clients | tojson | safe }});
+    
+    // Form validation
+    var form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
+</script>
+{% endblock %} 

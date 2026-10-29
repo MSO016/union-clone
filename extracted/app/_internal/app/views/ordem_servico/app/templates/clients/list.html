@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+{# Fase 7 - Modernizacao cosmetica da listagem de Clientes (escopado em .clients-modern) #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/clients-modern.css') }}?v=20260529-tema">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 clients-modern">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="bi bi-people-fill text-primary"></i>
+            Clientes
+        </h2>
+        <a href="{{ url_for('clients.add') }}" class="btn btn-primary">
+            <i class="bi bi-person-plus-fill"></i> Novo Cliente
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="search" class="form-label">Buscar</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="search" name="search" 
+                               value="{{ search }}" placeholder="Nome, {% if locale and locale.code == 'PT' %}NIF{% elif locale and locale.code == 'US' %}SSN/EIN{% else %}CPF/CNPJ{% endif %}">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label for="type" class="form-label">Tipo</label>
+                    <select class="form-select" id="type" name="type">
+                        <option value="">Todos</option>
+                        <option value="PF" {% if type == 'PF' %}selected{% endif %}>Pessoa Física</option>
+                        <option value="PJ" {% if type == 'PJ' %}selected{% endif %}>Pessoa Jurídica</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-secondary w-100">
+                        <i class="bi bi-funnel"></i> Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Clientes -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome</th>
+                            <th>Tipo</th>
+                            <th>Documento</th>
+                            <th>Contato</th>
+                            <th>Aniversário</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for client in clients.items %}
+                        <tr>
+                            <td>{{ client.name }}</td>
+                            <td>{{ 'Pessoa Física' if client.type == 'PF' else 'Pessoa Jurídica' }}</td>
+                            <td>{{ client.document }}</td>
+                            <td>
+                                {% if client.phone %}
+                                <div>📞 {{ client.phone }}</div>
+                                {% endif %}
+                                {% if client.whatsapp %}
+                                <div>
+                                    📱 {{ client.whatsapp }}
+                                    <a href="https://wa.me/55{{ client.whatsapp|replace('(', '')|replace(')', '')|replace('-', '')|replace(' ', '') }}" 
+                                       target="_blank" class="btn btn-sm btn-success ms-2">
+                                        <i class="bi bi-whatsapp"></i> VIEW
+                                    </a>
+                                </div>
+                                {% endif %}
+                                {% if client.email %}
+                                <div>✉️ {{ client.email }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if client.birthday %}
+                                {{ client.birthday.strftime('%d/%m/%Y') }}
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <a href="{{ url_for('orders.from_client', client_id=client.id) }}" 
+                                       class="btn btn-sm btn-success"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="Nova Ordem de Serviço">
+                                        <i class="bi bi-tools"></i>
+                                    </a>
+                                    <a href="{{ url_for('clients.view', id=client.id) }}" 
+                                       class="btn btn-sm btn-primary"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="Visualizar Cliente">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('clients.edit', id=client.id) }}" 
+                                       class="btn btn-sm btn-warning"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="Editar Cliente">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    {% if current_user.role in ['admin', 'developer'] %}
+                                    <button type="button" 
+                                            class="btn btn-sm btn-danger"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Excluir Cliente"
+                                            data-id="{{ client.id }}"
+                                            data-name="{{ client.name }}"
+                                            data-oscount="{{ orders_count.get(client.id, 0) }}"
+                                            onclick="confirmDelete(this)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="bi bi-inbox fs-2"></i>
+                                    <p class="mt-2">Nenhum cliente encontrado.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginação -->
+            {% if clients.pages > 1 %}
+            <nav aria-label="Navegação de páginas" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if clients.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('clients.list', page=clients.prev_num, search=search, type=type) }}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for page_num in clients.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                        {% if page_num %}
+                            <li class="page-item {{ 'active' if page_num == clients.page else '' }}">
+                                <a class="page-link" href="{{ url_for('clients.list', page=page_num, search=search, type=type) }}">
+                                    {{ page_num }}
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if clients.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('clients.list', page=clients.next_num, search=search, type=type) }}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle text-danger" id="deleteModalIcon"></i>
+                    <span id="deleteModalTitle">Confirmar Exclusão</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Estado 1: cliente SEM OS -> pode excluir -->
+                <div id="deleteConfirmBody">
+                    <p>Tem certeza que deseja excluir o cliente <strong id="clientName"></strong>?</p>
+                    <p class="text-danger">
+                        <i class="bi bi-exclamation-circle"></i>
+                        Esta ação não pode ser desfeita!
+                    </p>
+                </div>
+                <!-- Estado 2: cliente COM OS -> bloqueado, apenas informa -->
+                <div id="deleteBlockedBody" style="display:none;">
+                    <p>O cliente <strong id="clientNameBlocked"></strong> <u>não pode ser excluído</u>.</p>
+                    <p class="text-warning mb-0">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Ele possui <strong id="clientOsCount"></strong> ordem(ns) de serviço
+                        vinculada(s). Para preservar o histórico de atendimentos, exclua ou
+                        transfira as OS antes de remover o cliente.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <!-- Footer estado 1: Cancelar + Excluir -->
+                <form id="deleteForm" method="post">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Excluir
+                    </button>
+                </form>
+                <!-- Footer estado 2: apenas OK -->
+                <button type="button" class="btn btn-primary" id="deleteOkBtn"
+                        data-bs-dismiss="modal" style="display:none;">
+                    <i class="bi bi-check-circle"></i> OK, entendi
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+function confirmDelete(btn) {
+    var id = btn.dataset.id;
+    var name = btn.dataset.name || '';
+    var osCount = parseInt(btn.dataset.oscount, 10) || 0;
+
+    var form = document.getElementById('deleteForm');
+    var okBtn = document.getElementById('deleteOkBtn');
+    var confirmBody = document.getElementById('deleteConfirmBody');
+    var blockedBody = document.getElementById('deleteBlockedBody');
+    var title = document.getElementById('deleteModalTitle');
+    var icon = document.getElementById('deleteModalIcon');
+
+    if (osCount > 0) {
+        // Cliente possui OS -> bloqueado: explica o motivo e oferece apenas "OK"
+        document.getElementById('clientNameBlocked').textContent = name;
+        document.getElementById('clientOsCount').textContent = osCount;
+        confirmBody.style.display = 'none';
+        blockedBody.style.display = '';
+        form.style.display = 'none';
+        okBtn.style.display = '';
+        title.textContent = 'Não é possível excluir';
+        icon.className = 'bi bi-exclamation-triangle text-warning';
+    } else {
+        // Cliente sem OS -> confirmação normal de exclusão
+        document.getElementById('clientName').textContent = name;
+        form.action = "{{ url_for('clients.delete', id=0) }}".replace('0', id);
+        confirmBody.style.display = '';
+        blockedBody.style.display = 'none';
+        form.style.display = '';
+        okBtn.style.display = 'none';
+        title.textContent = 'Confirmar Exclusão';
+        icon.className = 'bi bi-exclamation-triangle text-danger';
+    }
+
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+
+// Inicializa os tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

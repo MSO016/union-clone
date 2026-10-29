@@ -1,0 +1,208 @@
+{% extends "finance/base.html" %}
+
+{% block page_title %}Controle de Caixa{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('finance.cash_history') }}" class="btn btn-sm btn-outline-secondary">
+    <i class="fas fa-history"></i> Histórico
+</a>
+{% endblock %}
+
+{% block finance_content %}
+<div class="row">
+    <!-- Status do Caixa -->
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-cash-register"></i> Status do Caixa
+                </h5>
+                {% if is_open %}
+                    <span class="badge badge-success"><i class="fas fa-lock-open"></i> Aberto</span>
+                {% else %}
+                    <span class="badge badge-secondary"><i class="fas fa-lock"></i> Fechado</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if is_open and opening %}
+                    <div class="mb-3">
+                        <small class="text-muted">Aberto por</small>
+                        <p class="mb-1"><strong>{{ opening.created_by.username }}</strong></p>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">Saldo Inicial</small>
+                        <p class="mb-1 h5 text-primary">R$ {{ "%.2f"|format(opening.amount) }}</p>
+                    </div>
+                    {% if expected_balance is not none %}
+                    <div class="mb-3">
+                        <small class="text-muted">Saldo Esperado (atual)</small>
+                        <p class="mb-0 h5 {% if expected_balance >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            R$ {{ "%.2f"|format(expected_balance) }}
+                        </p>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-info-circle fa-2x text-muted mb-2"></i>
+                        <p class="text-muted">O caixa ainda não foi aberto hoje.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumo do Dia -->
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Resumo do Dia</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <small class="text-muted d-block">Entradas</small>
+                        <span class="h5 text-success">R$ {{ "%.2f"|format(total_entradas) }}</span>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">Saídas</small>
+                        <span class="h5 text-danger">R$ {{ "%.2f"|format(total_saidas) }}</span>
+                    </div>
+                </div>
+                <hr>
+                <div class="text-center">
+                    <small class="text-muted d-block">Movimento Líquido</small>
+                    <span class="h4 {% if (total_entradas - total_saidas) >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        R$ {{ "%.2f"|format(total_entradas - total_saidas) }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ação: Abrir ou Fechar -->
+<div class="row mt-4">
+    <div class="col-md-8 mx-auto">
+        {% if not is_open %}
+        <!-- Formulário de Abertura -->
+        <div class="card shadow-sm border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-lock-open"></i> Abrir Caixa</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('finance.cash_open') }}">
+                    <div class="form-group">
+                        <label for="amount"><strong>Saldo Inicial (dinheiro em caixa)</strong></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">R$</span>
+                            </div>
+                            <input type="text" class="form-control money" id="amount" name="amount" 
+                                   placeholder="0,00" required>
+                        </div>
+                        <small class="form-text text-muted">Informe o valor em dinheiro disponível no caixa.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Observações (opcional)</label>
+                        <input type="text" class="form-control" id="notes" name="notes" 
+                               placeholder="Ex: Troco do dia anterior">
+                    </div>
+                    <button type="submit" class="btn btn-success btn-block">
+                        <i class="fas fa-lock-open"></i> Abrir Caixa
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <!-- Formulário de Fechamento -->
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-lock"></i> Fechar Caixa</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('finance.cash_close') }}">
+                    <div class="form-group">
+                        <label for="amount"><strong>Valor contado no caixa</strong></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">R$</span>
+                            </div>
+                            <input type="text" class="form-control money" id="amount" name="amount" 
+                                   placeholder="0,00" required>
+                        </div>
+                        <small class="form-text text-muted">
+                            Conte o dinheiro no caixa e informe o valor real.
+                            {% if expected_balance is not none %}
+                                Saldo esperado: <strong>R$ {{ "%.2f"|format(expected_balance) }}</strong>
+                            {% endif %}
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Observações (opcional)</label>
+                        <input type="text" class="form-control" id="notes" name="notes" 
+                               placeholder="Ex: Faltou troco para cliente">
+                    </div>
+                    <button type="submit" class="btn btn-danger btn-block" 
+                            onclick="return confirm('Confirma o fechamento do caixa?')">
+                        <i class="fas fa-lock"></i> Fechar Caixa
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Histórico do Dia -->
+{% if today_sessions %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list"></i> Operações de Hoje</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Hora</th>
+                            <th>Tipo</th>
+                            <th>Valor</th>
+                            <th>Diferença</th>
+                            <th>Operador</th>
+                            <th>Obs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in today_sessions %}
+                        <tr>
+                            <td>{{ s.created_at.strftime('%H:%M') if s.created_at else '-' }}</td>
+                            <td>
+                                {% if s.type == 'abertura' %}
+                                    <span class="badge badge-success">Abertura</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Fechamento</span>
+                                {% endif %}
+                            </td>
+                            <td>R$ {{ "%.2f"|format(s.amount) }}</td>
+                            <td>
+                                {% if s.difference is not none and s.difference != 0 %}
+                                    <span class="{% if s.difference > 0 %}text-success{% else %}text-danger{% endif %}">
+                                        R$ {{ "%.2f"|format(s.difference) }}
+                                    </span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>{{ s.created_by.username }}</td>
+                            <td>{{ s.notes or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

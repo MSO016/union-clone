@@ -1,0 +1,519 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Gerenciamento de Licenças</h2>
+    
+    <!-- ID da Máquina Atual -->
+    <div class="alert alert-info">
+        <h5><i class="bi bi-info-circle"></i> ID da Máquina Atual</h5>
+        <p class="mb-0"><code>{{ current_machine_id }}</code></p>
+        <small class="text-muted">Este é o ID único desta máquina.</small>
+    </div>
+
+    <!-- Lista de Licenças -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Licenças do Sistema</h5>
+            <button type="button" class="btn btn-primary" onclick="openNewLicenseModal()">
+                <i class="bi bi-plus-circle"></i> Nova Licença
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID da Máquina</th>
+                            <th>Tipo</th>
+                            <th>Status</th>
+                            <th>Dias Restantes</th>
+                            <th>Data de Expiração</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for license in licenses %}
+                        <tr>
+                            <td><code>{{ license.machine_id }}</code></td>
+                            <td>
+                                <span class="badge bg-{{ 'primary' if license.license_type == 'pro' else 'secondary' }}">
+                                    {{ license.license_type|title }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if license.is_active else 'danger' }}">
+                                    {{ 'Ativa' if license.is_active else 'Inativa' }}
+                                </span>
+                            </td>
+                            <td>{{ license.days_remaining }} dias</td>
+                            <td>{{ license.expiration_date.strftime('%d/%m/%Y') }}</td>
+                            <td class="text-end">
+                                <button type="button" class="btn btn-sm btn-primary" 
+                                        onclick="openEditModal('{{ license.id }}')">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                
+                                <button type="button" class="btn btn-sm btn-warning" 
+                                        onclick="openExtendModal('{{ license.id }}')">
+                                    <i class="bi bi-clock"></i>
+                                </button>
+                                
+                                {% if license.is_active %}
+                                <form method="POST" action="{{ url_for('license.deactivate', id=license.id) }}" 
+                                      class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-danger" 
+                                            onclick="return confirm('Deseja realmente desativar esta licença?')">
+                                        <i class="bi bi-power"></i>
+                                    </button>
+                                </form>
+                                {% else %}
+                                <form method="POST" action="{{ url_for('license.reactivate', id=license.id) }}" 
+                                      class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-success" 
+                                            onclick="return confirm('Deseja reativar esta licença?')">
+                                        <i class="bi bi-play"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                
+                                <form method="POST" action="{{ url_for('license.delete', id=license.id) }}" 
+                                      class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-danger" 
+                                            onclick="return confirm('Deseja realmente excluir esta licença? Esta ação não pode ser desfeita.')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nova Licença -->
+<div class="modal fade" id="newLicenseModal" tabindex="-1" aria-labelledby="newLicenseModalLabel" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newLicenseModalLabel">Nova Licença</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('license.activate') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="machine_id" class="form-label">ID da Máquina *</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="machine_id" name="machine_id" 
+                                   placeholder="Digite ou capture o ID da máquina do cliente" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="captureMachineId()">
+                                <i class="bi bi-upc-scan"></i> Capturar ID Atual
+                            </button>
+                        </div>
+                        <small class="text-muted">ID único que identifica a máquina do cliente</small>
+                    </div>
+                    
+                    <!-- Novo campo para MAC fixo -->
+                    <div class="mb-3">
+                        <label for="fixed_mac" class="form-label">MAC Fixo *</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="fixed_mac" name="fixed_mac" 
+                                   placeholder="00:00:00:00:00:00" pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="listMacAddresses()">
+                                <i class="bi bi-list"></i> Listar MACs
+                            </button>
+                        </div>
+                        <small class="text-muted">Endereço MAC da interface de rede principal</small>
+                    </div>
+
+                    <!-- Modal para listar MACs -->
+                    <div class="modal fade" id="macListModal" tabindex="-1" aria-labelledby="macListModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="macListModalLabel">Selecione o MAC Address</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="list-group" id="macList">
+                                        <!-- Lista de MACs será preenchida via JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="license_type" class="form-label">Tipo de Licença *</label>
+                        <select name="license_type" class="form-select" required>
+                            <option value="">Selecione o tipo de licença...</option>
+                            <option value="basic">Básica</option>
+                            <option value="professional">Profissional</option>
+                            <option value="enterprise">Empresarial</option>
+                        </select>
+                        <div class="form-text">
+                            Básica: Para pequenos negócios<br>
+                            Profissional: Para médias empresas<br>
+                            Empresarial: Para grandes empresas
+                        </div>
+                    </div>
+                    {% if current_user.role == 'developer' %}
+                    <div class="mb-3">
+                        <label for="duration" class="form-label">Duração (dias) *</label>
+                        <input type="number" class="form-control" id="duration" name="duration" 
+                               placeholder="Dias de duração da licença" required>
+                        <small class="text-muted">Como desenvolvedor, você pode personalizar a duração</small>
+                    </div>
+                    {% else %}
+                    <input type="hidden" id="duration" name="duration" value="">
+                    {% endif %}
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Observações</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="2" 
+                                 placeholder="Informações adicionais sobre a licença ou cliente"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Criar Licença</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modais de Edição e Extensão para cada licença -->
+{% for license in licenses %}
+<!-- Modal de Edição -->
+<div class="modal fade" id="editModal{{ license.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ license.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel{{ license.id }}">Editar Licença #{{ license.id }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('license.edit', id=license.id) }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="machine_id_{{ license.id }}" class="form-label">ID da Máquina</label>
+                        <input type="text" class="form-control" id="machine_id_{{ license.id }}" name="machine_id" 
+                               value="{{ license.machine_id }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fixed_mac_{{ license.id }}" class="form-label">MAC Fixo</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="fixed_mac_{{ license.id }}" name="fixed_mac" 
+                                   value="{{ license.fixed_mac }}" pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="listMacAddressesForEdit('{{ license.id }}')">
+                                <i class="bi bi-list"></i> Listar MACs
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="license_type_{{ license.id }}" class="form-label">Tipo de Licença</label>
+                        <select class="form-select" id="license_type_{{ license.id }}" name="license_type" required>
+                            <option value="basic" {% if license.license_type == 'basic' %}selected{% endif %}>Básica</option>
+                            <option value="professional" {% if license.license_type == 'professional' %}selected{% endif %}>Profissional</option>
+                            <option value="enterprise" {% if license.license_type == 'enterprise' %}selected{% endif %}>Empresarial</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="expiration_date_{{ license.id }}" class="form-label">Data de Expiração</label>
+                        <input type="date" class="form-control" id="expiration_date_{{ license.id }}" name="expiration_date" 
+                               value="{{ license.expiration_date.strftime('%Y-%m-%d') }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes_{{ license.id }}" class="form-label">Observações</label>
+                        <textarea class="form-control" id="notes_{{ license.id }}" name="notes" rows="2">{{ license.notes }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Extensão -->
+<div class="modal fade" id="extendModal{{ license.id }}" tabindex="-1" aria-labelledby="extendModalLabel{{ license.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="extendModalLabel{{ license.id }}">Estender Licença #{{ license.id }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('license.extend', id=license.id) }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="days_{{ license.id }}" class="form-label">Dias a Estender</label>
+                        <input type="number" class="form-control" id="days_{{ license.id }}" name="days" 
+                               value="30" min="1" required>
+                        <small class="text-muted">Número de dias a adicionar à data de expiração atual</small>
+                    </div>
+                    <p class="mb-0">
+                        <strong>Data de Expiração Atual:</strong> {{ license.expiration_date.strftime('%d/%m/%Y') }}
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Estender Licença</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM carregado - Iniciando configuração dos modais');
+
+        // Função para inicializar um modal
+        function initModal(modalElement) {
+            try {
+                console.log('Tentando inicializar modal:', modalElement.id);
+                if (!modalElement._bsModal) {
+                    console.log('Criando nova instância do modal:', modalElement.id);
+                    modalElement._bsModal = new bootstrap.Modal(modalElement, {
+                        backdrop: false,  // Desativa o backdrop padrão do Bootstrap
+                        keyboard: true
+                    });
+                    console.log('Modal inicializado com sucesso:', modalElement.id);
+                } else {
+                    console.log('Modal já estava inicializado:', modalElement.id);
+                }
+                return modalElement._bsModal;
+            } catch (error) {
+                console.error('Erro ao inicializar modal:', modalElement.id, error);
+                return null;
+            }
+        }
+
+        // Função para abrir modal com retry
+        function openModalWithRetry(modalElement, maxRetries = 3) {
+            console.log('Tentando abrir modal:', modalElement.id);
+            let retries = 0;
+            const tryOpen = () => {
+                try {
+                    console.log(`Tentativa ${retries + 1} de abrir modal:`, modalElement.id);
+                    const modal = initModal(modalElement);
+                    if (modal) {
+                        console.log('Mostrando modal:', modalElement.id);
+                        // Força o display block antes de mostrar
+                        modalElement.style.display = 'block';
+                        modal.show();
+                        // Adiciona classe show manualmente
+                        modalElement.classList.add('show');
+                        // Adiciona log para verificar se o modal está visível
+                        setTimeout(() => {
+                            console.log('Estado do modal após show:', {
+                                display: modalElement.style.display,
+                                visible: modalElement.classList.contains('show'),
+                                classes: modalElement.className
+                            });
+                        }, 100);
+                    } else if (retries < maxRetries) {
+                        retries++;
+                        console.log(`Modal não inicializado, tentando novamente em 100ms (tentativa ${retries})`);
+                        setTimeout(tryOpen, 100);
+                    } else {
+                        console.error('Falha ao abrir modal após todas as tentativas:', modalElement.id);
+                    }
+                } catch (error) {
+                    console.error(`Erro ao abrir modal (tentativa ${retries + 1}):`, error);
+                    if (retries < maxRetries) {
+                        retries++;
+                        setTimeout(tryOpen, 100);
+                    }
+                }
+            };
+            tryOpen();
+        }
+
+        // Funções para abrir modais
+        window.openEditModal = function(licenseId) {
+            console.log('Função openEditModal chamada para licença:', licenseId);
+            const modalElement = document.getElementById('editModal' + licenseId);
+            console.log('Elemento do modal encontrado:', modalElement ? 'sim' : 'não');
+            if (modalElement) {
+                console.log('HTML do modal:', modalElement.outerHTML);
+                openModalWithRetry(modalElement);
+            } else {
+                console.error('Modal não encontrado:', 'editModal' + licenseId);
+            }
+        };
+
+        window.openExtendModal = function(licenseId) {
+            console.log('Função openExtendModal chamada para licença:', licenseId);
+            const modalElement = document.getElementById('extendModal' + licenseId);
+            if (modalElement) {
+                openModalWithRetry(modalElement);
+            } else {
+                console.error('Modal não encontrado:', 'extendModal' + licenseId);
+            }
+        };
+
+        // Inicializa todos os modais existentes
+        console.log('Inicializando todos os modais existentes');
+        document.querySelectorAll('.modal').forEach(function(modalElement) {
+            console.log('Encontrado modal:', modalElement.id);
+            initModal(modalElement);
+        });
+
+        // Desabilita botões de submit durante o envio
+        document.querySelectorAll('form').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                console.log('Form submit iniciado:', form.action);
+                const submitButton = form.querySelector('button[type="submit"]');
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processando...';
+                }
+            });
+        });
+
+        // Verifica se o Bootstrap está disponível
+        console.log('Bootstrap disponível:', typeof bootstrap !== 'undefined' ? 'sim' : 'não');
+        if (typeof bootstrap === 'undefined') {
+            console.error('Bootstrap não está carregado! Verifique se o script do Bootstrap está incluído corretamente.');
+        }
+
+        // Função para abrir modal de nova licença
+        window.openNewLicenseModal = function() {
+            console.log('Função openNewLicenseModal chamada');
+            const modalElement = document.getElementById('newLicenseModal');
+            console.log('Elemento do modal encontrado:', modalElement ? 'sim' : 'não');
+            if (modalElement) {
+                console.log('HTML do modal:', modalElement.outerHTML);
+                openModalWithRetry(modalElement);
+            } else {
+                console.error('Modal não encontrado: newLicenseModal');
+            }
+        };
+
+        // Função para capturar o ID da máquina atual
+        window.captureMachineId = function() {
+            const currentId = '{{ current_machine_id }}';
+            document.getElementById('machine_id').value = currentId;
+        };
+
+        // Função para atualizar a duração baseada no tipo de licença
+        window.updateDurationPlaceholder = function() {
+            const select = document.getElementById('license_type');
+            const durationInput = document.getElementById('duration');
+            const selectedOption = select.options[select.selectedIndex];
+            
+            if (selectedOption.value) {
+                const defaultDuration = selectedOption.dataset.duration;
+                durationInput.value = defaultDuration;
+                
+                // Se for trial, desabilita a edição da duração mesmo para desenvolvedores
+                if (selectedOption.value === 'trial') {
+                    durationInput.readOnly = true;
+                    durationInput.value = '7';
+                } else {
+                    durationInput.readOnly = false;
+                    {% if current_user.role == 'developer' %}
+                    durationInput.placeholder = `Padrão: ${defaultDuration} dias`;
+                    {% endif %}
+                }
+            }
+        };
+
+        // Função para atualizar a data de expiração baseada no tipo de licença
+        window.updateExpirationDate = function(licenseId) {
+            const select = document.getElementById('license_type_' + licenseId);
+            const expirationInput = document.getElementById('expiration_date_' + licenseId);
+            const selectedOption = select.options[select.selectedIndex];
+            
+            if (selectedOption.value && expirationInput) {
+                const duration = parseInt(selectedOption.dataset.duration);
+                const today = new Date();
+                const newDate = new Date(today.setDate(today.getDate() + duration));
+                
+                // Formata a data para YYYY-MM-DD
+                const formattedDate = newDate.toISOString().split('T')[0];
+                expirationInput.value = formattedDate;
+            }
+        };
+
+        // Função para listar os MACs disponíveis
+        window.listMacAddresses = function() {
+            fetch('/license/get_macs')
+                .then(response => response.json())
+                .then(macs => {
+                    const macList = document.getElementById('macList');
+                    macList.innerHTML = '';
+                    
+                    macs.forEach(([interface_name, mac]) => {
+                        const item = document.createElement('a');
+                        item.href = '#';
+                        item.className = 'list-group-item list-group-item-action';
+                        item.innerHTML = `
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">${interface_name}</h6>
+                                <small class="text-monospace">${mac}</small>
+                            </div>
+                        `;
+                        item.onclick = function(e) {
+                            e.preventDefault();
+                            document.getElementById('fixed_mac').value = mac;
+                            bootstrap.Modal.getInstance(document.getElementById('macListModal')).hide();
+                        };
+                        macList.appendChild(item);
+                    });
+                    
+                    const macListModal = new bootstrap.Modal(document.getElementById('macListModal'));
+                    macListModal.show();
+                })
+                .catch(error => {
+                    console.error('Erro ao obter lista de MACs:', error);
+                    alert('Erro ao obter lista de MACs. Verifique o console para mais detalhes.');
+                });
+        };
+
+        // Função para listar MACs no modal de edição
+        window.listMacAddressesForEdit = function(licenseId) {
+            fetch('/license/get_macs')
+                .then(response => response.json())
+                .then(macs => {
+                    const macList = document.getElementById('macList');
+                    macList.innerHTML = '';
+                    
+                    macs.forEach(([interface_name, mac]) => {
+                        const item = document.createElement('a');
+                        item.href = '#';
+                        item.className = 'list-group-item list-group-item-action';
+                        item.innerHTML = `
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">${interface_name}</h6>
+                                <small class="text-monospace">${mac}</small>
+                            </div>
+                        `;
+                        item.onclick = function(e) {
+                            e.preventDefault();
+                            document.getElementById(`fixed_mac_${licenseId}`).value = mac;
+                            bootstrap.Modal.getInstance(document.getElementById('macListModal')).hide();
+                        };
+                        macList.appendChild(item);
+                    });
+                    
+                    const macListModal = new bootstrap.Modal(document.getElementById('macListModal'));
+                    macListModal.show();
+                })
+                .catch(error => {
+                    console.error('Erro ao obter lista de MACs:', error);
+                    alert('Erro ao obter lista de MACs. Verifique o console para mais detalhes.');
+                });
+        };
+    });
+</script>
+{% endblock %} 

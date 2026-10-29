@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            {% if not is_developer and (not license or not license.is_active or license.is_expired) %}
+            <div class="text-center mb-4">
+                <h3 class="text-danger">
+                    <i class="bi bi-exclamation-triangle"></i> Sistema não Ativado
+                </h3>
+                <p class="text-muted">Entre em contato com o suporte para ativação do sistema</p>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body bg-light">
+                    <h6 class="text-center">ID da Máquina</h6>
+                    <div class="text-center">
+                        <code class="select-all">{{ current_machine_id }}</code>
+                    </div>
+                    <p class="text-center text-muted small mt-2 mb-0">
+                        Forneça este ID ao entrar em contato com o suporte.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="text-center mb-4">Entre em contato conosco para ativar seu sistema:</h5>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="https://www.restorecellsolucoes.com/" target="_blank" 
+                           class="btn btn-primary">
+                            <i class="bi bi-globe"></i> Visite Nosso Site
+                        </a>
+                        
+                        <a href="https://wa.me/5585989634058" target="_blank" 
+                           class="btn btn-success">
+                            <i class="bi bi-whatsapp"></i> WhatsApp Gerência
+                        </a>
+                        
+                        <a href="https://wa.me/5585997507465" target="_blank" 
+                           class="btn btn-success">
+                            <i class="bi bi-whatsapp"></i> WhatsApp Suporte
+                        </a>
+                        
+                        <a href="tel:8532136918" class="btn btn-info text-white">
+                            <i class="bi bi-telephone"></i> (85) 3213-6918
+                        </a>
+                        
+                        <a href="mailto:restorecellst@gmail.com" class="btn btn-primary">
+                            <i class="bi bi-envelope"></i> Email Suporte
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body text-center">
+                    <p class="mb-1">
+                        <i class="bi bi-geo-alt"></i> 
+                        Av. Godofredo Maciel, 1178, Parangaba - Fortaleza-CE
+                    </p>
+                    <p class="text-muted mb-0">
+                        <strong>Horário de Funcionamento:</strong><br>
+                        Seg-Sex: 8:30h às 17:00h | Sábado: 8:30h às 12:00h
+                    </p>
+                </div>
+            </div>
+            {% else %}
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-shield-lock"></i> Status da Licença
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if is_developer %}
+                    <div class="alert alert-info">
+                        <h5><i class="bi bi-shield-check"></i> Acesso de Desenvolvedor</h5>
+                        <p class="mb-0">Você tem acesso total ao sistema como desenvolvedor.</p>
+                        <small class="text-muted">ID da Máquina: {{ current_machine_id }}</small>
+                    </div>
+                    {% else %}
+                    <div class="mb-4">
+                        <h6 class="text-muted">Informações da Licença</h6>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>ID da Máquina:</strong><br>
+                                <code class="select-all">{{ current_machine_id }}</code></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Tipo:</strong><br>
+                                <span class="badge bg-{{ 'primary' if license.license_type == 'full' else 'secondary' }}">
+                                    {{ license.license_type|title }}
+                                </span></p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <p><strong>Status:</strong><br>
+                                <span class="badge bg-{{ 'success' if license.is_active and not license.is_expired else 'danger' }}">
+                                    {{ 'Ativa' if license.is_active and not license.is_expired else 'Inativa' }}
+                                </span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Expira em:</strong><br>
+                                <span id="licenseTimeRemaining">
+                                    {% if license.is_expired %}
+                                    <span class="text-danger">Expirada</span>
+                                    {% else %}
+                                    <span id="daysRemaining">{{ license.days_remaining }}</span> dias
+                                    <span id="hoursRemaining">00</span>:<span id="minutesRemaining">00</span>:<span id="secondsRemaining">00</span>
+                                    {% endif %}
+                                </span></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6><i class="bi bi-headset"></i> Suporte Técnico</h6>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><i class="bi bi-whatsapp"></i> WhatsApp: 
+                                   <a href="https://wa.me/5585989634058" target="_blank">(85) 98963-4058</a></p>
+                                <p><i class="bi bi-telephone"></i> Telefone: (85) 3213-6918</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><i class="bi bi-envelope"></i> Email: 
+                                   <a href="mailto:restorecellst@gmail.com">restorecellst@gmail.com</a></p>
+                                <p><i class="bi bi-geo-alt"></i> Fortaleza-CE</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if not is_developer and license and not license.is_expired %}
+<script>
+    // Atualização do tempo restante
+    const expirationDate = new Date("{{ license.expiration_date.isoformat() }}");
+    
+    function updateLicenseTime() {
+        const now = new Date();
+        const timeDiff = expirationDate - now;
+        
+        if (timeDiff <= 0) {
+            document.getElementById('licenseTimeRemaining').innerHTML = 
+                '<span class="text-danger">Licença Expirada</span>';
+            location.reload();
+            return;
+        }
+        
+        // Calcula dias, horas, minutos e segundos
+        const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+        
+        // Atualiza os elementos com padding de zeros
+        document.getElementById('daysRemaining').textContent = days;
+        document.getElementById('hoursRemaining').textContent = hours.toString().padStart(2, '0');
+        document.getElementById('minutesRemaining').textContent = minutes.toString().padStart(2, '0');
+        document.getElementById('secondsRemaining').textContent = seconds.toString().padStart(2, '0');
+    }
+    
+    // Atualiza a cada segundo
+    setInterval(updateLicenseTime, 1000);
+    updateLicenseTime();
+</script>
+{% endif %}
+
+<style>
+.select-all {
+    user-select: all;
+    cursor: pointer;
+    padding: 5px 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+.btn {
+    padding: 10px 20px;
+    margin-bottom: 10px;
+}
+.btn i {
+    margin-right: 8px;
+}
+#hoursRemaining, #minutesRemaining, #secondsRemaining {
+    font-family: monospace;
+    font-size: 1.1em;
+    background: #f8f9fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    margin: 0 2px;
+}
+</style>
+{% endblock %}

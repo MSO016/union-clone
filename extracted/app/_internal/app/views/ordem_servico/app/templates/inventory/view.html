@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4 view-modern">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4>Detalhes do Produto</h4>
+            <div>
+                <a href="{{ url_for('inventory.index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+                <a href="{{ url_for('inventory.edit', id=item.id) }}" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Informações do Produto -->
+                <div class="col-md-8">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th style="width: 200px;">Nome:</th>
+                            <td>{{ item.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Categoria:</th>
+                            <td>{{ item.get_category_display() }}</td>
+                        </tr>
+                        <tr>
+                            <th>Quantidade em Estoque:</th>
+                            <td>{{ item.quantity }}</td>
+                        </tr>
+                        <tr>
+                            <th>Quantidade Mínima:</th>
+                            <td>{{ item.minimum_quantity }}</td>
+                        </tr>
+                        <tr>
+                            <th>Fornecedor:</th>
+                            <td>{{ item.supplier or 'Não informado' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Preço de Custo:</th>
+                            <td>R$ {{ "%.2f"|format(item.price_per_unit) }}</td>
+                        </tr>
+                        <tr>
+                            <th>Margem de Lucro:</th>
+                            <td>{{ "%.2f"|format(item.markup_percentage) }}%</td>
+                        </tr>
+                        <tr>
+                            <th>Preço de Venda:</th>
+                            <td>R$ {{ "%.2f"|format(item.sale_price) }}</td>
+                        </tr>
+                        <tr>
+                            <th>Tipo de Uso:</th>
+                            <td>{{ item.get_usage_display() if item.usage else 'Não definido' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Data de Entrada:</th>
+                            <td>{{ item.entry_date }}</td>
+                        </tr>
+                        <tr>
+                            <th>Observações:</th>
+                            <td>{{ item.notes or 'Nenhuma observação' }}</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <!-- QR Code -->
+                <div class="col-md-4 text-center">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">QR Code do Produto</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if not item.qr_code %}
+                                <p>QR Code não gerado</p>
+                                <form action="{{ url_for('inventory.generate_qr_code', id=item.id) }}" method="post">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-qr-code"></i> Gerar QR Code
+                                    </button>
+                                </form>
+                            {% else %}
+                                {% set qr_path = item.generate_qr_code() %}
+                                {% if qr_path %}
+                                    <div class="qr-code-container mb-3">
+                                        <img src="{{ qr_path }}" 
+                                             alt="QR Code" class="img-fluid" style="max-width: 200px;">
+                                    </div>
+                                    <div>
+                                    <p class="mb-2">Código: {{ item.qr_code }}</p>
+                                    <a href="{{ url_for('inventory.download_qr_code', id=item.id, size_mm=25) }}" 
+                                       class="btn btn-success btn-sm mb-1">
+                                        <i class="bi bi-download"></i> PNG 25 mm
+                                    </a>
+                                    <div class="btn-group btn-group-sm mb-1" role="group">
+                                        <a href="{{ url_for('inventory.download_qr_code', id=item.id, size_mm=30) }}" class="btn btn-outline-success">PNG 30 mm</a>
+                                        <a href="{{ url_for('inventory.download_qr_code', id=item.id, size_mm=40) }}" class="btn btn-outline-success">PNG 40 mm</a>
+                                    </div>
+                                    <div class="btn-group btn-group-sm mb-1" role="group">
+                                        <a href="{{ url_for('inventory.download_inventory_label', id=item.id, size_mm=25) }}" class="btn btn-outline-primary">PDF 25 mm</a>
+                                        <a href="{{ url_for('inventory.download_inventory_label', id=item.id, size_mm=30) }}" class="btn btn-outline-primary">PDF 30 mm</a>
+                                        <a href="{{ url_for('inventory.download_inventory_label', id=item.id, size_mm=40) }}" class="btn btn-outline-primary">PDF 40 mm</a>
+                                    </div>
+                                    <div>
+                                        <a href="{{ url_for('inventory.download_qr_code', id=item.id, size_mm='legacy') }}" class="small text-muted">PNG tela</a>
+                                    </div>
+                                    </div>
+                                {% else %}
+                                    <p>Erro ao gerar QR Code</p>
+                                    <form action="{{ url_for('inventory.generate_qr_code', id=item.id) }}" method="post">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-qr-code"></i> Tentar Novamente
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Histórico de Movimentações -->
+            <div class="mt-4">
+                <h5 class="bg-primary text-white p-2 rounded">Histórico de Movimentações</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Data</th>
+                                <th>Tipo</th>
+                                <th>Quantidade</th>
+                                <th>Preço Unit.</th>
+                                <th>Total</th>
+                                <th>Observações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for movement in item.movements %}
+                            <tr>
+                                <td>{{ movement.date.strftime('%d/%m/%Y %H:%M') }}</td>
+                                <td>
+                                    <span class="badge {{ 'bg-success' if movement.type == 'entrada' else 'bg-danger' }}">
+                                        {{ movement.get_type_display() }}
+                                    </span>
+                                </td>
+                                <td>{{ movement.quantity }}</td>
+                                <td>R$ {{ "%.2f"|format(movement.unit_price) if movement.unit_price else '0.00' }}</td>
+                                <td>R$ {{ "%.2f"|format(movement.total_price) if movement.total_price else '0.00' }}</td>
+                                <td>{{ movement.notes or '' }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center">Nenhuma movimentação registrada</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.qr-code-container {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: inline-block;
+}
+
+.qr-code-container img {
+    display: block;
+    margin: 0 auto;
+}
+
+.badge {
+    padding: 6px 12px;
+    font-size: 0.9em;
+}
+
+.bg-success {
+    background-color: #28a745 !important;
+    color: white;
+}
+
+.bg-danger {
+    background-color: #dc3545 !important;
+    color: white;
+}
+
+.bg-primary {
+    background-color: #007bff !important;
+    color: white;
+}
+
+.btn {
+    padding: 6px 12px;
+    margin: 0 2px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+</style>
+{# Fase 11 - Modernizacao cosmetica VIEW (escopado em .view-modern).
+   Linkado APOS o <style> inline acima para vencer o !important das regras
+   .bg-primary/.bg-success/.bg-danger/.btn-* legadas. Nao mexe em logica
+   de QR Code, generate_qr_code, download_qr_code, movements. #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/view-modern.css') }}?v=20260529-tema">
+{% endblock %} 

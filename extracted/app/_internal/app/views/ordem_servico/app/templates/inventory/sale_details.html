@@ -1,0 +1,780 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+{# Fase 10 - Modernizacao cosmetica dos detalhes da venda (escopado em .form-modern).
+   Nao mexe em pdf_handler.js, modais (confirmar/cancelar/excluir), dropdown PDF,
+   WhatsApp quick_quote, jQuery dropdown toggle. #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/forms-modern.css') }}?v=20260530-bold">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/pdf_handler.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 form-modern">
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+        <h1 class="mb-0">
+            <i class="bi bi-receipt me-2"></i>
+            {{ sale.get_status_display() }} #{{ sale.id }}
+        </h1>
+        <div class="btn-group">
+            <a href="{{ url_for('inventory.list_sales') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Voltar
+            </a>
+            {% if sale.status == 'draft' %}
+            <button type="button" class="btn btn-success confirm-sale">
+                <i class="bi bi-check-lg me-2"></i>Confirmar Venda
+            </button>
+            <button type="button" class="btn btn-success" onclick="enviarOrcamentoWhatsApp()">
+                <i class="bi bi-whatsapp me-2"></i>Enviar WhatsApp
+            </button>
+            <button type="button" class="btn btn-outline-danger delete-quote">
+                <i class="bi bi-trash me-2"></i>Excluir Orçamento
+            </button>
+            {% endif %}
+            {% if sale.status == 'confirmed' %}
+            <button type="button" class="btn btn-danger cancel-sale">
+                <i class="bi bi-x-lg me-2"></i>Cancelar Venda
+            </button>
+            {% endif %}
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-file-pdf me-2"></i>PDF
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item pdf-download" href="#" data-type="normal">
+                            <i class="bi bi-file-pdf me-2"></i>PDF Tamanho A4
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item pdf-download" href="#" data-type="thermal">
+                            <i class="bi bi-printer me-2"></i>PDF Impressora Térmica
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item print-direct" href="#" data-type="thermal">
+                            <i class="bi bi-printer-fill me-2"></i>Imprimir Direto (Térmica)
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item print-direct" href="#" data-type="normal">
+                            <i class="bi bi-printer-fill me-2"></i>Imprimir Direto (A4)
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Coluna da Esquerda - Itens -->
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-cart me-2 text-primary"></i>
+                        <h5 class="mb-0">Itens</h5>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Detalhes dos Itens -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-cart me-2"></i>
+                                Itens da Venda
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>QR Code</th>
+                                            <th width="120">Quantidade</th>
+                                            <th width="150">Preço Unit.</th>
+                                            <th width="150" class="text-end">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in sale.items %}
+                                        <tr>
+                                            <td>{{ item.inventory.name }}</td>
+                                            <td>
+                                                {% if item.inventory.qr_code %}
+                                                <small class="text-muted">{{ item.inventory.qr_code }}</small>
+                                                {% else %}
+                                                <small class="text-muted">Não gerado</small>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ "%.2f"|format(item.quantity) }}</td>
+                                            <td>{{ format_money(item.unit_price) if format_money else 'R$ %.2f'|format(item.unit_price) }}</td>
+                                            <td class="text-end">{{ format_money(item.total_price) if format_money else 'R$ %.2f'|format(item.total_price) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3" class="text-end fw-bold">Subtotal:</td>
+                                            <td class="text-end fw-bold">{{ format_money(sale.total_amount) if format_money else 'R$ %.2f'|format(sale.total_amount) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-end">Desconto:</td>
+                                            <td class="text-end">{{ format_money(sale.discount) if format_money else 'R$ %.2f'|format(sale.discount) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-end fw-bold">Total Final:</td>
+                                            <td class="text-end fw-bold">{{ format_money(sale.final_amount) if format_money else 'R$ %.2f'|format(sale.final_amount) }}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna da Direita - Informações -->
+        <div class="col-md-4">
+            <!-- Status e Data -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-info-circle me-2 text-primary"></i>
+                        <h5 class="mb-0">Informações</h5>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Status:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-{{ {
+                                'draft': 'warning',
+                                'confirmed': 'success',
+                                'cancelled': 'danger'
+                            }[sale.status] }}">
+                                {{ sale.get_status_display() }}
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-4">Data:</dt>
+                        <dd class="col-sm-8">{{ sale.date.strftime('%d/%m/%Y %H:%M') }}</dd>
+
+                        <dt class="col-sm-4">Cliente:</dt>
+                        <dd class="col-sm-8">
+                            {% if sale.client %}
+                                {{ sale.client.name }}
+                                {% if sale.client.document %}
+                                <br><small class="text-muted">{{ sale.client.document }}</small>
+                                {% endif %}
+                            {% else %}
+                                {{ sale.client_name or 'Cliente não informado' }}
+                            {% endif %}
+                        </dd>
+
+                        <dt class="col-sm-4">Vendedor:</dt>
+                        <dd class="col-sm-8">{{ sale.created_by.username }}</dd>
+
+                        {% if sale.payment_method %}
+                        <dt class="col-sm-4">Pagamento:</dt>
+                        <dd class="col-sm-8">
+                            {{ sale.get_payment_method_display() }}
+                            {# Botao QR Code PIX - aparece somente para vendas no PIX e se imagem cadastrada #}
+                            {% if pix_qrcode_url and sale.payment_method == 'pix' %}
+                            <button type="button" class="btn btn-outline-success btn-sm ms-2"
+                                    data-bs-toggle="modal" data-bs-target="#modalPixQrCode">
+                                <i class="bi bi-qr-code"></i> QR Code
+                            </button>
+                            {% endif %}
+                        </dd>
+                        {% endif %}
+
+                        {% if sale.warranty %}
+                        <dt class="col-sm-4">Garantia:</dt>
+                        <dd class="col-sm-8">{{ sale.warranty }}</dd>
+                        {% endif %}
+
+                        {% if sale.notes %}
+                        <dt class="col-sm-12">Observações:</dt>
+                        <dd class="col-sm-12">{{ sale.notes }}</dd>
+                        {% endif %}
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirmar Venda</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja confirmar esta venda?</p>
+                <p class="text-warning">Esta ação irá:</p>
+                <ul>
+                    <li>Atualizar o estoque dos produtos</li>
+                    <li>Gerar uma transação financeira</li>
+                    <li>Não poderá ser desfeita</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="confirmSaleBtn">
+                    <i class="bi bi-check-lg me-2"></i>Sim, Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Cancelamento -->
+<div class="modal fade" id="cancelModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancelar Venda</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja cancelar esta venda?</p>
+                <p class="mb-0"><small class="text-muted">Esta ação não poderá ser desfeita.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não</button>
+                <button type="button" class="btn btn-danger" id="cancelSaleBtn">
+                    <i class="bi bi-x-lg me-2"></i>Sim, Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ----------------------------------------------------------- #}
+{# Modal QR Code PIX - aditivo, so renderiza se imagem existe. #}
+{# ----------------------------------------------------------- #}
+{% if pix_qrcode_url %}
+<div class="modal fade" id="modalPixQrCode" tabindex="-1" aria-labelledby="modalPixQrCodeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalPixQrCodeLabel">
+                    <i class="bi bi-qr-code me-2"></i>QR Code PIX
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <img src="{{ pix_qrcode_url }}" alt="QR Code PIX"
+                     style="max-width: 100%; max-height: 480px; border: 1px solid #dee2e6; padding: 10px; background: #fff;">
+                <p class="text-muted mt-3 mb-0">
+                    <i class="bi bi-camera me-1"></i>
+                    Aponte a camera do celular para escanear
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-1"></i> Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Modal de Exclusão de Orçamento -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Excluir Orçamento
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>Atenção!</strong> Esta ação NÃO pode ser desfeita!
+                </div>
+                <p class="mb-3">Tem certeza que deseja <strong>EXCLUIR PERMANENTEMENTE</strong> este orçamento?</p>
+                <p class="text-muted mb-0">
+                    <small>
+                        <i class="bi bi-info-circle me-1"></i>
+                        O orçamento e todos os seus itens serão removidos do sistema.
+                    </small>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-2"></i>Não, Manter
+                </button>
+                <button type="button" class="btn btn-danger" id="deleteSaleBtn">
+                    <i class="bi bi-trash me-2"></i>Sim, Excluir Definitivamente
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/pdf_handler.js') }}"></script>
+<script>
+// Variáveis globais
+window.APP = window.APP || {};
+window.APP.saleId = {{ sale.id }};
+window.APP.urls = {
+    confirm: "{{ url_for('inventory.confirm_sale', id=sale.id) }}",
+    cancel: "{{ url_for('inventory.cancel_sale', id=sale.id) }}",
+    delete: "{{ url_for('inventory.delete_sale', id=sale.id) }}"
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    const cancelModal = new bootstrap.Modal(document.getElementById('cancelModal'));
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    
+    // Gerenciamento dos dropdowns
+    $('.dropdown-toggle').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Atualiza o aria-expanded
+        $(this).attr('aria-expanded', function(i, attr) {
+            return attr === 'true' ? 'false' : 'true';
+        });
+        
+        // Toggle da classe show
+        $(this).toggleClass('show');
+        $(this).next('.dropdown-menu').toggleClass('show');
+        
+        // Fecha outros dropdowns
+        $('.dropdown-toggle').not(this).attr('aria-expanded', 'false');
+        $('.dropdown-toggle').not(this).removeClass('show');
+        $('.dropdown-menu').not($(this).next('.dropdown-menu')).removeClass('show');
+    });
+
+    // Fecha dropdowns quando clicar fora
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.btn-group').length) {
+            $('.dropdown-toggle').attr('aria-expanded', 'false');
+            $('.dropdown-toggle, .dropdown-menu').removeClass('show');
+        }
+    });
+    
+    // Botões de PDF (download)
+    document.querySelectorAll('.pdf-download').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const type = this.dataset.type;
+            window.pdfHandler.savePDF(window.APP.saleId, type);
+        });
+    });
+
+    // Botões de impressão direta (com fallback para nova aba)
+    document.querySelectorAll('.print-direct').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const type = this.dataset.type;
+            const saleId = window.APP.saleId;
+            const pdfUrl = `/sales/${saleId}/pdf?type=${type}`;
+            try {
+                fetch(pdfUrl)
+                    .then(function(response) {
+                        if (!response.ok) throw new Error('Erro ao gerar PDF');
+                        return response.blob();
+                    })
+                    .then(function(blob) {
+                        var blobUrl = window.URL.createObjectURL(blob);
+                        var iframe = document.getElementById('print-iframe');
+                        if (!iframe) {
+                            iframe = document.createElement('iframe');
+                            iframe.id = 'print-iframe';
+                            iframe.style.position = 'fixed';
+                            iframe.style.left = '-9999px';
+                            iframe.style.top = '-9999px';
+                            iframe.style.width = '0';
+                            iframe.style.height = '0';
+                            document.body.appendChild(iframe);
+                        }
+                        iframe.onload = function() {
+                            try {
+                                iframe.contentWindow.focus();
+                                iframe.contentWindow.print();
+                            } catch (err) {
+                                console.warn('Impressão via iframe falhou, abrindo em nova aba:', err);
+                                window.open(blobUrl, '_blank');
+                            }
+                        };
+                        iframe.src = blobUrl;
+                    })
+                    .catch(function(error) {
+                        console.error('Erro ao imprimir:', error);
+                        // Fallback: tenta abrir PDF em nova aba
+                        window.open(pdfUrl, '_blank');
+                    });
+            } catch (err) {
+                console.error('Erro ao processar impressão:', err);
+                window.open(pdfUrl, '_blank');
+            }
+        });
+    });
+    
+    // Botão de confirmar venda
+    const confirmButton = document.querySelector('.confirm-sale');
+    if (confirmButton) {
+        confirmButton.addEventListener('click', function() {
+            confirmModal.show();
+        });
+    }
+    
+    // Botão de cancelar venda
+    const cancelButton = document.querySelector('.cancel-sale');
+    if (cancelButton) {
+        cancelButton.addEventListener('click', function() {
+            cancelModal.show();
+        });
+    }
+    
+    // Botão de excluir orçamento
+    const deleteButton = document.querySelector('.delete-quote');
+    if (deleteButton) {
+        deleteButton.addEventListener('click', function() {
+            deleteModal.show();
+        });
+    }
+    
+    // Ação de confirmar venda
+    const confirmSaleBtn = document.getElementById('confirmSaleBtn');
+    if (confirmSaleBtn) {
+        confirmSaleBtn.addEventListener('click', function() {
+            // Mostra indicador de carregamento
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Confirmando...';
+            this.disabled = true;
+
+            // Faz a requisição AJAX
+            fetch(window.APP.urls.confirm, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Se backend forneceu reload_url (com ?auto_print=1),
+                    // redireciona para ela — dispara modal 2x2 no destino.
+                    // Fallback defensivo: se reload_url ausente, comportamento
+                    // historico (location.reload) e' preservado.
+                    if (data.reload_url) {
+                        window.location.href = data.reload_url;
+                    } else {
+                        window.location.reload();
+                    }
+                } else {
+                    // Mostra erro
+                    alert(data.message || 'Erro ao confirmar venda');
+                    confirmModal.hide();
+                    this.innerHTML = '<i class="bi bi-check-lg me-2"></i>Sim, Confirmar';
+                    this.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao confirmar venda');
+                confirmModal.hide();
+                this.innerHTML = '<i class="bi bi-check-lg me-2"></i>Sim, Confirmar';
+                this.disabled = false;
+            });
+        });
+    }
+    
+    // Ação de cancelar venda
+    const cancelSaleBtn = document.getElementById('cancelSaleBtn');
+    if (cancelSaleBtn) {
+        cancelSaleBtn.addEventListener('click', async function() {
+            try {
+                const response = await fetch(window.APP.urls.cancel, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    const text = await response.text();
+                    console.error('Erro na resposta:', text);
+                    throw new Error('HTTP error! status: ' + response.status);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Erro ao cancelar venda');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao processar a requisição. Por favor, tente novamente.');
+            }
+        });
+    }
+    
+    // Ação de excluir orçamento
+    const deleteSaleBtn = document.getElementById('deleteSaleBtn');
+    if (deleteSaleBtn) {
+        deleteSaleBtn.addEventListener('click', async function() {
+            // Mostra indicador de carregamento
+            const originalHTML = this.innerHTML;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Excluindo...';
+            this.disabled = true;
+            
+            try {
+                const response = await fetch(window.APP.urls.delete, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Mostra mensagem de sucesso
+                    alert('Orçamento excluído com sucesso!');
+                    // Redireciona para lista de vendas
+                    window.location.href = "{{ url_for('inventory.list_sales') }}";
+                } else {
+                    // Mostra mensagem de erro
+                    alert(data.message || 'Erro ao excluir orçamento');
+                    deleteModal.hide();
+                    this.innerHTML = originalHTML;
+                    this.disabled = false;
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao processar a requisição. Por favor, tente novamente.');
+                deleteModal.hide();
+                this.innerHTML = originalHTML;
+                this.disabled = false;
+            }
+        });
+    }
+
+    // ------------------------------------------------------------------
+    // AUTO-PRINT (Fase 2A - Vendas)
+    // Se URL contem ?auto_print=1 E venda esta confirmed, abre modal 2x2
+    // com opcoes Imprimir/Baixar × A4/Termica. Padrao (Enter) = Imprimir A4.
+    //
+    // Reutiliza lógica de blob/iframe já existente em .print-direct/pdf-download
+    // deste mesmo template. Nao muda backend. Fallback triplo:
+    //   1) Iframe oculto + print() (nao expoe URL).
+    //   2) window.open blob URL em nova aba se iframe falhar.
+    //   3) Se rota principal falhar, tenta fallbackType uma unica vez.
+    //
+    // Se auto_print flag ausente/false, template renderiza normalmente sem modal.
+    // ------------------------------------------------------------------
+    (function _autoPrintVenda() {
+        try {
+            var params = new URLSearchParams(window.location.search);
+            if (params.get('auto_print') !== '1') return;
+            if ('{{ sale.status }}' !== 'confirmed') return;
+            if (typeof Swal === 'undefined') {
+                console.warn('SweetAlert2 nao carregado; auto-print cancelado.');
+                return;
+            }
+
+            var SALE_ID = window.APP.saleId;
+            var URL_A4       = '/sales/' + SALE_ID + '/pdf?type=normal';
+            var URL_TERMICA  = '/sales/' + SALE_ID + '/pdf?type=thermal';
+
+            // Baixa blob e dispara download OU impressao via iframe.
+            function _fetchAndAct(url, mode, fallbackUrl) {
+                fetch(url)
+                    .then(function (resp) {
+                        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                        return resp.blob();
+                    })
+                    .then(function (blob) {
+                        var blobUrl = window.URL.createObjectURL(blob);
+                        if (mode === 'download') {
+                            var a = document.createElement('a');
+                            a.href = blobUrl;
+                            a.download = 'venda_' + SALE_ID + '.pdf';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            setTimeout(function(){ window.URL.revokeObjectURL(blobUrl); }, 2000);
+                        } else {
+                            var iframe = document.getElementById('print-iframe');
+                            if (!iframe) {
+                                iframe = document.createElement('iframe');
+                                iframe.id = 'print-iframe';
+                                iframe.style.position = 'fixed';
+                                iframe.style.left = '-9999px';
+                                iframe.style.top = '-9999px';
+                                iframe.style.width = '0';
+                                iframe.style.height = '0';
+                                document.body.appendChild(iframe);
+                            }
+                            iframe.onload = function () {
+                                try {
+                                    iframe.contentWindow.focus();
+                                    iframe.contentWindow.print();
+                                } catch (e) {
+                                    console.warn('iframe.print falhou; abrindo nova aba:', e);
+                                    window.open(blobUrl, '_blank');
+                                }
+                            };
+                            iframe.src = blobUrl;
+                        }
+                    })
+                    .catch(function (err) {
+                        console.error('Falha ao gerar PDF venda:', err);
+                        if (fallbackUrl && fallbackUrl !== url) {
+                            console.warn('Tentando fallback:', fallbackUrl);
+                            _fetchAndAct(fallbackUrl, mode, fallbackUrl);
+                        } else {
+                            Swal.fire({
+                                title: 'Erro',
+                                text: 'Nao foi possivel gerar o PDF da venda.',
+                                icon: 'error',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        }
+                    });
+            }
+
+            // Remove ?auto_print da URL para nao reabrir modal em reloads/back.
+            try {
+                var cleanUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+            } catch (e) { /* ignore */ }
+
+            var _swalEnterHandlerVenda = function (ev) {
+                if (ev.key === 'Enter') {
+                    var btn = document.getElementById('vpdf-imp-a4');
+                    if (btn) { ev.preventDefault(); btn.click(); }
+                }
+            };
+
+            Swal.fire({
+                title: 'Venda Registrada!',
+                text: 'Escolha o que fazer com o comprovante:',
+                icon: 'success',
+                showConfirmButton: false,
+                showCancelButton: false,
+                allowOutsideClick: false,
+                html: '' +
+                    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">' +
+                    '  <button id="vpdf-imp-a4" class="swal2-styled" style="background:#28a745;color:#fff;">' +
+                    '    <i class="bi bi-printer-fill"></i><br>Imprimir A4<br>' +
+                    '    <small style="opacity:.85">(padrão · Enter)</small>' +
+                    '  </button>' +
+                    '  <button id="vpdf-imp-ter" class="swal2-styled" style="background:#17a2b8;color:#fff;">' +
+                    '    <i class="bi bi-printer-fill"></i><br>Imprimir Térmica' +
+                    '  </button>' +
+                    '  <button id="vpdf-bx-a4" class="swal2-styled" style="background:#6c757d;color:#fff;">' +
+                    '    <i class="bi bi-download"></i><br>Baixar A4' +
+                    '  </button>' +
+                    '  <button id="vpdf-bx-ter" class="swal2-styled" style="background:#6c757d;color:#fff;">' +
+                    '    <i class="bi bi-download"></i><br>Baixar Térmica' +
+                    '  </button>' +
+                    '</div>' +
+                    '<div style="margin-top:14px;">' +
+                    '  <a href="#" id="vpdf-skip" style="color:#6c757d;font-size:0.9em;text-decoration:underline;">Fechar sem imprimir</a>' +
+                    '</div>',
+                didOpen: function () {
+                    var def = document.getElementById('vpdf-imp-a4');
+                    if (def) def.focus();
+                    document.addEventListener('keydown', _swalEnterHandlerVenda);
+
+                    function _pick(mode, url, fallback) {
+                        Swal.close();
+                        setTimeout(function () {
+                            _fetchAndAct(url, mode, fallback);
+                            var descr = (mode === 'download' ? 'Download iniciado.' : 'Enviado para impressora.');
+                            Swal.fire({
+                                title: 'Pronto!',
+                                text: descr + ' Conclua a acao antes de fechar.',
+                                icon: 'success',
+                                confirmButtonText: 'Ok',
+                                confirmButtonColor: '#28a745',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false
+                            });
+                        }, 80);
+                    }
+
+                    document.getElementById('vpdf-imp-a4').addEventListener('click', function(){
+                        _pick('print', URL_A4, URL_A4);
+                    });
+                    document.getElementById('vpdf-imp-ter').addEventListener('click', function(){
+                        _pick('print', URL_TERMICA, URL_A4);
+                    });
+                    document.getElementById('vpdf-bx-a4').addEventListener('click', function(){
+                        _pick('download', URL_A4, URL_A4);
+                    });
+                    document.getElementById('vpdf-bx-ter').addEventListener('click', function(){
+                        _pick('download', URL_TERMICA, URL_A4);
+                    });
+                    document.getElementById('vpdf-skip').addEventListener('click', function(e){
+                        e.preventDefault();
+                        Swal.close();
+                    });
+                },
+                willClose: function () {
+                    document.removeEventListener('keydown', _swalEnterHandlerVenda);
+                }
+            });
+        } catch (err) {
+            // Auto-print e feature opcional. Se qualquer coisa falhar,
+            // pagina continua funcionando normalmente sem modal.
+            console.warn('auto-print venda desativado por erro:', err);
+        }
+    })();
+});
+
+async function enviarOrcamentoWhatsApp() {
+    try {
+        const response = await fetch(`{{ url_for('inventory.quick_quote') }}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                sale_id: window.APP.saleId
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            window.open(`https://wa.me/55${result.whatsapp}?text=${encodeURIComponent(result.message)}`, '_blank');
+        } else {
+            alert(result.message || 'Erro ao gerar orçamento');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao gerar orçamento');
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="card-title mb-0">
+                        Checklist de {{ 'Entrada' if checklist.checklist_type == 'entrada' else 'Saída' }}
+                    </h5>
+                    <div class="mt-1">
+                        <span class="badge bg-light text-dark">OS #{{ checklist.order.id }}</span>
+                        <span class="badge bg-light text-dark">Cliente: {{ checklist.order.client.name }}</span>
+                    </div>
+                </div>
+                <div>
+                    {% if checklist.order.status != 'finalizada' %}
+                    <a href="{{ url_for('checklists.edit_checklist', checklist_id=checklist.id) }}" 
+                       class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('checklists.download_pdf', checklist_id=checklist.id) }}" 
+                       class="btn btn-primary">
+                        <i class="bi bi-download"></i> Baixar PDF
+                    </a>
+                    <a href="{{ url_for('orders.view', id=checklist.order.id) }}" 
+                       class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Voltar
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- Informações do Checklist -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p><strong>Criado por:</strong> {{ checklist.created_by.username }}</p>
+                    <p><strong>Data:</strong> {{ checklist.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+                </div>
+                <div class="col-md-6">
+                    {% if checklist.template %}
+                    <p><strong>Modelo:</strong> {{ checklist.template.name }}</p>
+                    {% endif %}
+                    <p>
+                        <strong>Status:</strong>
+                        {% set problems = checklist.items|selectattr('status', 'equalto', 'problema')|list %}
+                        {% if problems %}
+                        <span class="badge bg-warning">{{ problems|length }} problemas encontrados</span>
+                        {% else %}
+                        <span class="badge bg-success">Todos os itens OK</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Itens do Checklist -->
+            <h6 class="mb-3">Itens Verificados</h6>
+            {% for item in checklist.items %}
+            <div class="card mb-3 {% if item.status == 'problema' %}border-warning{% endif %}">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="card-title">
+                                {{ item.description }}
+                                {% if item.template_item and item.template_item.is_critical %}
+                                <span class="badge bg-danger">Crítico</span>
+                                {% endif %}
+                            </h6>
+                            {% if item.template_item and item.template_item.category %}
+                            <small class="text-muted">{{ item.template_item.category }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <span class="badge {% if item.status == 'ok' %}bg-success{% elif item.status == 'problema' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                {{ {'ok': 'OK', 'problema': 'Problema', 'na': 'Não se Aplica'}[item.status] }}
+                            </span>
+                        </div>
+                        <div class="col-md-3">
+                            {% if item.observations %}
+                            <small class="text-muted">{{ item.observations }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Fotos do Item -->
+                    {% if item.attachments %}
+                    <div class="photos-container mt-3">
+                        <h6 class="text-muted mb-2">Fotos</h6>
+                        <div class="row g-2">
+                            {% for attachment in item.attachments %}
+                            {% if attachment.file_type.startswith('image/') %}
+                            <div class="col-auto">
+                                <a href="{{ url_for('static', filename=attachment.file_path) }}" 
+                                   target="_blank" 
+                                   class="photo-thumbnail">
+                                    <img src="{{ url_for('static', filename=attachment.file_path) }}" 
+                                         class="img-thumbnail" 
+                                         alt="Foto do item"
+                                         style="max-width: 150px; max-height: 150px;">
+                                </a>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Comentários -->
+            {% if checklist.comments %}
+            <div class="mt-4">
+                <h6>Observações Gerais</h6>
+                <p class="card-text">{{ checklist.comments }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Assinaturas -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h6>Assinatura do Cliente</h6>
+                    {% if checklist.client_signature %}
+                    <img src="data:image/png;base64,{{ checklist.client_signature|b64encode }}" 
+                         alt="Assinatura do Cliente" 
+                         class="img-fluid border rounded p-2">
+                    {% else %}
+                    <p class="text-muted">Assinatura não coletada</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <h6>Assinatura do Técnico</h6>
+                    {% if checklist.technician_signature %}
+                    <img src="data:image/png;base64,{{ checklist.technician_signature|b64encode }}" 
+                         alt="Assinatura do Técnico" 
+                         class="img-fluid border rounded p-2">
+                    {% else %}
+                    <p class="text-muted">Assinatura não coletada</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Visualização de Foto -->
+<div class="modal fade" id="photoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Visualizar Foto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="" class="img-fluid" id="modalImage">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script>
+// Abre o modal ao clicar em uma foto
+document.querySelectorAll('.photo-thumbnail').forEach(thumb => {
+    thumb.addEventListener('click', function(e) {
+        e.preventDefault();
+        const modal = new bootstrap.Modal(document.getElementById('photoModal'));
+        document.getElementById('modalImage').src = this.href;
+        modal.show();
+    });
+});
+
+// Função para lidar com PDFs no PyWebView
+async function handlePDF(url) {
+    try {
+        const headers = {};
+        if (window.pywebview !== undefined) {
+            headers['X-Pywebview'] = 'true';
+        }
+        
+        const response = await fetch(url, {
+            headers: headers
+        });
+        
+        if (window.pywebview !== undefined) {
+            // Estamos no PyWebView
+            const data = await response.json();
+            if (data.success) {
+                window.pywebview.api.download_file(data.file_path, data.filename);
+                // Mostra mensagem de sucesso
+                alert('O PDF está sendo baixado. Por favor, aguarde.');
+            } else {
+                alert(data.message || 'Erro ao baixar o PDF. Por favor, tente novamente.');
+            }
+        } else {
+            // Estamos no navegador - o download será automático
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '';  // O nome do arquivo virá do Content-Disposition
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao baixar o PDF. Por favor, tente novamente.');
+    }
+}
+
+// Adiciona event listener para os botões de download de PDF
+document.querySelectorAll('.pdf-download-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const url = this.dataset.pdfUrl;
+        handlePDF(url);
+    });
+});
+</script>
+
+<style>
+.photo-thumbnail {
+    display: inline-block;
+    position: relative;
+    margin: 5px;
+    transition: transform 0.2s;
+}
+
+.photo-thumbnail:hover {
+    transform: scale(1.05);
+}
+
+.photo-thumbnail img {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+</style>
+{% endblock %} 

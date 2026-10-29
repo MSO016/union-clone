@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Logs de Auditoria</h2>
+    
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Data/Hora</th>
+                    <th>Usuário</th>
+                    <th>Ação</th>
+                    <th>Tipo</th>
+                    <th>ID</th>
+                    <th>Detalhes</th>
+                </tr>
+            </thead>
+            <tbody id="auditLogsTable">
+                <!-- Preenchido via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+// Função para formatar a data no padrão brasileiro
+function formatDate(dateStr) {
+    if (!dateStr) return 'Data não disponível';
+    
+    try {
+        // Log para debug
+        console.log('Valor recebido em formatDate:', dateStr);
+        
+        // Se for uma string ISO (formato do banco)
+        if (typeof dateStr === 'string') {
+            // Remove qualquer caractere inválido e espaços extras
+            dateStr = dateStr.trim();
+            
+            // Tenta extrair a data usando regex
+            const matches = dateStr.match(/(\d{4})-(\d{2})-(\d{2})(?:[T\s](\d{2}):(\d{2}):(\d{2}))?/);
+            
+            if (matches) {
+                const [_, year, month, day, hour = '00', minute = '00', second = '00'] = matches;
+                
+                // Cria a data usando UTC para evitar problemas de timezone
+                const date = new Date(Date.UTC(
+                    parseInt(year),
+                    parseInt(month) - 1,
+                    parseInt(day),
+                    parseInt(hour),
+                    parseInt(minute),
+                    parseInt(second)
+                ));
+                
+                // Ajusta para o timezone local
+                const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+                
+                // Formata para o padrão brasileiro
+                return localDate.toLocaleString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false,
+                    timeZone: 'America/Sao_Paulo'
+                });
+            }
+            
+            console.warn('Formato de data não reconhecido:', dateStr);
+            return 'Data inválida';
+        }
+        
+        return 'Formato de data inválido';
+    } catch (e) {
+        console.error('Erro ao formatar data:', e);
+        console.error('Valor que causou o erro:', dateStr);
+        return 'Data inválida';
+    }
+}
+
+// Função para obter descrição amigável da ação
+function getActionDescription(action) {
+    const actions = {
+        // Usuários
+        'create_user': 'Criação de Usuário',
+        'update_user': 'Atualização de Usuário',
+        'delete_user': 'Exclusão de Usuário',
+        
+        // Clientes
+        'create_client': 'Cadastro de Cliente',
+        'update_client': 'Atualização de Cliente',
+        'delete_client': 'Exclusão de Cliente',
+        
+        // Ordens de Serviço
+        'create_order': 'Criação de OS',
+        'edit_order': 'Edição de OS',
+        'delete_order': 'Exclusão de OS',
+        'update_status': 'Atualização de Status',
+        'close_order': 'Fechamento de OS',
+        'reopen_warranty': 'Reabertura em Garantia',
+        'reopen_not_authorized': 'Reabertura não Autorizada',
+        
+        // Financeiro
+        'add_transaction': 'Nova Transação',
+        'edit_transaction': 'Edição de Transação',
+        'add_account': 'Nova Conta',
+        'pay_account': 'Pagamento de Conta',
+        'add_category': 'Nova Categoria',
+        'edit_category': 'Edição de Categoria',
+        'delete_category': 'Exclusão de Categoria',
+        
+        // Sistema
+        'update_company': 'Atualização de Dados da Empresa',
+        'restore_backup': 'Restauração de Backup',
+        'create_backup': 'Criação de Backup',
+        'login': 'Login no Sistema',
+        'logout': 'Logout do Sistema'
+    };
+    return actions[action] || action;
+}
+
+// Função para obter descrição amigável do tipo de entidade
+function getEntityTypeDescription(type) {
+    const types = {
+        'user': 'Usuário',
+        'client': 'Cliente',
+        'service_order': 'Ordem de Serviço',
+        'financial_transaction': 'Transação',
+        'account': 'Conta',
+        'financial_category': 'Categoria',
+        'company': 'Empresa',
+        'system': 'Sistema'
+    };
+    return types[type] || type;
+}
+
+// Função para carregar logs
+function loadAuditLogs() {
+    fetch('/api/v1/audit-logs')
+        .then(response => response.json())
+        .then(logs => {
+            const tbody = document.getElementById('auditLogsTable');
+            tbody.innerHTML = '';
+            
+            logs.forEach(log => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formatDate(log.timestamp)}</td>
+                    <td>${log.user}</td>
+                    <td>${getActionDescription(log.action)}</td>
+                    <td>${getEntityTypeDescription(log.entity_type)}</td>
+                    <td>${log.entity_id || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick='showDetails(${JSON.stringify(log)})'>
+                            Ver Detalhes
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar logs:', error);
+            document.getElementById('auditLogsTable').innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-danger">
+                        Erro ao carregar os logs. Por favor, tente novamente.
+                    </td>
+                </tr>
+            `;
+        });
+}
+
+// Função para formatar os dados do log
+function formatLogData(data) {
+    if (!data) return 'Nenhum dado disponível';
+    try {
+        const parsedData = typeof data === 'string' ? JSON.parse(data) : data;
+        let formattedData = {};
+        
+        // Mapeia campos para nomes mais amigáveis
+        const fieldMappings = {
+            'username': 'Nome de Usuário',
+            'email': 'E-mail',
+            'role': 'Função',
+            'name': 'Nome',
+            'phone': 'Telefone',
+            'address': 'Endereço',
+            'company_name': 'Nome da Empresa',
+            'cnpj': 'CNPJ',
+            'status': 'Status',
+            'description': 'Descrição',
+            'created_at': 'Data de Criação',
+            'updated_at': 'Data de Atualização',
+            'client_name': 'Nome do Cliente',
+            'service_type': 'Tipo de Serviço',
+            'equipment': 'Equipamento',
+            'brand': 'Marca',
+            'model': 'Modelo',
+            'serial_number': 'Número de Série',
+            'problem_reported': 'Problema Relatado',
+            'diagnosis': 'Diagnóstico',
+            'solution': 'Solução',
+            'price': 'Preço',
+            'warranty_days': 'Dias de Garantia',
+            'technician': 'Técnico Responsável',
+            'payment_method': 'Forma de Pagamento',
+            'payment_status': 'Status do Pagamento',
+            'is_active': 'Ativo',
+            'is_deleted': 'Excluído'
+        };
+
+        // Status de OS
+        const statusMappings = {
+            'pending': 'Pendente',
+            'in_progress': 'Em Andamento',
+            'waiting_parts': 'Aguardando Peças',
+            'waiting_approval': 'Aguardando Aprovação',
+            'approved': 'Aprovado',
+            'rejected': 'Rejeitado',
+            'completed': 'Concluído',
+            'delivered': 'Entregue',
+            'cancelled': 'Cancelado'
+        };
+
+        // Funções de usuário
+        const roleMappings = {
+            'admin': 'Administrador',
+            'developer': 'Desenvolvedor',
+            'user': 'Usuário',
+            'technician': 'Técnico'
+        };
+        
+        // Formata os valores
+        Object.entries(parsedData).forEach(([key, value]) => {
+            const friendlyKey = fieldMappings[key] || key;
+            
+            if (!value && value !== false && value !== 0) {
+                formattedData[friendlyKey] = '-';
+            } else if (key.includes('_at') && value) {
+                formattedData[friendlyKey] = formatDate(value);
+            } else if (key === 'role') {
+                formattedData[friendlyKey] = roleMappings[value] || value;
+            } else if (key === 'status') {
+                formattedData[friendlyKey] = statusMappings[value] || value;
+            } else if (key === 'price') {
+                formattedData[friendlyKey] = typeof value === 'number' ? 
+                    value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : value;
+            } else if (typeof value === 'boolean') {
+                formattedData[friendlyKey] = value ? 'Sim' : 'Não';
+            } else if (Array.isArray(value)) {
+                formattedData[friendlyKey] = value.join(', ');
+            } else {
+                formattedData[friendlyKey] = value;
+            }
+        });
+        
+        // Retorna HTML formatado em vez de JSON
+        let html = '';
+        Object.entries(formattedData).forEach(([key, value]) => {
+            html += `<div class="mb-2">
+                <strong>${key}:</strong> 
+                <span class="text-muted">${value}</span>
+            </div>`;
+        });
+        return html;
+    } catch (e) {
+        console.error('Erro ao formatar dados:', e);
+        return '<div class="text-danger">Erro ao formatar dados</div>';
+    }
+}
+
+// Função para mostrar detalhes do log
+function showDetails(log) {
+    const oldData = formatLogData(log.old_data);
+    const newData = formatLogData(log.new_data);
+    
+    let detailsHtml = `
+        <div class="modal fade" id="logDetailsModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-light">
+                        <h5 class="modal-title">Detalhes da Atividade</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Informações da Atividade</h6>
+                                <div class="mb-1"><strong>Data/Hora:</strong> ${formatDate(log.timestamp)}</div>
+                                <div class="mb-1"><strong>Usuário:</strong> ${log.user}</div>
+                                <div class="mb-1"><strong>Ação:</strong> ${getActionDescription(log.action)}</div>
+                                <div class="mb-1"><strong>Tipo:</strong> ${getEntityTypeDescription(log.entity_type)}</div>
+                                ${log.entity_id ? `<div class="mb-1"><strong>ID:</strong> ${log.entity_id}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">Dados Anteriores</h6>
+                                    </div>
+                                    <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                                        ${oldData}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">Dados Novos</h6>
+                                    </div>
+                                    <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                                        ${newData}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove modal anterior se existir
+    const oldModal = document.getElementById('logDetailsModal');
+    if (oldModal) {
+        oldModal.remove();
+    }
+    
+    // Adiciona o novo modal ao documento
+    document.body.insertAdjacentHTML('beforeend', detailsHtml);
+    
+    // Inicializa e mostra o modal
+    const modal = new bootstrap.Modal(document.getElementById('logDetailsModal'));
+    modal.show();
+}
+
+// Carrega logs ao iniciar
+document.addEventListener('DOMContentLoaded', loadAuditLogs);
+</script>
+{% endblock %} 

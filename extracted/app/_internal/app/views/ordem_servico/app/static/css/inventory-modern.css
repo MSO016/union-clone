@@ -1,0 +1,284 @@
+/* =============================================================================
+   inventory-modern.css — Estilos cosmeticos exclusivos da listagem de estoque
+   =============================================================================
+   ESCOPO: TODOS os seletores comecam com .inv-modern para nao afetar
+   nenhum outro template do sistema (existem 64 HTMLs no OS Manager).
+   
+   FILOSOFIA:
+   - Aproveita os campos quantity e minimum_quantity ja existentes.
+   - Visual de semaforo (verde/amarelo/vermelho) baseado em Inventory.stock_status.
+   - Dark mode automatico via prefers-color-scheme.
+   - Zero modificacao em arquivos globais (custom.css, style.css).
+   ============================================================================= */
+
+/* ---------- Tokens locais (nao vazam para outros templates) ---------------- */
+.inv-modern {
+    --inv-accent:        #4f46e5;
+    --inv-accent-soft:   rgba(79, 70, 229, 0.10);
+    --inv-text:          #0f172a;
+    --inv-text-muted:    #64748b;
+    --inv-bg-card:       #ffffff;
+    --inv-bg-page:       #f8fafc;
+    --inv-border:        #e2e8f0;
+    --inv-radius:        12px;
+    --inv-shadow-sm:     0 1px 3px rgba(15, 23, 42, 0.06);
+    --inv-shadow-md:     0 4px 12px rgba(15, 23, 42, 0.08);
+
+    /* Cores do semaforo */
+    --inv-critico:       #ef4444;
+    --inv-critico-soft:  #fef2f2;
+    --inv-critico-text:  #991b1b;
+    --inv-atencao:       #f59e0b;
+    --inv-atencao-soft:  #fffbeb;
+    --inv-atencao-text:  #92400e;
+    --inv-ok:            #10b981;
+    --inv-ok-soft:       #f0fdf4;
+    --inv-ok-text:       #065f46;
+}
+
+/* Dark 100% OPT-IN (29-05-2026): so com .theme-dark (era @media dark, que
+   ligava sozinho no Windows escuro e deixava texto claro em fundo claro). */
+:root.theme-dark .inv-modern {
+    --inv-text:        #e2e8f0;
+    --inv-text-muted:  #94a3b8;
+    --inv-bg-card:     #1e293b;
+    --inv-bg-page:     #0f172a;
+    --inv-border:      #334155;
+    --inv-critico-soft: rgba(239, 68, 68, 0.12);
+    --inv-atencao-soft: rgba(245, 158, 11, 0.12);
+    --inv-ok-soft:      rgba(16, 185, 129, 0.12);
+}
+
+/* ---------- Cards do resumo no topo --------------------------------------- */
+.inv-modern .resumo-row {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.inv-modern .resumo-card {
+    background: var(--inv-bg-card);
+    border: 1px solid var(--inv-border);
+    border-radius: var(--inv-radius);
+    padding: 1rem 1.25rem;
+    box-shadow: var(--inv-shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.inv-modern .resumo-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--inv-shadow-md);
+}
+
+.inv-modern .resumo-card .resumo-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--inv-text-muted);
+}
+
+.inv-modern .resumo-card .resumo-valor {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: var(--inv-text);
+    line-height: 1.1;
+}
+
+.inv-modern .resumo-card .resumo-hint {
+    font-size: 0.78rem;
+    color: var(--inv-text-muted);
+}
+
+.inv-modern .resumo-card.critico .resumo-valor { color: var(--inv-critico); }
+.inv-modern .resumo-card.atencao .resumo-valor { color: var(--inv-atencao); }
+.inv-modern .resumo-card.ok      .resumo-valor { color: var(--inv-ok); }
+
+.inv-modern .resumo-card.critico { border-left: 4px solid var(--inv-critico); }
+.inv-modern .resumo-card.atencao { border-left: 4px solid var(--inv-atencao); }
+.inv-modern .resumo-card.ok      { border-left: 4px solid var(--inv-ok); }
+.inv-modern .resumo-card.total   { border-left: 4px solid var(--inv-accent); }
+.inv-modern .resumo-card.valor   { border-left: 4px solid #0ea5e9; }
+
+@media (max-width: 991.98px) {
+    .inv-modern .resumo-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 575.98px) {
+    .inv-modern .resumo-row { grid-template-columns: 1fr; }
+}
+
+/* ---------- Chips de filtro rapido ---------------------------------------- */
+.inv-modern .chips-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.inv-modern .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 9999px;
+    border: 1px solid var(--inv-border);
+    background: var(--inv-bg-card);
+    color: var(--inv-text);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.inv-modern .chip:hover {
+    border-color: var(--inv-accent);
+    color: var(--inv-accent);
+    transform: translateY(-1px);
+}
+
+.inv-modern .chip .chip-count {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.05rem 0.45rem;
+    border-radius: 9999px;
+    background: var(--inv-accent-soft);
+    color: var(--inv-accent);
+    min-width: 1.4rem;
+    text-align: center;
+}
+
+.inv-modern .chip.critico .chip-count { background: var(--inv-critico-soft); color: var(--inv-critico); }
+.inv-modern .chip.atencao .chip-count { background: var(--inv-atencao-soft); color: var(--inv-atencao); }
+.inv-modern .chip.ok      .chip-count { background: var(--inv-ok-soft);      color: var(--inv-ok); }
+
+/* Chip ativo (filtro selecionado) */
+.inv-modern .chip.active {
+    background: var(--inv-accent);
+    color: #ffffff;
+    border-color: var(--inv-accent);
+}
+.inv-modern .chip.active.critico { background: var(--inv-critico); border-color: var(--inv-critico); }
+.inv-modern .chip.active.atencao { background: var(--inv-atencao); border-color: var(--inv-atencao); }
+.inv-modern .chip.active.ok      { background: var(--inv-ok);      border-color: var(--inv-ok); }
+.inv-modern .chip.active .chip-count {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+}
+
+/* ---------- Badge de status na linha da tabela --------------------------- */
+.inv-modern .stock-cell {
+    min-width: 130px;
+}
+
+.inv-modern .stock-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.18rem 0.55rem;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.inv-modern .stock-badge::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 0 2px currentColor;
+    opacity: 0.4;
+}
+
+.inv-modern .stock-badge.critico {
+    background: var(--inv-critico-soft);
+    color: var(--inv-critico-text);
+}
+.inv-modern .stock-badge.atencao {
+    background: var(--inv-atencao-soft);
+    color: var(--inv-atencao-text);
+}
+.inv-modern .stock-badge.ok {
+    background: var(--inv-ok-soft);
+    color: var(--inv-ok-text);
+}
+
+/* Pulso suave so para itens criticos (chama atencao sem ser intrusivo) */
+@keyframes inv-pulse-critico {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.65; }
+}
+.inv-modern .stock-badge.critico::before {
+    animation: inv-pulse-critico 2s ease-in-out infinite;
+}
+
+/* ---------- Mini barra de progresso quantidade vs minimo ----------------- */
+.inv-modern .stock-bar {
+    margin-top: 0.35rem;
+    height: 5px;
+    width: 100%;
+    max-width: 110px;
+    background: var(--inv-border);
+    border-radius: 9999px;
+    overflow: hidden;
+}
+.inv-modern .stock-bar-fill {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 0.3s ease;
+}
+.inv-modern .stock-bar-fill.critico { background: var(--inv-critico); }
+.inv-modern .stock-bar-fill.atencao { background: var(--inv-atencao); }
+.inv-modern .stock-bar-fill.ok      { background: var(--inv-ok); }
+
+.inv-modern .stock-percent {
+    font-size: 0.7rem;
+    color: var(--inv-text-muted);
+    margin-top: 0.15rem;
+    display: block;
+}
+
+/* ---------- Linhas da tabela com borda lateral colorida ------------------- */
+.inv-modern .table tbody tr.row-critico { box-shadow: inset 4px 0 0 var(--inv-critico); }
+.inv-modern .table tbody tr.row-atencao { box-shadow: inset 4px 0 0 var(--inv-atencao); }
+.inv-modern .table tbody tr.row-ok      { box-shadow: inset 4px 0 0 transparent; }
+
+/* Sobrescreve o table-danger legado (mais sutil que vermelho cheio) */
+.inv-modern .table tbody tr.table-danger {
+    background-color: transparent !important;
+}
+
+/* ---------- Refino tipografico interno da tabela ------------------------- */
+.inv-modern .table thead th {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--inv-text-muted);
+    font-weight: 600;
+}
+
+.inv-modern .item-name {
+    font-weight: 600;
+    color: var(--inv-text);
+}
+
+.inv-modern .item-meta {
+    font-size: 0.78rem;
+    color: var(--inv-text-muted);
+    margin-top: 0.1rem;
+}
+
+/* ---------- Esconde o select legado de status (substituido por chips) ---- */
+.inv-modern .legacy-status-filter {
+    display: none;
+}

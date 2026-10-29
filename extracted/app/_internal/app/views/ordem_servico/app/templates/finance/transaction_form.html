@@ -1,0 +1,190 @@
+{% extends "finance/base.html" %}
+
+{% block page_title %}{{ 'Editar' if transaction else 'Nova' }} Transação{% endblock %}
+
+{% block extra_css %}
+<!-- Adiciona o CSS necessário -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.mask.min.js') }}">
+<style>
+    .invalid-feedback {
+        display: none;
+        color: #dc3545;
+        font-size: 80%;
+    }
+    .was-validated .form-control:invalid ~ .invalid-feedback {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block finance_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" id="transactionForm" novalidate>
+                    <div class="form-group">
+                        <label for="date">Data</label>
+                        <input type="text" class="form-control datepicker" id="date" name="date"
+                               value="{{ transaction.date.strftime('%d/%m/%Y') if transaction else datetime.now().strftime('%d/%m/%Y') }}" 
+                               required pattern="\d{2}/\d{2}/\d{4}">
+                        <div class="invalid-feedback">
+                            Data inválida. Use o formato DD/MM/AAAA
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="type">Tipo</label>
+                        <select class="form-control" id="type" name="type" required>
+                            <option value="">Selecione...</option>
+                            <option value="entrada" {% if transaction and transaction.type == 'entrada' %}selected{% endif %}>Entrada</option>
+                            <option value="saida" {% if transaction and transaction.type == 'saida' %}selected{% endif %}>Saída</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Selecione o tipo da transação
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Descrição</label>
+                        <input type="text" class="form-control" id="description" name="description"
+                               value="{{ transaction.description if transaction else '' }}" required minlength="3">
+                        <div class="invalid-feedback">
+                            A descrição deve ter pelo menos 3 caracteres
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount">Valor</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">R$</span>
+                            </div>
+                            <input type="text" class="form-control money" id="amount" name="amount" 
+                                   value="{{ '%.2f'|format(transaction.amount)|replace('.', ',') if transaction else '' }}" 
+                                   required>
+                            <div class="invalid-feedback">
+                                Informe um valor válido maior que zero
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category_id">Categoria</label>
+                        <select class="form-control" id="category_id" name="category_id" required>
+                            <option value="">Selecione...</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" 
+                                        data-type="{{ category.type }}"
+                                        {% if transaction and transaction.category_id == category.id %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">
+                            Selecione uma categoria
+                        </div>
+                    </div>
+
+                    {% if not transaction %}
+                    <div class="form-group">
+                        <label for="service_order_id">Ordem de Serviço (Opcional)</label>
+                        <select class="form-control" id="service_order_id" name="service_order_id">
+                            <option value="">Selecione...</option>
+                            {% for order in service_orders %}
+                                <option value="{{ order.id }}">OS #{{ order.id }} - {{ order.client.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">{{ 'Atualizar' if transaction else 'Salvar' }}</button>
+                        <a href="{{ url_for('finance.transactions') }}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Ajuda</h5>
+            </div>
+            <div class="card-body">
+                <h6>Tipos de Transação</h6>
+                <ul>
+                    <li><strong>Entrada:</strong> Dinheiro recebido (vendas, serviços, etc)</li>
+                    <li><strong>Saída:</strong> Despesas, pagamentos, etc</li>
+                </ul>
+
+                <h6>Dicas</h6>
+                <ul>
+                    <li>Use categorias para melhor organização</li>
+                    <li>Seja específico na descrição</li>
+                    <li>Valores devem ser inseridos com vírgula como separador decimal</li>
+                    <li>Transações vinculadas a OS ou vendas não podem ser editadas</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- jQuery Mask Plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Inicializa as máscaras
+    if ($.fn.mask) {
+        $('.money').mask('#.##0,00', {reverse: true});
+        $('.date').mask('00/00/0000');
+    } else {
+        console.error('jQuery Mask Plugin não está carregado!');
+    }
+    
+    // Inicializa datepicker
+    $('.datepicker').datepicker({
+        format: 'dd/mm/yyyy',
+        language: 'pt-BR',
+        autoclose: true
+    });
+
+    // Filtra categorias baseado no tipo
+    $('#type').change(function() {
+        var selectedType = $(this).val();
+        $('#category_id option').each(function() {
+            var categoryType = $(this).data('type');
+            if (!categoryType || categoryType === selectedType || categoryType === 'ambos') {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+        $('#category_id').val('');
+    });
+
+    // Validação do formulário
+    $('#transactionForm').on('submit', function(e) {
+        var form = $(this);
+        
+        if (!form[0].checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        form.addClass('was-validated');
+        
+        // Validação adicional do valor
+        var amount = $('.money').val().replace('.', '').replace(',', '.');
+        if (parseFloat(amount) <= 0) {
+            e.preventDefault();
+            $('.money').addClass('is-invalid');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %} 

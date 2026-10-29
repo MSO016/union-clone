@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{% if template %}Editar Template de Checklist{% else %}Novo Template de Checklist{% endif %}</h2>
+    
+    <!-- Seletor de Templates Pré-definidos (mostrar apenas para novos templates) -->
+    {% if not template %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Templates Pré-definidos</h5>
+            <p class="card-text text-muted">Selecione um template pré-definido ou crie um novo do zero.</p>
+            <select class="form-select" id="predefinedTemplate" onchange="loadPredefinedTemplate()">
+                <option value="">Criar template do zero...</option>
+                <option value="iphone">Template para iPhone</option>
+                <option value="android">Template para Android</option>
+                <option value="pc">Template para PC/Notebook</option>
+                <option value="generic">Template Genérico para Eletrônicos</option>
+            </select>
+            <div class="form-text mt-2">
+                <i class="bi bi-info-circle"></i> Os templates pré-definidos são um ponto de partida e podem ser personalizados conforme sua necessidade.
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <form id="templateForm" class="mt-4" method="POST">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="name" class="form-label">Nome do Template</label>
+                <input type="text" class="form-control" id="name" name="name" required
+                       value="{{ template.name if template else '' }}"
+                       placeholder="Ex: Checklist - Manutenção de iPhone 13">
+                <div class="form-text">
+                    Dê um nome descritivo que identifique facilmente o propósito do template.
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <label for="equipment_type" class="form-label">Tipo de Equipamento</label>
+                <select class="form-select" id="equipment_type" name="equipment_type" required>
+                    <option value="">Selecione o tipo de equipamento...</option>
+                    <option value="smartphone" {% if template and template.equipment_type == "smartphone" %}selected{% endif %}>Smartphone</option>
+                    <option value="tablet" {% if template and template.equipment_type == "tablet" %}selected{% endif %}>Tablet</option>
+                    <option value="notebook" {% if template and template.equipment_type == "notebook" %}selected{% endif %}>Notebook</option>
+                    <option value="computador" {% if template and template.equipment_type == "computador" %}selected{% endif %}>Computador</option>
+                    <option value="outro" {% if template and template.equipment_type == "outro" %}selected{% endif %}>Outro</option>
+                </select>
+                <div class="form-text">
+                    Escolha o tipo de equipamento para melhor organização dos templates.
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Itens do Checklist</label>
+            <div class="alert alert-info">
+                <i class="bi bi-lightbulb"></i> Dicas para criar bons itens de checklist:
+                <ul class="mb-0">
+                    <li>Use verbos de ação no infinitivo (Verificar, Testar, Checar)</li>
+                    <li>Seja específico nas descrições</li>
+                    <li>Marque como crítico os itens essenciais para o funcionamento</li>
+                    <li>Organize por categorias para melhor visualização</li>
+                </ul>
+            </div>
+            <div id="itemsContainer">
+                <!-- Os itens serão adicionados aqui dinamicamente -->
+            </div>
+            
+            <button type="button" class="btn btn-outline-primary mt-2" onclick="addTemplateItem('', '', false)">
+                <i class="bi bi-plus-lg"></i> Adicionar Item
+            </button>
+        </div>
+        
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Salvar Template</button>
+            <a href="{{ url_for('checklists.list_templates') }}" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if template and template.items %}
+        {% for item in template.items %}
+            addTemplateItem(
+                JSON.parse('{{ item.description|tojson }}'),
+                JSON.parse('{{ item.category|tojson }}'),
+                {{ 'true' if item.is_critical else 'false' }}
+            );
+        {% endfor %}
+    {% else %}
+        addTemplateItem('', '', false);
+    {% endif %}
+});
+
+function addTemplateItem(description, category, critical) {
+    const itemsContainer = document.getElementById('itemsContainer');
+    const itemCount = itemsContainer.children.length;
+    
+    const itemHtml = `
+        <div class="card mb-2 template-item">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Descrição</label>
+                            <input type="text" class="form-control" name="items[${itemCount}][description]" 
+                                   value="${description}" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label">Categoria</label>
+                            <input type="text" class="form-control" name="items[${itemCount}][category]" 
+                                   value="${category}">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-check mt-4">
+                            <input type="checkbox" class="form-check-input" 
+                                   name="items[${itemCount}][is_critical]" 
+                                   ${critical ? 'checked' : ''}>
+                            <label class="form-check-label">Item Crítico</label>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-outline-danger btn-sm mt-4" 
+                                onclick="removeTemplateItem(this)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    itemsContainer.insertAdjacentHTML('beforeend', itemHtml);
+}
+
+function removeTemplateItem(button) {
+    button.closest('.template-item').remove();
+}
+
+// Templates pré-definidos
+const predefinedTemplates = {
+    iphone: {
+        name: "Checklist - iPhone",
+        equipment_type: "smartphone",
+        items: [
+            { description: "Verificar Face ID", category: "Biometria", critical: true },
+            { description: "Testar Touch ID", category: "Biometria", critical: true },
+            { description: "Checar vibração", category: "Hardware", critical: false },
+            { description: "Testar áudio de chamada", category: "Áudio", critical: true },
+            { description: "Testar alto-falante", category: "Áudio", critical: true },
+            { description: "Verificar microfone", category: "Áudio", critical: true },
+            { description: "Checar conectividade Wi-Fi", category: "Conectividade", critical: true },
+            { description: "Testar Bluetooth", category: "Conectividade", critical: true },
+            { description: "Verificar sinal de celular", category: "Conectividade", critical: true },
+            { description: "Testar câmera traseira", category: "Câmeras", critical: true },
+            { description: "Testar câmera frontal", category: "Câmeras", critical: true },
+            { description: "Verificar flash", category: "Câmeras", critical: false },
+            { description: "Testar botões físicos", category: "Hardware", critical: true },
+            { description: "Verificar carregamento", category: "Bateria", critical: true },
+            { description: "Testar True Tone", category: "Display", critical: false },
+            { description: "Verificar sensor de proximidade", category: "Sensores", critical: true }
+        ]
+    },
+    android: {
+        name: "Checklist - Android",
+        equipment_type: "smartphone",
+        items: [
+            { description: "Verificar sensor de impressão digital", category: "Biometria", critical: true },
+            { description: "Testar reconhecimento facial", category: "Biometria", critical: false },
+            { description: "Checar bateria e carregamento", category: "Bateria", critical: true },
+            { description: "Testar botão Power", category: "Hardware", critical: true },
+            { description: "Verificar botões de volume", category: "Hardware", critical: true },
+            { description: "Testar áudio de chamada", category: "Áudio", critical: true },
+            { description: "Verificar alto-falante", category: "Áudio", critical: true },
+            { description: "Testar microfone", category: "Áudio", critical: true },
+            { description: "Checar conectividade Wi-Fi", category: "Conectividade", critical: true },
+            { description: "Testar Bluetooth", category: "Conectividade", critical: true },
+            { description: "Verificar NFC", category: "Conectividade", critical: false },
+            { description: "Testar sinal de celular", category: "Conectividade", critical: true },
+            { description: "Verificar câmera principal", category: "Câmeras", critical: true },
+            { description: "Testar câmera selfie", category: "Câmeras", critical: true },
+            { description: "Checar flash LED", category: "Câmeras", critical: false },
+            { description: "Verificar sensores (Giroscópio, etc)", category: "Sensores", critical: true }
+        ]
+    },
+    pc: {
+        name: "Checklist - PC/Notebook",
+        equipment_type: "computador",
+        items: [
+            { description: "Testar funcionamento de portas USB", category: "Conectividade", critical: true },
+            { description: "Checar disco rígido/SSD", category: "Armazenamento", critical: true },
+            { description: "Verificar memória RAM", category: "Hardware", critical: true },
+            { description: "Testar conexão de rede (Ethernet)", category: "Conectividade", critical: true },
+            { description: "Verificar Wi-Fi", category: "Conectividade", critical: true },
+            { description: "Testar desempenho de CPU", category: "Hardware", critical: true },
+            { description: "Verificar GPU/Placa de vídeo", category: "Hardware", critical: true },
+            { description: "Testar teclado", category: "Periféricos", critical: true },
+            { description: "Verificar touchpad/mouse", category: "Periféricos", critical: true },
+            { description: "Checar webcam", category: "Periféricos", critical: false },
+            { description: "Testar áudio (alto-falantes)", category: "Áudio", critical: true },
+            { description: "Verificar microfone", category: "Áudio", critical: true },
+            { description: "Testar carregador/bateria", category: "Energia", critical: true },
+            { description: "Checar temperatura do sistema", category: "Hardware", critical: true },
+            { description: "Verificar ventiladores", category: "Hardware", critical: true }
+        ]
+    },
+    generic: {
+        name: "Checklist - Eletrônicos (Genérico)",
+        equipment_type: "outro",
+        items: [
+            { description: "Verificar funcionalidade principal", category: "Geral", critical: true },
+            { description: "Testar alimentação/energia", category: "Energia", critical: true },
+            { description: "Checar conectividade", category: "Conectividade", critical: true },
+            { description: "Verificar botões e controles", category: "Hardware", critical: true },
+            { description: "Testar sensores principais", category: "Sensores", critical: true },
+            { description: "Checar display/tela", category: "Display", critical: true },
+            { description: "Verificar portas de conexão", category: "Conectividade", critical: true },
+            { description: "Testar áudio (se aplicável)", category: "Áudio", critical: false },
+            { description: "Checar atualizações de firmware", category: "Software", critical: false },
+            { description: "Verificar calibração", category: "Calibração", critical: true }
+        ]
+    }
+};
+
+function loadPredefinedTemplate() {
+    const selectedTemplate = document.getElementById('predefinedTemplate').value;
+    
+    if (!selectedTemplate) {
+        // Limpa o formulário se "Criar do zero" for selecionado
+        document.getElementById('name').value = '';
+        document.getElementById('equipment_type').value = '';
+        document.getElementById('itemsContainer').innerHTML = '';
+        addTemplateItem('', '', false);
+        return;
+    }
+    
+    const template = predefinedTemplates[selectedTemplate];
+    if (!template) return;
+    
+    // Preenche os campos do formulário
+    document.getElementById('name').value = template.name;
+    document.getElementById('equipment_type').value = template.equipment_type;
+    
+    // Limpa os itens existentes
+    document.getElementById('itemsContainer').innerHTML = '';
+    
+    // Adiciona os novos itens
+    template.items.forEach(item => {
+        addTemplateItem(item.description, item.category, item.critical);
+    });
+}
+
+document.getElementById('templateForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (this.checkValidity() === false) {
+        e.stopPropagation();
+        this.classList.add('was-validated');
+        return;
+    }
+    
+    const formData = new FormData(this);
+    
+    fetch("{{ url_for('checklists.add_template') }}", {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = "{{ url_for('checklists.list_templates') }}";
+        } else {
+            alert(data.message || 'Erro ao salvar template');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao salvar template. Por favor, tente novamente.');
+    });
+});
+</script>
+
+<style>
+.was-validated .form-control:invalid {
+    border-color: #dc3545;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.was-validated .form-control:valid {
+    border-color: #198754;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+</style>
+{% endblock %}

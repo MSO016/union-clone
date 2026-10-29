@@ -1,0 +1,151 @@
+{% extends "finance/base.html" %}
+
+{% block page_title %}Nova Conta{% endblock %}
+
+{% block finance_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="type">Tipo</label>
+                        <select class="form-control" id="type" name="type" required>
+                            <option value="">Selecione...</option>
+                            <option value="pagar">Conta a Pagar</option>
+                            <option value="receber">Conta a Receber</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Descrição</label>
+                        <input type="text" class="form-control" id="description" name="description"
+                               placeholder="Descreva a conta" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount">Valor</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">R$</span>
+                            </div>
+                            <input type="number" class="form-control" id="amount" name="amount"
+                                   step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="due_date">Data de Vencimento</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control datepicker" id="due_date" name="due_date"
+                                   value="{{ datetime.now().strftime('%d/%m/%Y') }}" required>
+                            <span class="input-group-text">
+                                <i class="bi bi-calendar"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payment_method">Forma de Pagamento (Opcional)</label>
+                        <select class="form-control" id="payment_method" name="payment_method">
+                            <option value="">Selecione...</option>
+                            <option value="dinheiro">Dinheiro</option>
+                            <option value="pix">PIX</option>
+                            <option value="cartao_credito">Cartão de Crédito</option>
+                            <option value="cartao_debito">Cartão de Débito</option>
+                            <option value="transferencia">Transferência</option>
+                            <option value="boleto">Boleto</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="service_order_id">Ordem de Serviço (Opcional)</label>
+                        <select class="form-control" id="service_order_id" name="service_order_id">
+                            <option value="">Selecione...</option>
+                            {% for order in service_orders %}
+                                <option value="{{ order.id }}">OS #{{ order.id }} - {{ order.client.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        <a href="{{ url_for('finance.accounts') }}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Ajuda</h5>
+            </div>
+            <div class="card-body">
+                <h6>Tipos de Conta</h6>
+                <ul>
+                    <li><strong>Conta a Pagar:</strong> Despesas, fornecedores, etc</li>
+                    <li><strong>Conta a Receber:</strong> Valores a receber de clientes</li>
+                </ul>
+
+                <h6>Dicas</h6>
+                <ul>
+                    <li>Vincule à OS quando a conta for relacionada a um serviço</li>
+                    <li>Defina a forma de pagamento se já souber</li>
+                    <li>Seja específico na descrição para facilitar o controle</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    $(document).ready(function() {
+        console.log('[account_form] Iniciando configuração dos componentes');
+        
+        try {
+            // Inicializa datepicker com configuração específica
+            $('#due_date').datepicker({
+                format: 'dd/mm/yyyy',
+                language: 'pt-BR',
+                autoclose: true,
+                todayHighlight: true,
+                clearBtn: true
+            }).on('changeDate', function(e) {
+                console.log('[account_form] Data selecionada:', e.format());
+            });
+
+            // Formata input de valor para moeda
+            $('#amount').on('change', function() {
+                var value = parseFloat($(this).val());
+                if (!isNaN(value)) {
+                    $(this).val(value.toFixed(2));
+                }
+            });
+
+            // Atualiza campos baseado no tipo de conta
+            $('#type').on('change', function() {
+                var type = $(this).val();
+                var $paymentMethod = $('#payment_method');
+                var $dueDate = $('#due_date');
+                
+                if (type === 'receber') {
+                    $paymentMethod.closest('.form-group').show();
+                    // Não vamos mais definir min-date aqui
+                } else {
+                    $paymentMethod.closest('.form-group').hide();
+                }
+            });
+
+            console.log('[account_form] Componentes inicializados com sucesso');
+        } catch (error) {
+            console.error('[account_form] Erro ao inicializar componentes:', error);
+        }
+    });
+</script>
+{% endblock %} 

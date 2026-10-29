@@ -1,0 +1,424 @@
+/* =============================================================================
+   sales-modern.css — Modernizacao cosmetica das listagens de Vendas/Orcamentos
+   =============================================================================
+   FASE 10 — 17/05/2026
+   ESCOPO: TODOS os seletores comecam com .sales-modern para nao afetar
+   nenhum outro template do sistema.
+
+   FILOSOFIA (mesma das Fases 7-9):
+   - Apenas substitui visualmente cards/tabela/badges/botoes/paginacao.
+   - Mantem 100% do JS (filtros, downloadPDF, WhatsApp, confirm/cancel) intacto.
+   - Convive com .navbar.ui-modern (Fase 5) e theme-toggle (Fase 6).
+   - Paleta sincronizada com Union (#0D47A1 + #2196F3) + acento verde para
+     totais/confirmacao (#2E7D32 — Material Green 800).
+   - Suporte a prefers-color-scheme: dark e theme-light/dark forcados.
+
+   Usado em:
+   - inventory/sales.html        (lista oficial paginada)
+   - inventory/sales_list.html   (lista alternativa)
+   ============================================================================= */
+
+/* ---------- Tokens locais ---------------------------------------------- */
+.sales-modern {
+    --sl-accent:        #0D47A1;
+    --sl-accent-2:      #2196F3;
+    --sl-accent-soft:   rgba(13, 71, 161, 0.10);
+    --sl-success:       #2E7D32;
+    --sl-success-soft:  rgba(46, 125, 50, 0.12);
+    --sl-warn:          #F57C00;
+    --sl-warn-soft:     rgba(245, 124, 0, 0.14);
+    --sl-error:         #DC2626;
+    --sl-error-soft:    rgba(220, 38, 38, 0.12);
+    --sl-text:          #0f172a;
+    --sl-text-muted:    #64748b;
+    --sl-bg-card:       #ffffff;
+    --sl-bg-card-soft:  #f8fafc;
+    --sl-border:        #e2e8f0;
+    --sl-border-strong: #cbd5e1;
+    --sl-radius:        14px;
+    --sl-radius-sm:     10px;
+    --sl-radius-pill:   9999px;
+    --sl-shadow-sm:     0 1px 3px rgba(15, 23, 42, 0.06);
+    --sl-shadow-md:     0 4px 14px rgba(15, 23, 42, 0.08);
+}
+
+/* Dark 100% OPT-IN (29-05-2026): so com .theme-dark (era @media dark, que
+   ligava sozinho no Windows escuro e deixava texto claro em fundo claro). */
+:root.theme-dark .sales-modern {
+    --sl-text:          #e2e8f0;
+    --sl-text-muted:    #94a3b8;
+    --sl-bg-card:       #1e293b;
+    --sl-bg-card-soft:  #0f172a;
+    --sl-border:        #334155;
+    --sl-border-strong: #475569;
+}
+
+/* ============================================================================
+   HEADER — titulo "Vendas e Orcamentos" + botao "Nova Venda"
+   ============================================================================ */
+.sales-modern > .d-flex.justify-content-between {
+    background: linear-gradient(135deg, var(--sl-accent) 0%, var(--sl-accent-2) 100%);
+    color: #ffffff;
+    padding: 1.1rem 1.4rem !important;
+    border-radius: var(--sl-radius);
+    box-shadow: var(--sl-shadow-md);
+    margin-bottom: 1.5rem !important;
+}
+
+.sales-modern > .d-flex.justify-content-between h1 {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 1.4rem !important;
+    margin: 0;
+    letter-spacing: 0.01em;
+}
+.sales-modern > .d-flex.justify-content-between h1 i {
+    color: rgba(255, 255, 255, 0.92) !important;
+    margin-right: 0.5rem;
+}
+
+.sales-modern > .d-flex.justify-content-between .btn-primary,
+.sales-modern > .d-flex.justify-content-between .btn-group .btn {
+    background: rgba(255, 255, 255, 0.18) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    color: #ffffff !important;
+    border-radius: var(--sl-radius-pill) !important;
+    padding: 0.45rem 1.05rem !important;
+    font-weight: 500;
+    transition: background 0.18s ease, transform 0.15s ease;
+    backdrop-filter: blur(6px);
+}
+.sales-modern > .d-flex.justify-content-between .btn-primary:hover,
+.sales-modern > .d-flex.justify-content-between .btn-group .btn:hover {
+    background: rgba(255, 255, 255, 0.30) !important;
+    transform: translateY(-1px);
+}
+
+/* ============================================================================
+   CARDS GENERICOS (filtros + lista)
+   ============================================================================ */
+.sales-modern .card {
+    background: var(--sl-bg-card) !important;
+    border: 1px solid var(--sl-border) !important;
+    border-radius: var(--sl-radius) !important;
+    box-shadow: var(--sl-shadow-sm) !important;
+    overflow: hidden;
+}
+
+/* Card-header com bg-white original — agora soft */
+.sales-modern .card-header.bg-white,
+.sales-modern .card-header {
+    background: var(--sl-bg-card-soft) !important;
+    border-bottom: 1px solid var(--sl-border) !important;
+    padding: 0.85rem 1.1rem !important;
+}
+.sales-modern .card-header h5 {
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--sl-text) !important;
+    margin: 0;
+}
+.sales-modern .card-header i.text-primary {
+    color: var(--sl-accent) !important;
+}
+
+/* ============================================================================
+   FORMULARIO DE FILTROS
+   ============================================================================ */
+.sales-modern .card-body .form-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--sl-text-muted);
+    margin-bottom: 0.35rem;
+}
+
+.sales-modern .form-control,
+.sales-modern .form-select {
+    border-radius: var(--sl-radius-sm) !important;
+    border-color: var(--sl-border) !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    font-size: 0.92rem;
+}
+.sales-modern .form-control:focus,
+.sales-modern .form-select:focus {
+    border-color: var(--sl-accent-2) !important;
+    box-shadow: 0 0 0 3px var(--sl-accent-soft) !important;
+}
+
+/* Botao Filtrar (btn-primary do form) */
+.sales-modern form .btn-primary {
+    background: var(--sl-accent) !important;
+    border-color: var(--sl-accent) !important;
+    color: #ffffff !important;
+    border-radius: var(--sl-radius-pill) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+.sales-modern form .btn-primary:hover {
+    background: var(--sl-accent-2) !important;
+    border-color: var(--sl-accent-2) !important;
+    transform: translateY(-1px);
+}
+
+/* Botao Limpar (outline-secondary) */
+.sales-modern form .btn-outline-secondary {
+    background: transparent !important;
+    border: 1px solid var(--sl-border-strong) !important;
+    color: var(--sl-text-muted) !important;
+    border-radius: var(--sl-radius-pill) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+}
+.sales-modern form .btn-outline-secondary:hover {
+    background: var(--sl-accent-soft) !important;
+    color: var(--sl-accent) !important;
+    border-color: var(--sl-accent) !important;
+}
+
+/* ============================================================================
+   TABELA
+   ============================================================================ */
+.sales-modern .table {
+    margin-bottom: 0;
+    color: var(--sl-text);
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--sl-text);
+    --bs-table-hover-bg: var(--sl-accent-soft);
+    --bs-table-striped-bg: var(--sl-bg-card-soft);
+    --bs-table-striped-color: var(--sl-text);
+}
+
+/* Cabecalho */
+.sales-modern .table thead.table-light,
+.sales-modern .table thead {
+    background: var(--sl-bg-card-soft) !important;
+}
+.sales-modern .table thead th {
+    font-size: 0.74rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    color: var(--sl-text-muted) !important;
+    font-weight: 700 !important;
+    background: var(--sl-bg-card-soft) !important;
+    border-bottom: 1px solid var(--sl-border) !important;
+    padding: 0.7rem 0.85rem !important;
+    white-space: nowrap;
+}
+
+.sales-modern .table tbody tr {
+    transition: background 0.15s ease;
+}
+.sales-modern .table tbody tr:hover {
+    background: var(--sl-accent-soft) !important;
+}
+
+.sales-modern .table tbody td {
+    padding: 0.6rem 0.85rem !important;
+    border-color: var(--sl-border) !important;
+    color: var(--sl-text);
+    vertical-align: middle;
+    font-size: 0.92rem;
+}
+
+/* Total destacado em verde */
+.sales-modern .table tbody td.text-end strong {
+    color: var(--sl-success) !important;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+/* Desconto pequeno */
+.sales-modern .table tbody td small.text-success {
+    color: var(--sl-success) !important;
+    font-size: 0.74rem;
+}
+
+/* ============================================================================
+   STATUS BADGES — Material Light
+   ============================================================================ */
+.sales-modern .badge {
+    border-radius: var(--sl-radius-pill) !important;
+    padding: 0.32rem 0.72rem !important;
+    font-size: 0.74rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    line-height: 1.2;
+}
+
+/* Orcamento (draft) */
+.sales-modern .badge.bg-warning,
+.sales-modern .badge.bg-warning.text-dark {
+    background: var(--sl-warn-soft) !important;
+    color: #b45309 !important;
+    border-color: rgba(245, 124, 0, 0.30);
+}
+
+/* Confirmada (confirmed) */
+.sales-modern .badge.bg-success {
+    background: var(--sl-success-soft) !important;
+    color: var(--sl-success) !important;
+    border-color: rgba(46, 125, 50, 0.30);
+}
+
+/* Cancelada (cancelled) */
+.sales-modern .badge.bg-danger {
+    background: var(--sl-error-soft) !important;
+    color: var(--sl-error) !important;
+    border-color: rgba(220, 38, 38, 0.30);
+}
+
+/* ============================================================================
+   BOTOES DE ACAO NA TABELA (View / Confirm / Cancel / WhatsApp / PDF)
+   ============================================================================ */
+.sales-modern .table .btn-group .btn {
+    border-radius: 8px !important;
+    margin: 0 1px;
+    padding: 0.32rem 0.55rem !important;
+    border: 1px solid transparent !important;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+    font-size: 0.85rem;
+}
+.sales-modern .table .btn-group .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(15, 23, 42, 0.15);
+}
+
+.sales-modern .table .btn-group .btn.btn-primary,
+.sales-modern .table .btn-group .btn.btn-outline-primary {
+    background: var(--sl-accent) !important;
+    border-color: var(--sl-accent) !important;
+    color: #ffffff !important;
+}
+.sales-modern .table .btn-group .btn.btn-success,
+.sales-modern .table .btn-group .btn.btn-outline-success {
+    background: #25D366 !important;
+    border-color: #25D366 !important;
+    color: #ffffff !important;
+}
+.sales-modern .table .btn-group .btn.btn-danger {
+    background: var(--sl-error) !important;
+    border-color: var(--sl-error) !important;
+    color: #ffffff !important;
+}
+.sales-modern .table .btn-group .btn.btn-secondary,
+.sales-modern .table .btn-group .btn.btn-outline-dark {
+    background: #475569 !important;
+    border-color: #475569 !important;
+    color: #ffffff !important;
+}
+
+/* ============================================================================
+   PAGINACAO
+   ============================================================================ */
+.sales-modern .pagination {
+    margin-top: 1.3rem;
+    gap: 0.25rem;
+}
+
+.sales-modern .pagination .page-link {
+    border: 1px solid var(--sl-border) !important;
+    border-radius: var(--sl-radius-sm) !important;
+    color: var(--sl-text-muted);
+    padding: 0.4rem 0.75rem !important;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: background 0.15s ease, color 0.15s ease;
+    background: var(--sl-bg-card) !important;
+}
+.sales-modern .pagination .page-link:hover {
+    background: var(--sl-accent-soft) !important;
+    color: var(--sl-accent) !important;
+    border-color: var(--sl-accent) !important;
+}
+.sales-modern .pagination .page-item.active .page-link {
+    background: var(--sl-accent) !important;
+    border-color: var(--sl-accent) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(13, 71, 161, 0.25);
+}
+.sales-modern .pagination .page-item.disabled .page-link {
+    background: var(--sl-bg-card-soft) !important;
+    color: #cbd5e1 !important;
+    border-color: var(--sl-border) !important;
+}
+
+/* ============================================================================
+   ESTADO VAZIO
+   ============================================================================ */
+.sales-modern .table tbody tr td.text-center.py-4,
+.sales-modern .table tbody tr td.text-center.text-muted {
+    background: var(--sl-bg-card-soft);
+    padding: 2rem 1rem !important;
+}
+.sales-modern .table tbody .bi-inbox {
+    color: var(--sl-accent-2);
+    opacity: 0.6;
+}
+
+/* ============================================================================
+   DARK MODE — preferencia automatica do SO
+   ============================================================================ */
+/* Dark 100% OPT-IN (29-05-2026): so com .theme-dark (era @media dark). */
+:root.theme-dark .sales-modern .card {
+    background: var(--sl-bg-card) !important;
+    border-color: var(--sl-border) !important;
+}
+:root.theme-dark .sales-modern .card-header {
+    background: var(--sl-bg-card-soft) !important;
+    border-color: var(--sl-border) !important;
+}
+:root.theme-dark .sales-modern .form-control,
+:root.theme-dark .sales-modern .form-select {
+    background: var(--sl-bg-card-soft) !important;
+    color: var(--sl-text) !important;
+    border-color: var(--sl-border) !important;
+}
+:root.theme-dark .sales-modern .table {
+    --bs-table-color: var(--sl-text);
+    color: var(--sl-text) !important;
+}
+:root.theme-dark .sales-modern .table thead th,
+:root.theme-dark .sales-modern .table thead.table-light {
+    background: var(--sl-bg-card-soft) !important;
+    color: var(--sl-text-muted) !important;
+    border-color: var(--sl-border) !important;
+}
+:root.theme-dark .sales-modern .table tbody td {
+    border-color: var(--sl-border) !important;
+    color: var(--sl-text);
+}
+:root.theme-dark .sales-modern .pagination .page-link {
+    background: var(--sl-bg-card) !important;
+    color: var(--sl-text-muted) !important;
+    border-color: var(--sl-border) !important;
+}
+
+/* ============================================================================
+   RESPONSIVO
+   ============================================================================ */
+@media (max-width: 575.98px) {
+    .sales-modern > .d-flex.justify-content-between {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.75rem;
+        padding: 1rem !important;
+    }
+    .sales-modern > .d-flex.justify-content-between h1 {
+        font-size: 1.15rem !important;
+    }
+    .sales-modern .table thead th {
+        font-size: 0.68rem !important;
+    }
+    .sales-modern .table tbody td {
+        font-size: 0.85rem;
+    }
+}

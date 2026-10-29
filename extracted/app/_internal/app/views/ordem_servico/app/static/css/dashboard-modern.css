@@ -1,0 +1,294 @@
+/* =============================================================================
+   dashboard-modern.css — Estilos cosmeticos exclusivos do bloco de ranking
+   =============================================================================
+   ESCOPO: TODOS os seletores comecam com .dash-ranking para nao afetar
+   nenhum outro template do sistema (existem 64 HTMLs no OS Manager).
+
+   FILOSOFIA:
+   - Adiciona apenas o card de TOP pecas vendidas + estoque critico.
+   - Nenhuma sobreposicao em cards/graficos existentes do dashboard.
+   - Compartilha a mesma paleta de status (verde/amarelo/vermelho) da Fase 1.
+   - Dark mode automatico via prefers-color-scheme.
+   ============================================================================= */
+
+/* ---------- Tokens locais (nao vazam para outros templates) ---------------- */
+.dash-ranking {
+    --dash-text:        #0f172a;
+    --dash-text-muted:  #64748b;
+    --dash-bg-card:     #ffffff;
+    --dash-border:      #e2e8f0;
+    --dash-radius:      12px;
+    --dash-shadow-sm:   0 1px 3px rgba(15, 23, 42, 0.06);
+    --dash-shadow-md:   0 4px 12px rgba(15, 23, 42, 0.08);
+
+    /* Cores do semaforo (mesma paleta da Fase 1) */
+    --dash-critico:       #ef4444;
+    --dash-critico-soft:  #fef2f2;
+    --dash-critico-text:  #991b1b;
+    --dash-atencao:       #f59e0b;
+    --dash-atencao-soft:  #fffbeb;
+    --dash-atencao-text:  #92400e;
+    --dash-ok:            #10b981;
+    --dash-ok-soft:       #f0fdf4;
+    --dash-ok-text:       #065f46;
+
+    /* Acento de ranking (top 1, top 2, top 3) */
+    --dash-medal-gold:    #f59e0b;
+    --dash-medal-silver:  #94a3b8;
+    --dash-medal-bronze:  #b45309;
+}
+
+/* Dark 100% OPT-IN (29-05-2026): so com .theme-dark (era @media dark, que
+   ligava sozinho no Windows escuro e deixava texto claro em fundo claro). */
+:root.theme-dark .dash-ranking {
+    --dash-text:        #e2e8f0;
+    --dash-text-muted:  #94a3b8;
+    --dash-bg-card:     #1e293b;
+    --dash-border:      #334155;
+    --dash-critico-soft: rgba(239, 68, 68, 0.12);
+    --dash-atencao-soft: rgba(245, 158, 11, 0.12);
+    --dash-ok-soft:      rgba(16, 185, 129, 0.12);
+}
+
+/* ---------- Card base ----------------------------------------------------- */
+.dash-ranking .ranking-card {
+    background: var(--dash-bg-card);
+    border: 1px solid var(--dash-border);
+    border-radius: var(--dash-radius);
+    box-shadow: var(--dash-shadow-sm);
+    height: 100%;
+    overflow: hidden;
+    transition: box-shadow 0.15s ease;
+}
+.dash-ranking .ranking-card:hover {
+    box-shadow: var(--dash-shadow-md);
+}
+
+.dash-ranking .ranking-header {
+    padding: 0.95rem 1.25rem;
+    border-bottom: 1px solid var(--dash-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+.dash-ranking .ranking-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--dash-text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.dash-ranking .ranking-title i {
+    color: var(--dash-medal-gold);
+    font-size: 1.1rem;
+}
+.dash-ranking .ranking-subtitle {
+    font-size: 0.78rem;
+    color: var(--dash-text-muted);
+    margin-top: 0.1rem;
+}
+.dash-ranking .ranking-body {
+    padding: 0.5rem 0.5rem 0.75rem;
+}
+
+/* ---------- Estado vazio -------------------------------------------------- */
+.dash-ranking .ranking-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--dash-text-muted);
+    font-size: 0.85rem;
+}
+.dash-ranking .ranking-empty i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+    display: block;
+}
+
+/* ---------- Lista de TOP vendidos (com mini barra) ----------------------- */
+.dash-ranking .top-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.dash-ranking .top-list li {
+    display: grid;
+    grid-template-columns: 28px 1fr auto;
+    gap: 0.5rem;
+    padding: 0.55rem 0.75rem;
+    align-items: center;
+    border-radius: 8px;
+    transition: background 0.15s ease;
+}
+.dash-ranking .top-list li:hover {
+    background: rgba(15, 23, 42, 0.03);
+}
+.dash-ranking .top-rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--dash-border);
+    color: var(--dash-text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+.dash-ranking .top-list li:nth-child(1) .top-rank { background: var(--dash-medal-gold);   color: #ffffff; }
+.dash-ranking .top-list li:nth-child(2) .top-rank { background: var(--dash-medal-silver); color: #ffffff; }
+.dash-ranking .top-list li:nth-child(3) .top-rank { background: var(--dash-medal-bronze); color: #ffffff; }
+
+.dash-ranking .top-name {
+    font-size: 0.86rem;
+    color: var(--dash-text);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.dash-ranking .top-meta {
+    font-size: 0.72rem;
+    color: var(--dash-text-muted);
+    margin-top: 0.05rem;
+}
+.dash-ranking .top-qty {
+    font-size: 0.85rem;
+    color: var(--dash-text);
+    font-weight: 700;
+    text-align: right;
+    white-space: nowrap;
+}
+.dash-ranking .top-qty small {
+    display: block;
+    font-size: 0.68rem;
+    color: var(--dash-text-muted);
+    font-weight: 500;
+}
+
+/* ---------- Mini badge de status (compacto vs Fase 1) -------------------- */
+.dash-ranking .mini-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 9999px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-left: 0.35rem;
+}
+.dash-ranking .mini-badge::before {
+    content: "";
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+}
+.dash-ranking .mini-badge.critico { background: var(--dash-critico-soft); color: var(--dash-critico-text); }
+.dash-ranking .mini-badge.atencao { background: var(--dash-atencao-soft); color: var(--dash-atencao-text); }
+.dash-ranking .mini-badge.ok      { background: var(--dash-ok-soft);      color: var(--dash-ok-text); }
+
+/* ---------- Container do grafico de barras Chart.js ---------------------- */
+.dash-ranking .chart-wrap {
+    padding: 0.5rem 1rem 0.5rem;
+    border-top: 1px solid var(--dash-border);
+    margin-top: 0.5rem;
+}
+.dash-ranking .chart-wrap canvas {
+    /* O Chart.js do dashboard tem pointer-events:none global em style.css.
+       Aqui re-habilitamos APENAS dentro deste card, sem afetar outros. */
+    pointer-events: auto !important;
+    max-height: 220px;
+}
+
+/* ---------- Lista compacta de criticos (segundo card) -------------------- */
+.dash-ranking .critico-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.dash-ranking .critico-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+    transition: background 0.15s ease;
+}
+.dash-ranking .critico-list li:hover {
+    background: rgba(15, 23, 42, 0.03);
+}
+.dash-ranking .critico-list li.is-critico { border-left-color: var(--dash-critico); }
+.dash-ranking .critico-list li.is-atencao { border-left-color: var(--dash-atencao); }
+
+.dash-ranking .critico-info {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.dash-ranking .critico-info .nome {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--dash-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+.dash-ranking .critico-info .estoque {
+    font-size: 0.72rem;
+    color: var(--dash-text-muted);
+    margin-top: 0.05rem;
+}
+.dash-ranking .critico-qty {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--dash-critico);
+    text-align: right;
+    white-space: nowrap;
+    line-height: 1;
+}
+.dash-ranking .critico-qty.atencao {
+    color: var(--dash-atencao);
+}
+.dash-ranking .critico-qty small {
+    display: block;
+    font-size: 0.65rem;
+    color: var(--dash-text-muted);
+    font-weight: 500;
+    margin-top: 0.15rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* ---------- Footer com link "ver tudo" ----------------------------------- */
+.dash-ranking .ranking-footer {
+    padding: 0.5rem 1.25rem 0.85rem;
+    text-align: right;
+    font-size: 0.78rem;
+}
+.dash-ranking .ranking-footer a {
+    color: var(--dash-text-muted);
+    text-decoration: none;
+    font-weight: 500;
+}
+.dash-ranking .ranking-footer a:hover {
+    color: var(--dash-critico);
+}
+
+/* ---------- Responsivo --------------------------------------------------- */
+@media (max-width: 767.98px) {
+    .dash-ranking .ranking-header { padding: 0.75rem 1rem; }
+    .dash-ranking .top-list li,
+    .dash-ranking .critico-list li { padding: 0.5rem 0.6rem; }
+    .dash-ranking .top-name,
+    .dash-ranking .critico-info .nome { font-size: 0.82rem; }
+}

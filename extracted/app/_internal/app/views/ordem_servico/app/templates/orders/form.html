@@ -1,0 +1,2140 @@
+{% extends "base.html" %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/combobox.css') }}?v=20260529">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Adiciona viewport meta tag para melhor responsividade -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+/* Ajustes de layout para PyWebView */
+.form-container {
+    max-width: 100%;
+    padding: 1rem;
+    padding-bottom: 80px !important;
+}
+
+/* Estilos para o campo de cliente */
+.client-field {
+    position: relative;
+}
+
+.client-field .form-control:valid {
+    background-image: none !important;
+}
+
+.client-field .form-control.is-valid {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right calc(0.375em + 0.1875rem) center !important;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem) !important;
+    padding-right: calc(1.5em + 0.75rem) !important;
+    border-color: #198754 !important;
+}
+
+.client-field .form-control.is-invalid {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right calc(0.375em + 0.1875rem) center !important;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem) !important;
+    padding-right: calc(1.5em + 0.75rem) !important;
+    border-color: #dc3545 !important;
+}
+
+.client-field .form-control.is-valid:focus {
+    border-color: #198754 !important;
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25) !important;
+}
+
+.client-field .form-control.is-invalid:focus {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+}
+
+/* Melhorias para dispositivos móveis */
+@media (max-width: 768px) {
+    .form-container {
+        padding: 0.5rem !important;
+    }
+    
+    /* Ajusta tamanho dos inputs e labels */
+    .form-control, .form-select {
+        height: 42px !important;
+        font-size: 16px !important; /* Previne zoom automático no iOS */
+    }
+    
+    .form-label {
+        font-size: 14px !important;
+        margin-bottom: 0.25rem !important;
+    }
+    
+    /* Melhora espaçamento em telas pequenas */
+    .form-group {
+        margin-bottom: 0.75rem !important;
+    }
+    
+    /* Ajusta botões para melhor toque */
+    .btn {
+        min-height: 42px !important;
+        padding: 0.5rem 1rem !important;
+        font-size: 16px !important;
+    }
+    
+    /* Melhora visualização do grupo de botões */
+    .input-group {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+    
+    .input-group > .form-control,
+    .input-group > .btn {
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+    
+    /* Ajusta cards para melhor visualização */
+    .card {
+        border-radius: 8px !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    /* Melhora visualização de modais */
+    .modal-dialog {
+        margin: 0.5rem !important;
+        max-width: 100% !important;
+    }
+    
+    /* Ajusta área de texto para melhor digitação */
+    textarea.form-control {
+        min-height: 100px !important;
+    }
+    
+    /* Melhora visualização do botão fixo de salvar */
+    .fixed-save-button {
+        padding: 0.75rem !important;
+    }
+    
+    .fixed-save-button .btn {
+        width: 100% !important;
+        max-width: none !important;
+    }
+}
+
+/* Ajustes específicos para o formulário de OS */
+.form-container .input-group {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 0.25rem !important;
+}
+
+.form-container .input-group > .form-control {
+    min-width: 0;
+    flex: 1 1 auto !important;
+}
+
+.form-container .input-group > .btn {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    z-index: 0 !important; /* Corrige problema de z-index com Bootstrap 5 */
+}
+
+/* Ajustes específicos para o grupo de tipo de serviço */
+.form-container .service-type-group {
+    display: flex !important;
+    align-items: stretch !important;
+    gap: 0.25rem !important;
+}
+
+/* Ajustes para os botões de informação e novo */
+.form-container #serviceTypeInfo,
+.form-container .service-type-group .btn-outline-secondary {
+    position: relative !important;
+    margin-left: 0.25rem !important;
+    border: 1px solid #dee2e6 !important;
+    min-width: 40px !important;
+}
+
+.form-container #serviceTypeInfo {
+    background-color: #f8f9fa !important;
+    border-color: #17a2b8 !important;
+    color: #17a2b8 !important;
+}
+
+.form-container #serviceTypeInfo:not(:disabled):hover {
+    background-color: #17a2b8 !important;
+    color: white !important;
+}
+
+/* Ajustes para o botão de cadastro de cliente */
+.form-container #addClientBtn {
+    margin-left: 0.25rem !important;
+    white-space: nowrap !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.25rem !important;
+}
+
+/* Correção para o modal */
+#serviceTypeInfoModal {
+    z-index: 1056 !important; /* Garante que fique acima de outros elementos */
+}
+
+#serviceTypeInfoModal .modal-dialog {
+    margin: 1.75rem auto !important;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-control {
+    font-size: 0.9rem;
+    padding: 0.5rem;
+}
+
+.form-label {
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+/* Ajustes de cards */
+.card {
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+.card-header {
+    padding: 0.75rem 1rem;
+    background-color: #f8f9fa;
+}
+
+/* Ajustes de botões */
+.btn {
+    font-size: 0.9rem;
+    padding: 0.375rem 0.75rem;
+}
+
+/* Ajustes de modal */
+.modal-dialog {
+    max-width: 90%;
+    margin: 1.75rem auto;
+}
+
+.modal-content {
+    border-radius: 0.25rem;
+}
+
+/* Ajustes de tabela */
+.table {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+/* Ajustes de autocomplete */
+.ui-autocomplete {
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-size: 0.9rem;
+}
+
+.ui-autocomplete {
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 9999 !important;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-color: white !important;
+}
+
+.ui-menu-item {
+    padding: 0;
+    border-bottom: 1px solid #eee;
+    background-color: white !important;
+}
+
+.ui-menu-item:last-child {
+    border-bottom: none;
+}
+
+.ui-menu-item div {
+    padding: 8px 12px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #333;
+    opacity: 1 !important;
+    background-color: white !important;
+    transition: background-color 0.2s ease;
+}
+
+.ui-menu-item:hover div {
+    background-color: #e9ecef !important;
+    cursor: pointer;
+    opacity: 1 !important;
+    color: #333 !important;
+}
+
+.ui-state-active div,
+.ui-widget-content .ui-state-active div,
+.ui-menu-item.ui-state-focus div,
+.ui-menu-item:hover.ui-state-active div {
+    background-color: #007bff !important;
+    color: white !important;
+    border: none !important;
+    margin: 0;
+    opacity: 1 !important;
+}
+
+.ui-helper-hidden-accessible {
+    display: none;
+}
+
+.suggestion-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    transition: background-color 0.2s ease;
+}
+
+.suggestion-item:hover {
+    background-color: #e9ecef;
+}
+
+.suggestion-count {
+    font-size: 12px;
+    color: #6c757d;
+    background: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 8px;
+}
+
+#clientDetails .card {
+    border-color: #ddd;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+#clientDetails .card-body {
+    padding: 1rem;
+}
+
+#clientDetails .card-title {
+    color: #333;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+#clientDetails .card-text {
+    color: #666;
+    line-height: 1.6;
+}
+
+#clientDetails strong {
+    color: #495057;
+}
+
+.invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 80%;
+    color: #dc3545;
+}
+
+.was-validated .form-control:invalid,
+.form-control.is-invalid {
+    border-color: #dc3545;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.was-validated .form-control:invalid:focus,
+.form-control.is-invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+.was-validated .form-control:invalid ~ .invalid-feedback,
+.form-control.is-invalid ~ .invalid-feedback {
+    display: block;
+}
+
+.inventory-item {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #dee2e6;
+}
+
+.inventory-item:hover {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-group {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-radius: 4px;
+}
+
+.btn-group .btn {
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.btn-group .btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-group .btn:active {
+    transform: translateY(0);
+}
+
+.tooltip {
+    font-size: 0.875rem;
+}
+
+.item-price {
+    font-weight: bold;
+    color: #198754;
+}
+
+.suggestion-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    transition: background-color 0.2s ease;
+}
+
+.suggestion-name {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.suggestion-count {
+    font-size: 12px;
+    color: #6c757d;
+    background: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.ui-menu-item:hover .suggestion-item {
+    background-color: #e9ecef;
+}
+
+.ui-state-active .suggestion-item,
+.ui-menu-item:hover.ui-state-active .suggestion-item {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+.ui-state-active .suggestion-count,
+.ui-menu-item:hover.ui-state-active .suggestion-count {
+    background-color: rgba(255,255,255,0.2);
+    color: white;
+}
+
+/* Estilos para os botões de ação */
+.btn-group .btn {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.btn-group .btn i {
+    font-size: 1rem;
+}
+
+.btn-group .btn-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-group .btn-secondary:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+/* Ajustes específicos para botões de ação */
+.btn-outline-info {
+    background-color: #f8f9fa;
+    border-color: #17a2b8;
+    color: #17a2b8;
+}
+
+.btn-outline-info:hover:not(:disabled) {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.btn-outline-info:disabled {
+    background-color: #e9ecef;
+    border-color: #6c757d;
+    color: #6c757d;
+    opacity: 0.65;
+}
+
+/* Ajuste para grupo de botões em telas menores */
+@media (max-width: 768px) {
+    .input-group {
+        flex-wrap: nowrap;
+    }
+    
+    .input-group .btn {
+        white-space: nowrap;
+        padding: 0.375rem 0.5rem;
+    }
+    
+    .input-group .btn i {
+        margin-right: 0;
+    }
+}
+
+/* Estilos específicos para o modal de informações */
+#serviceTypeInfoModal .modal-dialog {
+    max-width: 600px;
+}
+
+#serviceTypeInfoModal .modal-body {
+    padding: 1.5rem;
+}
+
+#serviceTypeInfoModal h6 {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+#serviceTypeInfoModal p {
+    color: #6c757d;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+#serviceTypeInfoModal #viewMode {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#serviceTypeInfoModal .form-control:disabled {
+    background-color: #e9ecef;
+    opacity: 0.75;
+}
+
+#serviceTypeInfoModal .btn-group {
+    gap: 0.5rem;
+}
+
+/* Ajustes específicos para o grupo de botões da OS */
+.input-group {
+    display: flex;
+    flex-wrap: nowrap !important; /* Força os botões a ficarem na mesma linha */
+}
+
+.input-group > .form-control {
+    min-width: 0; /* Permite que o input encolha se necessário */
+    flex: 1;
+}
+
+.input-group > .btn {
+    flex-shrink: 0; /* Impede que os botões encolham */
+    white-space: nowrap;
+}
+
+/* Ajustes responsivos para os botões */
+@media (max-width: 768px) {
+    .input-group {
+        gap: 0.25rem; /* Pequeno espaço entre os elementos */
+    }
+    
+    .input-group > .btn {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    /* Ajuste para o botão de cadastro de cliente */
+    #addClientBtn {
+        min-width: auto;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    
+    #addClientBtn i {
+        margin-right: 0.25rem;
+    }
+    
+    /* Ajuste para o botão de informações */
+    #serviceTypeInfo {
+        min-width: 40px;
+    }
+}
+
+/* Ajustes para o grupo de tipo de serviço */
+.input-group.service-type-group {
+    display: flex;
+    align-items: stretch;
+}
+
+.input-group.service-type-group > .form-control {
+    flex: 1;
+}
+
+.input-group.service-type-group > .btn {
+    margin-left: 0.25rem;
+}
+
+/* Estilos base para botões no formulário */
+.form-container .btn {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 500 !important;
+    text-align: center !important;
+    padding: 0.375rem 0.75rem !important;
+    border-radius: 0.25rem !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+/* Botão de cadastro de cliente */
+.form-container #addClientBtn {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #fff !important;
+}
+
+.form-container #addClientBtn:hover {
+    background-color: #0b5ed7 !important;
+    border-color: #0a58ca !important;
+}
+
+/* Botão de informações */
+.form-container #serviceTypeInfo {
+    background-color: #ffffff !important;
+    border-color: #17a2b8 !important;
+    color: #17a2b8 !important;
+}
+
+.form-container #serviceTypeInfo:not(:disabled):hover {
+    background-color: #17a2b8 !important;
+    color: #ffffff !important;
+}
+
+.form-container #serviceTypeInfo:disabled {
+    background-color: #e9ecef !important;
+    border-color: #6c757d !important;
+    color: #6c757d !important;
+    opacity: 0.65 !important;
+    cursor: not-allowed !important;
+}
+
+/* Botão Novo Tipo */
+.form-container .service-type-group .btn-outline-secondary {
+    background-color: #ffffff !important;
+    border-color: #6c757d !important;
+    color: #6c757d !important;
+}
+
+.form-container .service-type-group .btn-outline-secondary:hover {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    color: #ffffff !important;
+}
+
+/* Ajustes para ícones nos botões */
+.form-container .btn i {
+    margin-right: 0.5rem !important;
+    font-size: 0.875rem !important;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .form-container .btn {
+        padding: 0.375rem 0.5rem !important;
+    }
+    
+    .form-container .btn i {
+        margin-right: 0.25rem !important;
+    }
+    
+    .form-container #serviceTypeInfo {
+        padding: 0.375rem !important;
+    }
+    
+    .form-container #serviceTypeInfo i {
+        margin-right: 0 !important;
+    }
+}
+
+/* Correções para o grupo de botões */
+.form-container .input-group {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 0.25rem !important;
+}
+
+.form-container .input-group > .btn {
+    margin-left: 0 !important;
+    z-index: 1 !important;
+}
+
+.form-container .service-type-group {
+    gap: 0.25rem !important;
+}
+
+/* Estilos para o estado hover dos botões */
+.form-container .btn:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+.form-container .btn:active {
+    transform: translateY(0) !important;
+    box-shadow: none !important;
+}
+
+/* Ajustes específicos para os botões de tipo de serviço */
+.form-container .service-type-group {
+    display: flex !important;
+    align-items: stretch !important;
+    gap: 0.25rem !important;
+}
+
+/* Botão de informações do tipo de serviço */
+.form-container .service-type-group #serviceTypeInfo {
+    background-color: #0dcaf0 !important;
+    border-color: #0dcaf0 !important;
+    color: #fff !important;
+    min-width: 45px !important;
+    width: 45px !important;
+    padding: 0.375rem 0.25rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em !important;
+}
+
+.form-container .service-type-group #serviceTypeInfo:hover:not(:disabled) {
+    background-color: #31d2f2 !important;
+    border-color: #25cff2 !important;
+    color: #fff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+.form-container .service-type-group #serviceTypeInfo:disabled {
+    background-color: #e9ecef !important;
+    border-color: #ced4da !important;
+    color: #6c757d !important;
+    opacity: 0.65 !important;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .form-container .service-type-group #serviceTypeInfo {
+        min-width: 40px !important;
+        width: 40px !important;
+        padding: 0.25rem !important;
+        font-size: 0.75rem !important;
+    }
+}
+
+/* Botão Novo tipo de serviço */
+.form-container .service-type-group .btn-primary {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #fff !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.25rem !important;
+}
+
+.form-container .service-type-group .btn-primary:hover {
+    background-color: #0b5ed7 !important;
+    border-color: #0a58ca !important;
+    color: #fff !important;
+}
+
+/* Ajustes para ícones nos botões */
+.form-container .service-type-group .btn i {
+    margin: 0 !important;
+    font-size: 0.875rem !important;
+}
+
+.form-container .service-type-group .btn-primary i {
+    margin-right: 0.25rem !important;
+}
+
+/* Ajustes responsivos para os botões */
+@media (max-width: 768px) {
+    .form-container .service-type-group .btn {
+        padding: 0.375rem 0.5rem !important;
+        font-size: 0.875rem !important;
+    }
+    
+    .form-container .service-type-group #serviceTypeInfo {
+        padding: 0.375rem !important;
+    }
+    
+    .form-container .service-type-group .btn i {
+        margin-right: 0.25rem !important;
+    }
+}
+
+/* Botão Novo tipo de serviço */
+.form-container .service-type-group #addServiceTypeBtn {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #fff !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+}
+
+.form-container .service-type-group #addServiceTypeBtn:hover {
+    background-color: #0b5ed7 !important;
+    border-color: #0a58ca !important;
+    color: #fff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .form-container .service-type-group #addServiceTypeBtn {
+        padding: 0.25rem 0.5rem !important;
+        font-size: 0.8125rem !important;
+    }
+}
+
+/* Botão fixo de salvar */
+.fixed-save-button {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background-color: #fff !important;
+    padding: 1rem !important;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1) !important;
+    z-index: 1040 !important;
+    text-align: center !important;
+}
+
+.fixed-save-button .btn {
+    min-width: 200px !important;
+    font-weight: 600 !important;
+}
+</style>
+{# Fase 8 - Modernizacao cosmetica do formulario (escopado em .form-modern).
+   Linkado APOS o <style> inline acima para ganhar precedencia natural por
+   ordem de carregamento. Nao mexe em IMask, jQuery UI autocomplete,
+   SweetAlert2, modais, AJAX submit, geracao de PDF, validacao de cliente. #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/forms-modern.css') }}?v=20260530-bold">
+{% endblock %}
+
+{% block content %}
+<div class="form-container form-modern">
+    <h2 class="mb-4">{{ 'Editar' if order else 'Nova' }} Ordem de Serviço</h2>
+    
+    <form method="POST" 
+          action="{{ url_for('orders.edit', id=order.id) if order else url_for('orders.from_client', client_id=client.id) if client else url_for('orders.add') }}" 
+          class="needs-validation" 
+          id="orderForm"
+          novalidate>
+        
+        <!-- Alertas -->
+        <div id="alertContainer"></div>
+        
+        <!-- Cliente -->
+        <div class="form-group mb-3">
+            <label for="client_search">Cliente *</label>
+            <div class="input-group client-field">
+                {% if order or client %}
+                    <input type="text" class="form-control" id="client_search" 
+                           value="{{ order.client.name if order else client.name }}" readonly>
+                    <input type="hidden" name="client_id" id="client_id" 
+                           value="{{ order.client_id if order else client.id }}" required>
+                {% else %}
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="client_search" 
+                               placeholder="Digite nome, {% if locale and locale.code == 'PT' %}NIF{% elif locale and locale.code == 'US' %}SSN/EIN{% else %}CPF/CNPJ{% endif %} ou telefone do cliente" required>
+                        <input type="hidden" name="client_id" id="client_id" required>
+                        <button type="button" class="btn btn-outline-primary" id="addClientBtn">
+                            <i class="fas fa-plus"></i> Novo Cliente
+                        </button>
+                    </div>
+                    <div class="form-text">
+                        Digite pelo menos 3 caracteres para buscar um cliente. A busca funciona por nome, {% if locale and locale.code == 'PT' %}NIF{% elif locale and locale.code == 'US' %}SSN/EIN{% else %}CPF/CNPJ{% endif %} ou telefone.
+                    </div>
+                    <div class="invalid-feedback">
+                        Cliente não encontrado ou inválido. Por favor, selecione um cliente da lista ou cadastre um novo cliente.
+                    </div>
+                    <div id="clientDetails" class="mt-2 d-none">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">Detalhes do Cliente</h6>
+                                <p class="card-text">
+                                    <strong>Documento:</strong> <span id="clientDocument"></span><br>
+                                    <strong>Telefone:</strong> <span id="clientPhone"></span><br>
+                                    <strong>Email:</strong> <span id="clientEmail"></span><br>
+                                    <strong>Endereço:</strong> <span id="clientAddress"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Tipo de Serviço -->
+        <div class="form-group mb-3">
+            <label for="service_type_id">Tipo de Serviço</label>
+            <div class="input-group service-type-group">
+                <select class="form-control" id="service_type_id" name="service_type_id">
+                    <option value="">Selecione um tipo de serviço</option>
+                    {% for type in service_types %}
+                        <option value="{{ type.id }}" 
+                                data-description="{{ type.description }}"
+                                data-warranty="{{ type.default_warranty }}"
+                                {% if order and order.service_type_id == type.id %}selected{% endif %}>
+                            {{ type.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="btn" id="serviceTypeInfo" disabled>
+                    INFO
+                </button>
+                <a href="{{ url_for('settings.service_types') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-cog"></i><span class="button-text">Gerenciar</span>
+                </a>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" 
+                        data-bs-target="#serviceTypeModal">
+                    <i class="fas fa-plus"></i><span class="button-text">Novo</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Equipamento -->
+        <div class="form-group mb-3">
+            <label for="equipment">Equipamento *</label>
+            <input type="text" class="form-control" id="equipment" name="equipment" 
+                   value="{{ order.equipment if order else '' }}" 
+                   list="equipmentList" required data-combobox
+                   placeholder="Digite o tipo de equipamento (ex: Smartphone, Notebook, etc)">
+            <datalist id="equipmentList">
+                <option value="Smartphone">
+                <option value="iPhone">
+                <option value="Notebook">
+                <option value="PC / Computador">
+                <option value="Tablet">
+                <option value="iPad">
+                <option value="Smart TV">
+                <option value="Monitor">
+                <option value="Impressora">
+                <option value="Video Game">
+                <option value="Playstation">
+                <option value="Xbox">
+                <option value="Nintendo Switch">
+                <option value="Drone">
+                <option value="Placa de Vídeo">
+                <option value="Placa-Mãe">
+                <option value="Fonte de Alimentação">
+                <option value="Câmera Digital">
+                <option value="Câmera de Segurança">
+                <option value="Projetor">
+                <option value="Roteador">
+                <option value="Nobreak">
+                <option value="All in One">
+                <option value="Smartwatch">
+                <option value="GPS">
+                <option value="Som Automotivo">
+                <option value="Central Multimídia">
+            </datalist>
+            <div class="form-text">
+                Digite ou selecione o tipo de equipamento
+            </div>
+            <div class="invalid-feedback">
+                Por favor, informe o equipamento.
+            </div>
+        </div>
+
+        <!-- Prioridade -->
+        <div class="mb-3">
+            <label for="priority" class="form-label">Prioridade *</label>
+            <select class="form-select" id="priority" name="priority" required>
+                <option value="baixa" {% if order and order.priority == 'baixa' %}selected{% endif %}>Baixa</option>
+                <option value="media" {% if order and order.priority == 'media' %}selected{% endif %}>Média</option>
+                <option value="alta" {% if order and order.priority == 'alta' %}selected{% endif %}>Alta</option>
+            </select>
+            <div class="invalid-feedback">
+                Por favor, selecione a prioridade.
+            </div>
+        </div>
+
+        <!-- Outros campos -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group mb-3">
+                    <label for="brand">Marca</label>
+                    <input type="text" class="form-control" id="brand" name="brand" 
+                           value="{{ order.brand if order else '' }}"
+                           list="brandsList" data-combobox
+                           placeholder="Digite a marca do equipamento">
+                    <datalist id="brandsList">
+                        <!-- Smartphones e Tablets -->
+                        <option value="Samsung">
+                        <option value="Apple">
+                        <option value="Xiaomi">
+                        <option value="Motorola">
+                        <option value="LG">
+                        <option value="Asus">
+                        <option value="Huawei">
+                        <option value="OnePlus">
+                        <option value="Sony">
+                        <option value="Nokia">
+                        <option value="Realme">
+                        <option value="OPPO">
+                        <option value="Vivo">
+                        <!-- Computadores e Notebooks -->
+                        <option value="Dell">
+                        <option value="HP">
+                        <option value="Lenovo">
+                        <option value="Acer">
+                        <option value="MSI">
+                        <option value="Vaio">
+                        <option value="Positivo">
+                        <option value="Microsoft">
+                        <!-- TVs -->
+                        <option value="TCL">
+                        <option value="AOC">
+                        <option value="Philips">
+                        <option value="Philco">
+                        <option value="Panasonic">
+                        <option value="Toshiba">
+                        <!-- Componentes -->
+                        <option value="Intel">
+                        <option value="AMD">
+                        <option value="NVIDIA">
+                        <option value="Gigabyte">
+                        <option value="ASRock">
+                        <option value="Corsair">
+                        <option value="Kingston">
+                        <option value="Western Digital">
+                        <option value="Seagate">
+                        <!-- Impressoras -->
+                        <option value="Epson">
+                        <option value="Canon">
+                        <option value="Brother">
+                        <!-- Outros -->
+                        <option value="DJI">
+                        <option value="GoPro">
+                        <option value="Logitech">
+                        <option value="HyperX">
+                        <option value="Razer">
+                    </datalist>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group mb-3">
+                    <label for="model">Modelo</label>
+                    <input type="text" class="form-control" id="model" name="model" 
+                           value="{{ order.model if order else '' }}"
+                           placeholder="Digite o modelo do equipamento">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group mb-3">
+                    <label for="serial_number">Número de Série</label>
+                    <input type="text" class="form-control" id="serial_number" name="serial_number" 
+                           value="{{ order.serial_number if order else '' }}"
+                           placeholder="Digite o número de série (se disponível)">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="technician_id" class="form-label">Técnico Responsável</label>
+                    <select class="form-select" id="technician_id" name="technician_id">
+                        <option value="">Opcional - Pode ser selecionado no encerramento da OS</option>
+                        {% for technician in technicians %}
+                        <option value="{{ technician.id }}" 
+                                {% if order and order.technician_id == technician.id %}selected{% endif %}>
+                            {{ technician.name }} ({{ technician.commission_rate }}%)
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text text-muted">
+                        <i class="fas fa-info-circle"></i> O técnico pode ser designado posteriormente durante o andamento da OS
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Problema -->
+        <div class="form-group mb-3">
+            <label for="problem">Problema Relatado *</label>
+            <textarea class="form-control" id="problem" name="problem" rows="3" required
+                      placeholder="Descreva detalhadamente o problema relatado pelo cliente. Ex: Equipamento não liga, tela quebrada, etc.">{{ order.problem if order else '' }}</textarea>
+            <div class="invalid-feedback">
+                Por favor, descreva o problema relatado.
+            </div>
+        </div>
+
+        <!-- Observações -->
+        <div class="form-group mb-3">
+            <label for="observations">Observações</label>
+            <textarea class="form-control" id="observations" name="observations" rows="3"
+                      placeholder="IMPORTANTE: Registre aqui detalhes como:&#13;&#10;• Estado do equipamento (arranhões, marcas de uso, etc.)&#13;&#10;• Acessórios deixados pelo cliente&#13;&#10;• Senhas fornecidas&#13;&#10;• Outras informações relevantes">{{ order.observations if order else '' }}</textarea>
+            <div class="form-text text-muted">
+                <i class="fas fa-info-circle"></i> Registre informações importantes sobre o estado do equipamento e acessórios
+            </div>
+        </div>
+
+        
+
+        <!-- Botões -->
+        <div class="fixed-save-button">
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="fas fa-save"></i> {{ 'Salvar Alterações' if order else 'Criar Ordem de Serviço' }}
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<!-- Modal para Novo Tipo de Serviço -->
+<div class="modal fade" id="serviceTypeModal" tabindex="-1" aria-labelledby="serviceTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="serviceTypeModalLabel">Novo Tipo de Serviço</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Alertas -->
+                <div id="serviceTypeAlerts"></div>
+                
+                <div class="mb-3">
+                    <label for="serviceTypeName" class="form-label">Nome *</label>
+                    <input type="text" class="form-control" id="serviceTypeName" required
+                           placeholder="Digite o nome do tipo de serviço">
+                    <div class="invalid-feedback">
+                        Por favor, informe o nome do tipo de serviço.
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="serviceTypeDescription" class="form-label">Descrição</label>
+                    <textarea class="form-control" id="serviceTypeDescription" rows="2"
+                             placeholder="Descreva os detalhes deste tipo de serviço"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="serviceTypeWarranty" class="form-label">Garantia (dias)</label>
+                    <input type="number" class="form-control" id="serviceTypeWarranty" min="0" value="0"
+                           placeholder="Quantidade de dias de garantia">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="saveQuickServiceType">
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    <span class="button-text">Salvar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Informações do Tipo de Serviço -->
+<div class="modal fade" id="serviceTypeInfoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalhes do Tipo de Serviço</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Modo Visualização -->
+                <div id="viewMode">
+                    <div class="mb-3">
+                        <h6>Nome</h6>
+                        <p id="infoServiceTypeName" class="text-muted"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Descrição</h6>
+                        <p id="infoServiceTypeDescription" class="text-muted"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Garantia</h6>
+                        <p id="infoServiceTypeWarranty" class="text-muted"></p>
+                    </div>
+                </div>
+                
+                <!-- Modo Edição -->
+                <div id="editMode" style="display: none;">
+                    <div class="mb-3">
+                        <label class="form-label">Nome *</label>
+                        <input type="text" class="form-control" id="editServiceTypeName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descrição</label>
+                        <textarea class="form-control" id="editServiceTypeDescription" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Garantia (dias)</label>
+                        <input type="number" class="form-control" id="editServiceTypeWarranty" min="0">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <!-- Botões do Modo Visualização -->
+                <div id="viewModeButtons">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="editModeBtn">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                </div>
+                <!-- Botões do Modo Edição -->
+                <div id="editModeButtons" style="display: none;">
+                    <button type="button" class="btn btn-secondary" id="cancelEdit">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="saveEdit">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/combobox.js') }}?v=20260529"></script>
+<script>
+// Funções globais
+function updateItemPrice(row) {
+    if (!row) return; // Se a linha não existir, retorna sem fazer nada
+    
+    const select = row.querySelector('.item-select');
+    const quantityInput = row.querySelector('.item-quantity');
+    const priceSpan = row.querySelector('.item-price');
+    
+    if (!select || !priceSpan) return; // Se elementos necessários não existirem, retorna
+    
+    const quantity = parseFloat(quantityInput?.value) || 0;
+    
+    if (select.value) {
+        const option = select.options[select.selectedIndex];
+        const price = parseFloat(option?.dataset?.price) || 0;
+        const total = price * quantity;
+        priceSpan.textContent = total.toFixed(2);
+    } else {
+        priceSpan.textContent = '0.00';
+    }
+    
+    // Só chama updateTotalPrice se houver itens no inventário
+    const inventoryItems = document.getElementById('inventory-items');
+    if (inventoryItems && inventoryItems.children.length > 0) {
+        updateTotalPrice();
+    }
+}
+
+// Função para atualizar a numeração dos itens
+function updateItemNumbers() {
+    const items = document.querySelectorAll('.inventory-item');
+    items.forEach((item, index) => {
+        const numberSpan = item.querySelector('.item-number');
+        if (numberSpan) {
+            numberSpan.textContent = (index + 1).toString();
+        }
+    });
+}
+
+// Função para atualizar o preço total
+function updateTotalPrice() {
+    let total = 0;
+    const items = document.querySelectorAll('.item-price');
+    items.forEach(item => {
+        total += parseFloat(item.textContent) || 0;
+    });
+    const totalElement = document.getElementById('total-price');
+    if (totalElement) {
+        totalElement.textContent = total.toFixed(2);
+    }
+}
+
+// Inicialização quando o documento estiver pronto
+$(document).ready(function() {
+    const form = document.getElementById('orderForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const alertContainer = document.getElementById('alertContainer');
+    
+    // Função para mostrar alerta
+    function showAlert(message, type = 'error') {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        Toast.fire({
+            icon: type === 'danger' ? 'error' : type,
+            title: message
+        });
+    }
+
+    // Evento de submit do formulário
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!form.checkValidity()) {
+            e.stopPropagation();
+            showAlert('Por favor, preencha todos os campos obrigatórios.', 'error');
+            form.classList.add('was-validated');
+            return;
+        }
+
+        // Desabilita o botão de submit para evitar duplo envio
+        submitBtn.disabled = true;
+        
+        // Mostra loading com SweetAlert2
+        Swal.fire({
+            title: 'Salvando...',
+            text: 'Por favor, aguarde enquanto salvamos a ordem de serviço.',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        
+        // Envia o formulário via AJAX
+        $.ajax({
+            url: form.action,
+            method: form.method,
+            data: $(form).serialize(),
+            success: function(response) {
+                Swal.close(); // Fecha o loading
+                
+                if (response.success) {
+                    const orderId = response.order_id;
+                    if (!orderId && response.redirect_url) {
+                        window.location.href = response.redirect_url;
+                        return;
+                    }
+                    if (!orderId) {
+                        Swal.fire({
+                            title: 'Erro!',
+                            text: 'ID da ordem não encontrado na resposta',
+                            icon: 'error',
+                            confirmButtonColor: '#dc3545'
+                        });
+                        return;
+                    }
+
+                    // Prepara as URLs
+                    const pdfUrl = `{{ url_for('reports.service_order_pdf', id='0', type='recebimento') }}`.replace('0', orderId);
+                    const checklistUrl = `{{ url_for('checklists.new_checklist', order_id='0', type='entrada') }}`.replace('0', orderId);
+                    const listUrl = `{{ url_for('orders.list') }}`;
+
+                    // Pergunta o que o usuário deseja fazer
+                    Swal.fire({
+                        title: 'Ordem de Serviço Salva!',
+                        text: 'O que você deseja fazer agora?',
+                        icon: 'success',
+                        showDenyButton: true,
+                        showCancelButton: true,
+                        confirmButtonText: 'Gerar PDF',
+                        denyButtonText: 'Ir para Checklist',
+                        cancelButtonText: 'Voltar para Lista',
+                        confirmButtonColor: '#28a745',
+                        denyButtonColor: '#17a2b8',
+                        cancelButtonColor: '#6c757d'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Pergunta se quer visualizar ou baixar o PDF
+                            Swal.fire({
+                                title: 'PDF de Recebimento',
+                                text: 'Como você deseja abrir o PDF?',
+                                icon: 'question',
+                                showDenyButton: true,
+                                confirmButtonText: 'Visualizar',
+                                denyButtonText: 'Download',
+                                confirmButtonColor: '#28a745',
+                                denyButtonColor: '#17a2b8'
+                            }).then((pdfResult) => {
+                                if (pdfResult.isConfirmed) {
+                                    // Visualizar PDF
+                                    handlePDF(pdfUrl, false);
+                                } else if (pdfResult.isDenied) {
+                                    // Download PDF
+                                    handlePDF(pdfUrl, true);
+                                }
+                                
+                                // Após gerar o PDF, pergunta sobre o checklist
+                                setTimeout(() => {
+                                    Swal.fire({
+                                        title: 'Checklist de Entrada',
+                                        text: 'Deseja preencher o checklist de entrada?',
+                                        icon: 'question',
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Sim, preencher',
+                                        cancelButtonText: 'Não',
+                                        confirmButtonColor: '#28a745',
+                                        cancelButtonColor: '#6c757d'
+                                    }).then((checkResult) => {
+                                        if (checkResult.isConfirmed) {
+                                            window.location.href = checklistUrl;
+                                        } else {
+                                            window.location.href = listUrl;
+                                        }
+                                    });
+                                }, 1000);
+                            });
+                        } else if (result.isDenied) {
+                            // Vai direto para o checklist
+                            window.location.href = checklistUrl;
+                        } else {
+                            // Volta para a lista
+                            window.location.href = listUrl;
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Erro!',
+                        text: response.message || 'Erro ao salvar a ordem de serviço.',
+                        icon: 'error',
+                        confirmButtonColor: '#dc3545'
+                    });
+                    submitBtn.disabled = false;
+                }
+            },
+            error: function(xhr) {
+                console.error('AJAX Error:', xhr);
+                setTimeout(() => {
+                    Swal.close();
+                    Swal.fire({
+                        title: 'Erro!',
+                        text: xhr.responseJSON?.message || 'Erro ao gerar PDF',
+                        icon: 'error',
+                        confirmButtonColor: '#dc3545'
+                    });
+                }, 500);
+            }
+        });
+    });
+
+    // Inicializa os caches
+    let brandCache = initializeLocalCache('brandCache');
+    let modelCache = initializeLocalCache('modelCache');
+
+    // Configura o autocomplete para o campo de marca
+    $("#brand").autocomplete({
+        source: function(request, response) {
+            response(getSuggestions(brandCache, request.term));
+        },
+        minLength: 1,
+        select: function(event, ui) {
+            updateLocalCache('brandCache', ui.item.value);
+        },
+        change: function(event, ui) {
+            if (ui.item == null && $(this).val() != '') {
+                updateLocalCache('brandCache', $(this).val());
+            }
+        }
+    }).on('blur', function() {
+        if ($(this).val() != '') {
+            updateLocalCache('brandCache', $(this).val());
+        }
+    });
+
+    // Configura o autocomplete para o campo de modelo
+    $("#model").autocomplete({
+        source: function(request, response) {
+            response(getSuggestions(modelCache, request.term));
+        },
+        minLength: 1,
+        select: function(event, ui) {
+            updateLocalCache('modelCache', ui.item.value);
+        },
+        change: function(event, ui) {
+            if (ui.item == null && $(this).val() != '') {
+                updateLocalCache('modelCache', $(this).val());
+            }
+        }
+    }).on('blur', function() {
+        if ($(this).val() != '') {
+            updateLocalCache('modelCache', $(this).val());
+        }
+    });
+
+    // Botão de cadastro de cliente
+    $("#addClientBtn").click(function() {
+        window.location.href = "{{ url_for('clients.add') }}?return_to_order=true";
+    });
+
+    // Validação do formulário
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+
+    // Inicializa os itens existentes
+    const existingItems = document.querySelectorAll('.inventory-item');
+    existingItems.forEach(row => {
+        setupItemEvents(row);
+    });
+
+    // Inicializa a numeração e total
+    updateItemNumbers();
+    updateTotalPrice();
+
+    // Função para mostrar alerta no modal
+    function showServiceTypeAlert(message, type = 'danger') {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+
+        Toast.fire({
+            icon: type === 'danger' ? 'error' : type,
+            title: message
+        });
+    }
+
+    // Função para limpar alertas do modal
+    function clearServiceTypeAlerts() {
+        const alertsContainer = document.getElementById('serviceTypeAlerts');
+        if (alertsContainer) {
+            alertsContainer.innerHTML = '';
+        }
+    }
+
+    // Função para habilitar/desabilitar o formulário do modal
+    function toggleServiceTypeForm(disabled) {
+        const modal = document.getElementById('serviceTypeModal');
+        const saveBtn = document.getElementById('saveQuickServiceType');
+        
+        if (!modal || !saveBtn) {
+            console.error('Elementos do modal não encontrados');
+            return;
+        }
+        
+        const inputs = modal.querySelectorAll('input, textarea, select, button');
+        const spinner = saveBtn.querySelector('.spinner-border');
+        const buttonText = saveBtn.querySelector('.button-text');
+        
+        if (!spinner || !buttonText) {
+            console.error('Elementos do botão não encontrados');
+            return;
+        }
+        
+        // Desabilita todos os inputs exceto o botão de salvar
+        inputs.forEach(input => {
+            if (input !== saveBtn) {
+                input.disabled = disabled;
+            }
+        });
+        
+        // Atualiza o estado do botão de salvar
+        if (disabled) {
+            saveBtn.disabled = true;
+            spinner.classList.remove('d-none');
+            buttonText.textContent = 'Salvando...';
+        } else {
+            saveBtn.disabled = false;
+            spinner.classList.add('d-none');
+            buttonText.textContent = 'Salvar';
+        }
+    }
+
+    // Limpa o formulário quando o modal é fechado
+    document.getElementById('serviceTypeModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('serviceTypeName').value = '';
+        document.getElementById('serviceTypeDescription').value = '';
+        document.getElementById('serviceTypeWarranty').value = '0';
+        clearServiceTypeAlerts();
+        toggleServiceTypeForm(false);
+    });
+
+    // Função para atualizar o select de tipo de serviço
+    async function updateServiceTypeSelect(newType) {
+        console.log('Iniciando atualização do select com novo tipo:', newType);
+        try {
+            const select = document.getElementById('service_type_id');
+            if (!select) {
+                console.error('Select de tipo de serviço não encontrado');
+                return false;
+            }
+
+            // Cria a nova opção
+            const option = new Option(newType.name, newType.id);
+            option.dataset.description = newType.description || '';
+            option.dataset.warranty = newType.default_warranty || '0';
+
+            // Remove opções antigas com mesmo valor se existirem
+            const existingOption = select.querySelector(`option[value="${newType.id}"]`);
+            if (existingOption) {
+                existingOption.remove();
+            }
+
+            // Adiciona a nova opção
+            select.add(option);
+
+            // Seleciona a nova opção
+            select.value = newType.id;
+
+            // Dispara os eventos necessários
+            const event = new Event('change', { bubbles: true });
+            select.dispatchEvent(event);
+            
+            return true;
+        } catch (error) {
+            console.error('Erro ao atualizar select:', error);
+            return false;
+        }
+    }
+
+    // Função para fechar o modal com segurança
+    async function closeModalSafely(modalElement) {
+        return new Promise((resolve) => {
+            if (!modalElement) {
+                resolve();
+                return;
+            }
+
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (!modal) {
+                resolve();
+                return;
+            }
+
+            modalElement.addEventListener('hidden.bs.modal', function onHidden() {
+                modalElement.removeEventListener('hidden.bs.modal', onHidden);
+                resolve();
+            }, { once: true });
+
+            modal.hide();
+        });
+    }
+
+    // Inicializa os modais
+    const serviceTypeModal = new bootstrap.Modal(document.getElementById('serviceTypeModal'));
+    const serviceTypeInfoModal = new bootstrap.Modal(document.getElementById('serviceTypeInfoModal'));
+    const serviceTypeInfoBtn = document.getElementById('serviceTypeInfo');
+    const select = document.getElementById('service_type_id');
+    const saveQuickServiceTypeBtn = document.getElementById('saveQuickServiceType');
+
+    // Adiciona o evento de click no botão de salvar tipo de serviço
+    if (saveQuickServiceTypeBtn) {
+        saveQuickServiceTypeBtn.addEventListener('click', async function() {
+            console.log('Botão salvar clicado');
+            const name = document.getElementById('serviceTypeName').value.trim();
+            const description = document.getElementById('serviceTypeDescription').value.trim();
+            const warranty = document.getElementById('serviceTypeWarranty').value;
+            
+            if (!name) {
+                showServiceTypeAlert('Por favor, informe o nome do tipo de serviço');
+                return;
+            }
+            
+            // Desabilita o formulário e mostra loading
+            toggleServiceTypeForm(true);
+            clearServiceTypeAlerts();
+            
+            try {
+                const formData = new FormData();
+                formData.append('name', name);
+                formData.append('description', description);
+                formData.append('default_warranty', warranty);
+                
+                const response = await fetch('{{ url_for("settings.quick_add_service_type") }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Fecha o modal
+                    serviceTypeModal.hide();
+
+                    // B16 (29-05-2026): insere a nova opcao NO ATO e seleciona,
+                    // SEM reload — preserva o que ja foi digitado na OS. Fallback
+                    // defensivo: se a injecao falhar, recarrega como antes.
+                    try {
+                        var st = data.service_type || {};
+                        if (st.id && select) {
+                            var existente = select.querySelector('option[value="' + st.id + '"]');
+                            if (!existente) {
+                                var opt = document.createElement('option');
+                                opt.value = st.id;
+                                opt.textContent = st.name || '';
+                                opt.setAttribute('data-description', st.description || '');
+                                opt.setAttribute('data-warranty', (st.default_warranty != null ? st.default_warranty : ''));
+                                select.appendChild(opt);
+                            }
+                            select.value = st.id;
+                            select.dispatchEvent(new Event('change'));
+                        }
+                        // Limpa o form do modal para o proximo uso
+                        var stName = document.getElementById('serviceTypeName');
+                        var stDesc = document.getElementById('serviceTypeDescription');
+                        var stWar = document.getElementById('serviceTypeWarranty');
+                        if (stName) stName.value = '';
+                        if (stDesc) stDesc.value = '';
+                        if (stWar) stWar.value = '';
+                        toggleServiceTypeForm(false);
+
+                        Swal.fire({
+                            title: 'Sucesso!',
+                            text: data.message || 'Tipo de serviço criado e selecionado!',
+                            icon: 'success',
+                            timer: 1600,
+                            showConfirmButton: false
+                        });
+                    } catch (injErr) {
+                        console.error('Falha ao injetar tipo de servico, recarregando:', injErr);
+                        window.location.reload();
+                    }
+                } else {
+                    showServiceTypeAlert(data.message || 'Erro ao salvar tipo de serviço.');
+                    toggleServiceTypeForm(false);
+                }
+            } catch (error) {
+                console.error('Erro durante o processo de salvamento:', error);
+                showServiceTypeAlert('Erro ao salvar tipo de serviço. Por favor, tente novamente.');
+                toggleServiceTypeForm(false);
+            }
+        });
+    }
+
+    // Atualiza o botão de info quando o select muda
+    select.addEventListener('change', function() {
+        if (!serviceTypeInfoBtn) return; // Verifica se o botão existe
+        
+        const selectedOption = this.options[this.selectedIndex];
+        const hasValue = Boolean(this.value);
+        
+        // Atualiza o estado do botão
+        serviceTypeInfoBtn.disabled = !hasValue;
+        
+        // Atualiza as classes do botão
+        if (hasValue) {
+            serviceTypeInfoBtn.classList.remove('disabled');
+            serviceTypeInfoBtn.classList.add('btn-outline-info');
+        } else {
+            serviceTypeInfoBtn.classList.add('disabled');
+            serviceTypeInfoBtn.classList.remove('btn-outline-info');
+        }
+    });
+
+    // Verifica o estado inicial do select e do botão
+    if (select && serviceTypeInfoBtn) {
+        const hasValue = Boolean(select.value);
+        serviceTypeInfoBtn.disabled = !hasValue;
+        if (hasValue) {
+            serviceTypeInfoBtn.classList.remove('disabled');
+            serviceTypeInfoBtn.classList.add('btn-outline-info');
+        }
+    }
+
+    // Variáveis para o modal de informações
+    let currentServiceTypeId = null;
+    const viewMode = document.getElementById('viewMode');
+    const editMode = document.getElementById('editMode');
+    const viewModeButtons = document.getElementById('viewModeButtons');
+    const editModeButtons = document.getElementById('editModeButtons');
+
+    // Mostra o modal de informações quando o botão é clicado
+    serviceTypeInfoBtn.addEventListener('click', function() {
+        if (!select.value) return;
+        
+        const selectedOption = select.options[select.selectedIndex];
+        const name = selectedOption.text;
+        const description = selectedOption.dataset.description || 'Nenhuma descrição disponível';
+        const warranty = selectedOption.dataset.warranty || '0';
+        currentServiceTypeId = select.value;
+        
+        // Preenche os campos de visualização com animação de fade
+        const infoFields = {
+            'infoServiceTypeName': name,
+            'infoServiceTypeDescription': description,
+            'infoServiceTypeWarranty': `${warranty} dias`
+        };
+        
+        Object.entries(infoFields).forEach(([id, value]) => {
+            const element = document.getElementById(id);
+            element.style.opacity = '0';
+            element.textContent = value;
+            setTimeout(() => {
+                element.style.transition = 'opacity 0.3s ease-in-out';
+                element.style.opacity = '1';
+            }, 100);
+        });
+        
+        // Preenche os campos de edição
+        document.getElementById('editServiceTypeName').value = name;
+        document.getElementById('editServiceTypeDescription').value = description || '';
+        document.getElementById('editServiceTypeWarranty').value = warranty;
+        
+        // Mostra modo de visualização
+        showViewMode();
+        
+        serviceTypeInfoModal.show();
+    });
+
+    // Botão para entrar no modo de edição
+    document.getElementById('editModeBtn').addEventListener('click', function() {
+        showEditMode();
+    });
+
+    // Botão para cancelar a edição
+    document.getElementById('cancelEdit').addEventListener('click', function() {
+        showViewMode();
+    });
+
+    // Botão para salvar as alterações
+    document.getElementById('saveEdit').addEventListener('click', function() {
+        const name = document.getElementById('editServiceTypeName').value.trim();
+        const description = document.getElementById('editServiceTypeDescription').value.trim();
+        const warranty = document.getElementById('editServiceTypeWarranty').value;
+        
+        if (!name) {
+            alert('Por favor, informe o nome do tipo de serviço');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('description', description);
+        formData.append('default_warranty', warranty);
+        
+        // Envia os dados para o servidor
+        fetch(`{{ url_for("settings.quick_add_service_type") }}?id=${currentServiceTypeId}`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Atualiza a opção no select
+                const option = select.options[select.selectedIndex];
+                option.text = name;
+                option.dataset.description = description;
+                option.dataset.warranty = warranty;
+                
+                // Atualiza os campos de visualização
+                document.getElementById('infoServiceTypeName').textContent = name;
+                document.getElementById('infoServiceTypeDescription').textContent = description || 'Nenhuma descrição disponível';
+                document.getElementById('infoServiceTypeWarranty').textContent = `${warranty} dias`;
+                
+                // Volta para o modo de visualização
+                showViewMode();
+                
+                // Mostra mensagem de sucesso
+                Swal.fire({
+                    title: 'Sucesso!',
+                    text: 'Tipo de serviço atualizado com sucesso!',
+                    icon: 'success',
+                    confirmButtonColor: '#28a745'
+                });
+            } else {
+                alert(data.message || 'Erro ao atualizar tipo de serviço');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao atualizar tipo de serviço');
+        });
+    });
+
+    function showViewMode() {
+        viewMode.style.display = 'block';
+        editMode.style.display = 'none';
+        viewModeButtons.style.display = 'block';
+        editModeButtons.style.display = 'none';
+    }
+
+    function showEditMode() {
+        viewMode.style.display = 'none';
+        editMode.style.display = 'block';
+        viewModeButtons.style.display = 'none';
+        editModeButtons.style.display = 'block';
+    }
+});
+
+// Função para lidar com PDF
+function handlePDF(url, download) {
+    console.log('handlePDF called with url:', url, 'download:', download);
+    
+    Swal.fire({
+        title: 'Gerando PDF...',
+        text: 'Por favor, aguarde enquanto geramos o documento.',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    // Adiciona um pequeno delay para dar tempo de ver os logs
+    setTimeout(() => {
+        $.get(url)
+            .done(function(response) {
+                console.log('Response received:', response);
+                
+                // Aguarda um pouco antes de fechar o loading
+                setTimeout(() => {
+                    Swal.close();
+                    
+                    try {
+                        // Se a resposta for string, tenta fazer parse
+                        if (typeof response === 'string') {
+                            response = JSON.parse(response);
+                        }
+                        
+                        // Verifica se temos uma URL do PDF (seja via success ou direto)
+                        if (response.success && response.pdf_url) {
+                            console.log('PDF URL found:', response.pdf_url);
+                            if (download) {
+                                // Para download, cria um link temporário e clica nele
+                                const link = document.createElement('a');
+                                link.href = response.pdf_url;
+                                link.download = response.pdf_url.split('/').pop();
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                console.log('Download completed');
+                            } else {
+                                // Para visualização, abre em uma nova janela
+                                window.open(response.pdf_url, '_blank');
+                                console.log('View window opened');
+                            }
+                        } else if (response.url) { // Tenta formato alternativo
+                            console.log('Direct URL found:', response.url);
+                            if (download) {
+                                const link = document.createElement('a');
+                                link.href = response.url;
+                                link.download = response.url.split('/').pop();
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                console.log('Download completed (direct URL)');
+                            } else {
+                                window.open(response.url, '_blank');
+                                console.log('View window opened (direct URL)');
+                            }
+                        } else {
+                            console.error('No PDF URL found in response:', response);
+                            throw new Error('URL do PDF não encontrada na resposta');
+                        }
+                    } catch (error) {
+                        console.error('Error processing response:', error);
+                Swal.fire({
+                    title: 'Erro!',
+                            text: error.message || 'Erro ao processar resposta do PDF',
+                            icon: 'error',
+                            confirmButtonColor: '#dc3545'
+                        });
+                    }
+                }, 500); // Delay antes de fechar o loading
+            })
+            .fail(function(xhr) {
+                console.error('AJAX Error:', xhr);
+                setTimeout(() => {
+                    Swal.close();
+                    Swal.fire({
+                        title: 'Erro!',
+                        text: xhr.responseJSON?.message || 'Erro ao gerar PDF',
+                        icon: 'error',
+                        confirmButtonColor: '#dc3545'
+                    });
+                }, 500);
+            });
+    }, 500); // Delay inicial
+}
+
+// Função para inicializar o cache local
+function initializeLocalCache(key) {
+    try {
+        const cache = localStorage.getItem(key);
+        if (!cache) return { items: [], frequencies: {} };
+        
+        const data = JSON.parse(cache);
+        // Migração de dados antigos
+        if (Array.isArray(data)) {
+            return {
+                items: data.map(item => ({
+                    value: item,
+                    timestamp: Date.now(),
+                    frequency: 1
+                })),
+                frequencies: data.reduce((acc, item) => {
+                    acc[item] = 1;
+                    return acc;
+                }, {})
+            };
+        }
+        return data;
+    } catch (e) {
+        console.error('Erro ao inicializar cache:', e);
+        return { items: [], frequencies: {} };
+    }
+}
+
+// Função para atualizar o cache local
+function updateLocalCache(key, value) {
+    try {
+        const MAX_CACHE_ITEMS = 100; // Limite máximo de itens no cache
+        let cache = initializeLocalCache(key);
+        
+        // Atualiza ou adiciona o item
+        const existingItemIndex = cache.items.findIndex(item => 
+            item.value.toLowerCase() === value.toLowerCase()
+        );
+        
+        if (existingItemIndex > -1) {
+            // Atualiza item existente
+            cache.items[existingItemIndex].timestamp = Date.now();
+            cache.items[existingItemIndex].frequency = (cache.items[existingItemIndex].frequency || 0) + 1;
+            cache.frequencies[value] = cache.items[existingItemIndex].frequency;
+        } else {
+            // Adiciona novo item
+            cache.items.push({
+                value: value,
+                timestamp: Date.now(),
+                frequency: 1
+            });
+            cache.frequencies[value] = 1;
+            
+            // Remove itens mais antigos se exceder o limite
+            if (cache.items.length > MAX_CACHE_ITEMS) {
+                // Ordena por frequência e timestamp
+                cache.items.sort((a, b) => {
+                    if (a.frequency === b.frequency) {
+                        return b.timestamp - a.timestamp;
+                    }
+                    return b.frequency - a.frequency;
+                });
+                
+                // Remove os itens excedentes
+                cache.items = cache.items.slice(0, MAX_CACHE_ITEMS);
+                
+                // Atualiza frequencies
+                cache.frequencies = cache.items.reduce((acc, item) => {
+                    acc[item.value] = item.frequency;
+                    return acc;
+                }, {});
+            }
+        }
+        
+        localStorage.setItem(key, JSON.stringify(cache));
+    } catch (e) {
+        console.error('Erro ao atualizar cache:', e);
+    }
+}
+
+// Função para buscar sugestões do cache
+function getSuggestions(cache, term) {
+    const matches = cache.items
+        .filter(item => item.value.toLowerCase().includes(term.toLowerCase()))
+        .sort((a, b) => {
+            // Prioriza correspondências exatas
+            const aExact = a.value.toLowerCase() === term.toLowerCase();
+            const bExact = b.value.toLowerCase() === term.toLowerCase();
+            if (aExact !== bExact) return bExact - aExact;
+            
+            // Depois ordena por frequência
+            if (a.frequency !== b.frequency) {
+                return b.frequency - a.frequency;
+            }
+            
+            // Por fim, ordena por timestamp
+            return b.timestamp - a.timestamp;
+        })
+        .map(item => ({
+            label: `${item.value} (${item.frequency}x)`,
+            value: item.value
+        }));
+    
+    return matches;
+}
+
+// Autocomplete de cliente
+$("#client_search").autocomplete({
+    source: function(request, response) {
+        $.getJSON("{{ url_for('clients.search') }}", {
+            q: request.term
+        }, function(data) {
+            response(data);
+        });
+    },
+    minLength: 3,
+    select: function(event, ui) {
+        $("#client_id").val(ui.item.id);
+        $("#client_search").val(ui.item.name);
+        $("#client_search").attr('data-selected-name', ui.item.name);
+        $("#clientDetails").removeClass("d-none");
+        $("#clientDocument").text(ui.item.document || 'Não informado');
+        $("#clientPhone").text(ui.item.phone || 'Não informado');
+        $("#clientEmail").text(ui.item.email || 'Não informado');
+        $("#clientAddress").text(ui.item.address || 'Não informado');
+        $("#client_search").removeClass('is-invalid').addClass('is-valid');
+        return false;
+    },
+    change: function(event, ui) {
+        // Se nenhum item foi selecionado da lista
+        if (!ui.item) {
+            $("#client_id").val('');
+            $("#client_search")
+                .removeClass('is-valid')
+                .addClass('is-invalid');
+            $("#clientDetails").addClass("d-none");
+        }
+    }
+}).autocomplete("instance")._renderItem = function(ul, item) {
+    return $("<li>")
+        .append("<div class='suggestion-item'>" + 
+                "<span class='suggestion-name'>" + item.label + "</span>" +
+                "<span class='suggestion-count'>" + item.orders_count + " OS(s)</span></div>")
+        .appendTo(ul);
+};
+</script>
+{% endblock %}

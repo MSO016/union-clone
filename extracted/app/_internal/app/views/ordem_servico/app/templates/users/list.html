@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+/* Estilos para melhorar a área clicável do botão */
+.action-button-container {
+    position: relative;
+    z-index: 1000;
+    padding: 10px 0;
+    margin-bottom: 1rem;
+}
+
+.action-button-container .btn {
+    padding: 8px 16px;
+    font-size: 1rem;
+    min-width: 140px;
+    display: inline-block;
+}
+</style>
+
+<div class="container mt-4">
+    <!-- Cabeçalho com título e botão -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Usuários</h2>
+        <div class="action-button-container">
+            <a href="{{ url_for('users.add') }}" class="btn btn-primary">
+                <i class="bi bi-person-plus"></i> Novo Usuário
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nome de Usuário</th>
+                            <th>Email</th>
+                            <th>Papel</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr {% if not user.active %}class="table-secondary"{% endif %}>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                {% if user.role == 'admin' %}
+                                <span class="badge bg-primary">Administrador</span>
+                                {% elif user.role == 'tecnico' %}
+                                <span class="badge bg-secondary">Técnico</span>
+                                {% elif user.role == 'developer' %}
+                                <span class="badge bg-info">Desenvolvedor</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ user.role|title }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.active %}
+                                <span class="badge bg-success">Ativo</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inativo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('users.edit', id=user.id) }}" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    {% if user.id != current_user.id %}
+                                    <form action="{{ url_for('users.toggle_status', id=user.id) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm {% if user.active %}btn-danger{% else %}btn-success{% endif %}"
+                                                onclick="return confirm('Tem certeza que deseja {% if user.active %}desativar{% else %}ativar{% endif %} este usuário?')">
+                                            <i class="bi {% if user.active %}bi-person-x{% else %}bi-person-check{% endif %}"></i>
+                                        </button>
+                                    </form>
+                                    {% if not user.active %}
+                                    <form action="{{ url_for('users.delete', id=user.id) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-danger" 
+                                                onclick="return confirm('Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    {# B6 (F2): a exclusao so e liberada apos desativar o usuario.
+                                       Mostramos o botao desabilitado com tooltip explicando o passo,
+                                       preservando o safety-net (evita exclusao acidental de ativo).
+                                       O tooltip fica no span wrapper porque o Bootstrap nao dispara
+                                       tooltips em elementos 'disabled' (pointer-events: none). #}
+                                    <span class="d-inline-block" tabindex="0"
+                                          data-bs-toggle="tooltip" data-bs-placement="top"
+                                          title="Para excluir, primeiro desative o usuário (botão ao lado).">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" disabled
+                                                style="pointer-events: none;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </span>
+                                    {% endif %}
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

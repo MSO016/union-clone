@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+        <div class="col-md-8 text-center">
+            <div class="mb-5">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="RestoreCell" class="img-fluid mb-4" style="max-width: 300px;">
+                <h1 class="display-4 mb-3">{{ config['SYSTEM_NAME'] }}</h1>
+                <h2 class="h4 text-muted mb-4">{{ config['COMPANY_NAME'] }}</h2>
+                <p class="lead">Sistema de Gerenciamento de Ordens de Serviço</p>
+            </div>
+
+            {% if current_user.is_authenticated %}
+            <div class="row justify-content-center">
+                <div class="col-md-3">
+                    <a href="{{ url_for('orders.add') }}" class="btn btn-primary btn-lg w-100 mb-3">
+                        <i class="bi bi-plus-lg"></i> Nova OS
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{{ url_for('orders.list') }}" class="btn btn-outline-primary btn-lg w-100 mb-3">
+                        <i class="bi bi-list"></i> Listar OS
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{{ url_for('clients.list') }}" class="btn btn-outline-primary btn-lg w-100 mb-3">
+                        <i class="bi bi-people"></i> Clientes
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg w-100">
+                        <i class="bi bi-box-arrow-in-right"></i> Entrar no Sistema
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Footer com informações da empresa -->
+<footer class="footer mt-auto py-3 bg-light">
+    <div class="container text-center">
+        <p class="text-muted mb-0">
+            {{ config['COMPANY_NAME'] }} - Soluções em Tecnologia
+        </p>
+        <small class="text-muted">
+            Suporte: (XX) XXXX-XXXX | Email: suporte@restorecell.com.br
+        </small>
+    </div>
+</footer>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+.display-4 {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+</style>
+{% endblock %} 

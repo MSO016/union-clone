@@ -1,0 +1,530 @@
+/* =============================================================================
+   theme-toggle.css — Toggle manual de tema (Fase 6)
+   =============================================================================
+   PROBLEMA QUE RESOLVE:
+   As Fases 1-4 adicionaram @media (prefers-color-scheme: dark) automatico
+   em cada CSS. Em navegadores externos com SO escuro, o tema dark ativa
+   sozinho. Em WebView2 (PyQt), normalmente fica em light. Resultado:
+   inconsistencia visual entre os dois ambientes.
+
+   SOLUCAO:
+   Tres modos selecionaveis pelo usuario via botao flutuante:
+     - auto   : segue prefers-color-scheme do SO/navegador (default)
+     - light  : forca tema claro (ignora prefers-color-scheme: dark)
+     - dark   : forca tema escuro (mesmo se SO esta em light)
+
+   ESCOPO:
+   - Sem classe no <html> => modo auto (CSS das fases 1-4 inalterado)
+   - <html class="theme-light"> => overrides para tokens light
+   - <html class="theme-dark">  => overrides para tokens dark
+
+   ATIVACAO: feature flag UI_THEME_TOGGLE=1 (default).
+   FALLBACK: UI_THEME_TOGGLE=0 desativa CSS+JS, comportamento auto volta.
+   ============================================================================= */
+
+
+/* =============================================================================
+   1. MODO LIGHT FORCADO — sobrescreve prefers-color-scheme: dark
+   ============================================================================= */
+
+/* ---- Inventory (Fase 1, escopo .inv-modern) -------------------------- */
+:root.theme-light .inv-modern {
+    --inv-bg: #f8fafc;
+    --inv-bg-card: #ffffff;
+    --inv-bg-card-soft: #f1f5f9;
+    --inv-text: #0f172a;
+    --inv-text-muted: #64748b;
+    --inv-border: #e2e8f0;
+    --inv-border-strong: #cbd5e1;
+}
+
+/* ---- Dashboard shell (Fase 4, escopo .dash-shell) -------------------- */
+:root.theme-light .dash-shell {
+    --ds-text: #0f172a;
+    --ds-text-muted: #64748b;
+    --ds-bg-card: #ffffff;
+    --ds-bg-card-soft: #f8fafc;
+    --ds-border: #e2e8f0;
+    --ds-border-strong: #cbd5e1;
+}
+
+/* ---- Dashboard ranking (Fase 3, escopo .dash-ranking) ---------------- */
+:root.theme-light .dash-ranking {
+    --dash-text: #0f172a;
+    --dash-text-muted: #64748b;
+    --dash-bg-card: #ffffff;
+    --dash-bg-card-soft: #f1f5f9;
+    --dash-border: #e2e8f0;
+}
+
+/* ---- Login (Fase 2, escopo .login-modern) ---------------------------- */
+/* Login ja tem fundo gradient azul-marinho proprio (splash) — modo light
+   NAO altera o splash do container, mas precisa reverter TODOS os tokens
+   internos do card/inputs. HOTFIX N0 (29-05-2026): o @media dark do
+   login-modern.css escurecia --lg-bg-card/--lg-bg-input/--lg-border e o
+   override anterior so cobria o texto -> card escuro com texto escuro
+   ("login dark") em maquinas com Windows escuro. Cobertura completa: */
+:root.theme-light .login-modern {
+    --lg-text:          #0f172a;
+    --lg-text-muted:    #64748b;
+    --lg-bg-card:       rgba(255, 255, 255, 0.96);
+    --lg-bg-input:      #ffffff;
+    --lg-border:        #e2e8f0;
+    --lg-border-strong: #cbd5e1;
+    --lg-danger-soft:   #fef2f2;
+}
+
+/* ---- Orders list (Fase 7, escopo .orders-modern) -------------------- */
+/* HOTFIX 17/05/2026 #2: a Fase 7 foi adicionada APOS o theme-toggle e
+   ficou sem cobertura — em SO/navegador em dark, o @media interno
+   ativava dark mesmo com toggle em light. Overrides abaixo forcam
+   tokens light/dark independentemente da preferencia do SO. */
+:root.theme-light .orders-modern {
+    --or-text:          #0f172a;
+    --or-text-muted:    #64748b;
+    --or-bg-card:       #ffffff;
+    --or-bg-card-soft:  #f8fafc;
+    --or-border:        #e2e8f0;
+    --or-border-strong: #cbd5e1;
+}
+
+/* ---- Clients list (Fase 7, escopo .clients-modern) ------------------ */
+:root.theme-light .clients-modern {
+    --cl-text:        #0f172a;
+    --cl-text-muted:  #64748b;
+    --cl-bg-card:     #ffffff;
+    --cl-bg-card-soft:#f8fafc;
+    --cl-border:      #e2e8f0;
+}
+
+/* ---- Forms (Fase 8, escopo .form-modern — orders + clients form) ---- */
+:root.theme-light .form-modern {
+    --fm-text:          #0f172a;
+    --fm-text-muted:    #64748b;
+    --fm-bg-card:       #ffffff;
+    --fm-bg-card-soft:  #f8fafc;
+    --fm-border:        #e2e8f0;
+    --fm-border-strong: #cbd5e1;
+}
+
+/* ---- Sales list (Fase 10, escopo .sales-modern) -------------------- */
+:root.theme-light .sales-modern {
+    --sl-text:          #0f172a;
+    --sl-text-muted:    #64748b;
+    --sl-bg-card:       #ffffff;
+    --sl-bg-card-soft:  #f8fafc;
+    --sl-border:        #e2e8f0;
+    --sl-border-strong: #cbd5e1;
+}
+
+/* ---- Views (Fase 11, escopo .view-modern) -------------------------- */
+:root.theme-light .view-modern {
+    --vw-text:          #0f172a;
+    --vw-text-muted:    #64748b;
+    --vw-bg-card:       #ffffff;
+    --vw-bg-card-soft:  #f8fafc;
+    --vw-border:        #e2e8f0;
+    --vw-border-strong: #cbd5e1;
+}
+
+
+/* =============================================================================
+   2. MODO DARK FORCADO — aplica mesmo se SO esta em light
+   ============================================================================= */
+
+/* Body geral em dark forcado (afeta todas as paginas) */
+:root.theme-dark body {
+    background-color: #0b1220 !important;
+    color: #e2e8f0;
+}
+
+/* ---- Inventory ------------------------------------------------------- */
+:root.theme-dark .inv-modern {
+    --inv-bg: #0f172a;
+    --inv-bg-card: #1e293b;
+    --inv-bg-card-soft: #0f172a;
+    --inv-text: #e2e8f0;
+    --inv-text-muted: #94a3b8;
+    --inv-border: #334155;
+    --inv-border-strong: #475569;
+}
+
+/* ---- Dashboard shell ------------------------------------------------- */
+:root.theme-dark .dash-shell {
+    --ds-text: #e2e8f0;
+    --ds-text-muted: #94a3b8;
+    --ds-bg-card: #1e293b;
+    --ds-bg-card-soft: #0f172a;
+    --ds-border: #334155;
+    --ds-border-strong: #475569;
+}
+
+/* ---- Dashboard ranking ---------------------------------------------- */
+:root.theme-dark .dash-ranking {
+    --dash-text: #e2e8f0;
+    --dash-text-muted: #94a3b8;
+    --dash-bg-card: #1e293b;
+    --dash-bg-card-soft: #0f172a;
+    --dash-border: #334155;
+}
+
+/* ---- Login (mantem fundo gradient azul, ajusta tokens internos) ----- */
+:root.theme-dark .login-modern {
+    --lg-text: #e2e8f0;
+    --lg-text-muted: #94a3b8;
+}
+
+/* ---- Orders list (Fase 7) ------------------------------------------ */
+:root.theme-dark .orders-modern {
+    --or-text:          #e2e8f0;
+    --or-text-muted:    #94a3b8;
+    --or-bg-card:       #1e293b;
+    --or-bg-card-soft:  #0f172a;
+    --or-border:        #334155;
+    --or-border-strong: #475569;
+}
+
+/* ---- Clients list (Fase 7) ----------------------------------------- */
+:root.theme-dark .clients-modern {
+    --cl-text:        #e2e8f0;
+    --cl-text-muted:  #94a3b8;
+    --cl-bg-card:     #1e293b;
+    --cl-bg-card-soft:#0f172a;
+    --cl-border:      #334155;
+}
+
+/* ---- Forms (Fase 8) ------------------------------------------------ */
+:root.theme-dark .form-modern {
+    --fm-text:          #e2e8f0;
+    --fm-text-muted:    #94a3b8;
+    --fm-bg-card:       #1e293b;
+    --fm-bg-card-soft:  #0f172a;
+    --fm-border:        #334155;
+    --fm-border-strong: #475569;
+}
+
+/* ---- Sales list (Fase 10) ------------------------------------------ */
+:root.theme-dark .sales-modern {
+    --sl-text:          #e2e8f0;
+    --sl-text-muted:    #94a3b8;
+    --sl-bg-card:       #1e293b;
+    --sl-bg-card-soft:  #0f172a;
+    --sl-border:        #334155;
+    --sl-border-strong: #475569;
+}
+
+/* ---- Views (Fase 11) ----------------------------------------------- */
+:root.theme-dark .view-modern {
+    --vw-text:          #e2e8f0;
+    --vw-text-muted:    #94a3b8;
+    --vw-bg-card:       #1e293b;
+    --vw-bg-card-soft:  #0f172a;
+    --vw-border:        #334155;
+    --vw-border-strong: #475569;
+}
+:root.theme-dark .form-modern .card,
+:root.theme-dark .form-modern .form-control,
+:root.theme-dark .form-modern .form-select {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+:root.theme-dark .form-modern .input-group-text {
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+    border-color: #334155 !important;
+}
+:root.theme-dark .form-modern .fixed-save-button {
+    background: rgba(15, 23, 42, 0.92) !important;
+    border-top-color: #334155 !important;
+}
+
+/* ---- Bootstrap cards/tabelas genericos no dark forcado -------------- */
+/* Aplicado APENAS em paginas dentro de escopos modernos
+   para nao afetar modulos nao migrados (financeiro, etc.). */
+:root.theme-dark .dash-shell .card:not(.dashboard-card),
+:root.theme-dark .inv-modern .card,
+:root.theme-dark .orders-modern > .card,
+:root.theme-dark .clients-modern > .card,
+:root.theme-dark .sales-modern .card,
+:root.theme-dark .view-modern .card {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+
+:root.theme-dark .dash-shell .card-header,
+:root.theme-dark .inv-modern .card-header,
+:root.theme-dark .orders-modern .card-header,
+:root.theme-dark .clients-modern .card-header,
+:root.theme-dark .sales-modern .card-header,
+:root.theme-dark .view-modern .card-header {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+}
+
+:root.theme-dark .dash-shell .table,
+:root.theme-dark .inv-modern .table,
+:root.theme-dark .orders-modern .table,
+:root.theme-dark .clients-modern .table,
+:root.theme-dark .sales-modern .table,
+:root.theme-dark .view-modern .table {
+    color: #e2e8f0 !important;
+    --bs-table-bg: transparent;
+    --bs-table-color: #e2e8f0;
+}
+:root.theme-dark .dash-shell .table thead th,
+:root.theme-dark .inv-modern .table thead th,
+:root.theme-dark .orders-modern .table thead th,
+:root.theme-dark .clients-modern .table thead th,
+:root.theme-dark .sales-modern .table thead th,
+:root.theme-dark .view-modern .table thead th {
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+    border-color: #334155 !important;
+}
+:root.theme-dark .dash-shell .table tbody td,
+:root.theme-dark .inv-modern .table tbody td,
+:root.theme-dark .orders-modern .table tbody td,
+:root.theme-dark .clients-modern .table tbody td,
+:root.theme-dark .sales-modern .table tbody td,
+:root.theme-dark .view-modern .table tbody td {
+    border-color: #334155 !important;
+}
+
+/* Inputs/selects em dark forcado dentro dos novos escopos da Fase 7+10+11 */
+:root.theme-dark .orders-modern .form-control,
+:root.theme-dark .orders-modern .form-select,
+:root.theme-dark .clients-modern .form-control,
+:root.theme-dark .clients-modern .form-select,
+:root.theme-dark .sales-modern .form-control,
+:root.theme-dark .sales-modern .form-select,
+:root.theme-dark .view-modern .form-control,
+:root.theme-dark .view-modern .form-select {
+    background-color: #0f172a !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+:root.theme-dark .orders-modern .input-group-text,
+:root.theme-dark .clients-modern .input-group-text,
+:root.theme-dark .sales-modern .input-group-text,
+:root.theme-dark .view-modern .input-group-text {
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+    border-color: #334155 !important;
+}
+
+/* Tabela bordered (info label/value em inventory/view) dark */
+:root.theme-dark .view-modern .table-bordered tbody tr th {
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+    border-color: #334155 !important;
+}
+:root.theme-dark .view-modern .table-bordered tbody tr td {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+
+/* Card aninhado (subcard PDF orders/view) dark */
+:root.theme-dark .view-modern .card .card.h-100 {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+/* Texto strong (label) em paragrafos - clients/view */
+:root.theme-dark .view-modern .card-body p,
+:root.theme-dark .view-modern .card-body p strong {
+    color: #e2e8f0 !important;
+}
+:root.theme-dark .view-modern .card-body p strong {
+    color: #94a3b8 !important;
+}
+
+/* QR code preview dark */
+:root.theme-dark .view-modern .qr-code-container {
+    background-color: #f8fafc !important;
+    /* MANTEM fundo claro para o QR ser legivel mesmo em dark mode */
+}
+
+
+/* =============================================================================
+   3. MODO LIGHT FORCADO — overrides extras para garantir branco em WebView2
+   ============================================================================= */
+
+:root.theme-light body {
+    background-color: #ffffff !important;
+    color: #0f172a;
+}
+
+/* Reverte cards Bootstrap genericos para branco em modo light forcado */
+:root.theme-light .dash-shell .card:not(.dashboard-card),
+:root.theme-light .inv-modern .card,
+:root.theme-light .orders-modern > .card,
+:root.theme-light .clients-modern > .card,
+:root.theme-light .sales-modern .card,
+:root.theme-light .view-modern .card,
+:root.theme-light .view-modern .card .card.h-100 {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #e2e8f0 !important;
+}
+
+/* Reverte tabelas para branco em modo light forcado (Fase 7+10+11) */
+:root.theme-light .orders-modern .table,
+:root.theme-light .clients-modern .table,
+:root.theme-light .sales-modern .table,
+:root.theme-light .view-modern .table {
+    color: #0f172a !important;
+    --bs-table-color: #0f172a;
+}
+:root.theme-light .orders-modern .table thead th,
+:root.theme-light .clients-modern .table thead th,
+:root.theme-light .sales-modern .table thead th,
+:root.theme-light .view-modern .table thead th {
+    background-color: #f8fafc !important;
+    color: #64748b !important;
+    border-color: #e2e8f0 !important;
+}
+:root.theme-light .orders-modern .table tbody td,
+:root.theme-light .clients-modern .table tbody td,
+:root.theme-light .sales-modern .table tbody td,
+:root.theme-light .view-modern .table tbody td {
+    color: #0f172a !important;
+    border-color: #e2e8f0 !important;
+}
+
+/* Tabela bordered light (inventory/view) */
+:root.theme-light .view-modern .table-bordered tbody tr th {
+    background-color: #f8fafc !important;
+    color: #64748b !important;
+    border-color: #e2e8f0 !important;
+}
+:root.theme-light .view-modern .table-bordered tbody tr td {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #e2e8f0 !important;
+}
+
+/* Reverte inputs/selects para light em modo light forcado (Fase 7+10+11) */
+:root.theme-light .orders-modern .form-control,
+:root.theme-light .orders-modern .form-select,
+:root.theme-light .clients-modern .form-control,
+:root.theme-light .clients-modern .form-select,
+:root.theme-light .sales-modern .form-control,
+:root.theme-light .sales-modern .form-select,
+:root.theme-light .view-modern .form-control,
+:root.theme-light .view-modern .form-select {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #e2e8f0 !important;
+}
+:root.theme-light .orders-modern .input-group-text,
+:root.theme-light .clients-modern .input-group-text,
+:root.theme-light .sales-modern .input-group-text,
+:root.theme-light .view-modern .input-group-text {
+    background-color: #f8fafc !important;
+    color: #64748b !important;
+    border-color: #e2e8f0 !important;
+}
+
+/* Texto strong em paragrafos - clients/view light */
+:root.theme-light .view-modern .card-body p {
+    color: #0f172a !important;
+}
+:root.theme-light .view-modern .card-body p strong {
+    color: #64748b !important;
+}
+
+
+/* =============================================================================
+   4. BOTAO FLUTUANTE DE TOGGLE
+   ============================================================================= */
+
+.theme-toggle-btn {
+    position: fixed;
+    bottom: 18px;
+    left: 18px;        /* esquerda — network-access esta na direita (.bottom-0.end-0) */
+    z-index: 1045;     /* acima da navbar (1030) e network-access, abaixo de modal (1050) */
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(33, 150, 243, 0.45);
+    background: linear-gradient(135deg, #0D47A1 0%, #1565C0 100%);
+    color: #ffffff;
+    font-size: 1.05rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(13, 71, 161, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease,
+                background 0.2s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.theme-toggle-btn:hover {
+    transform: translateY(-2px) rotate(-8deg);
+    box-shadow: 0 10px 24px rgba(13, 71, 161, 0.45);
+    background: linear-gradient(135deg, #1565C0 0%, #2196F3 100%);
+}
+
+.theme-toggle-btn:focus-visible {
+    outline: 3px solid rgba(33, 150, 243, 0.55);
+    outline-offset: 2px;
+}
+
+.theme-toggle-btn:active {
+    transform: translateY(0) scale(0.95);
+}
+
+/* Pequeno indicador (badge) no canto inferior direito do botao mostrando
+   o estado atual: A=auto, L=light, D=dark. */
+.theme-toggle-btn::after {
+    content: attr(data-mode);
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    background: #2196F3;
+    color: #ffffff;
+    font-size: 0.55rem;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    line-height: 1;
+}
+
+/* Em modo dark, o badge do botao fica mais visivel */
+:root.theme-dark .theme-toggle-btn::after {
+    border-color: #0f172a;
+}
+
+/* Tooltip customizado opcional — exibido via title nativo */
+
+/* Em mobile, botao um pouco menor */
+@media (max-width: 575.98px) {
+    .theme-toggle-btn {
+        bottom: 12px;
+        left: 12px;
+        width: 40px;
+        height: 40px;
+        font-size: 0.95rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-toggle-btn,
+    .theme-toggle-btn:hover {
+        transition: none !important;
+        transform: none !important;
+    }
+}

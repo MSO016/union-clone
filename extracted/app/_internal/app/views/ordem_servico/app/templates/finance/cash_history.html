@@ -1,0 +1,106 @@
+{% extends "finance/base.html" %}
+
+{% block page_title %}Histórico de Caixa{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('finance.cash_register') }}" class="btn btn-sm btn-outline-primary">
+    <i class="fas fa-cash-register"></i> Voltar ao Caixa
+</a>
+{% endblock %}
+
+{% block finance_content %}
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        {% if sessions.items %}
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Hora</th>
+                    <th>Tipo</th>
+                    <th>Valor Informado</th>
+                    <th>Valor Esperado</th>
+                    <th>Diferença</th>
+                    <th>Operador</th>
+                    <th>Observações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in sessions.items %}
+                <tr>
+                    <td>{{ s.date.strftime('%d/%m/%Y') if s.date else '-' }}</td>
+                    <td>{{ s.created_at.strftime('%H:%M') if s.created_at else '-' }}</td>
+                    <td>
+                        {% if s.type == 'abertura' %}
+                            <span class="badge badge-success">Abertura</span>
+                        {% else %}
+                            <span class="badge badge-danger">Fechamento</span>
+                        {% endif %}
+                    </td>
+                    <td>R$ {{ "%.2f"|format(s.amount) }}</td>
+                    <td>
+                        {% if s.expected_amount is not none %}
+                            R$ {{ "%.2f"|format(s.expected_amount) }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if s.difference is not none and s.difference != 0 %}
+                            <span class="{% if s.difference > 0 %}text-success{% else %}text-danger{% endif %} font-weight-bold">
+                                {% if s.difference > 0 %}+{% endif %}R$ {{ "%.2f"|format(s.difference) }}
+                            </span>
+                        {% elif s.type == 'fechamento' %}
+                            <span class="text-success"><i class="fas fa-check"></i> OK</span>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ s.created_by.username }}</td>
+                    <td>{{ s.notes or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Paginação -->
+        {% if sessions.pages > 1 %}
+        <nav class="d-flex justify-content-center py-3">
+            <ul class="pagination pagination-sm mb-0">
+                {% if sessions.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('finance.cash_history', page=sessions.prev_num) }}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for p in sessions.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if p %}
+                        <li class="page-item {% if p == sessions.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('finance.cash_history', page=p) }}">{{ p }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if sessions.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('finance.cash_history', page=sessions.next_num) }}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+            <p class="text-muted">Nenhum registro de abertura/fechamento encontrado.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

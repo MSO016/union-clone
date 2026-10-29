@@ -1,0 +1,348 @@
+/* =============================================================================
+   clients-modern.css — Modernizacao cosmetica da listagem de Clientes
+   =============================================================================
+   ESCOPO: TODOS os seletores comecam com .clients-modern.
+
+   FILOSOFIA (mesma das Fases 1, 4 e 7-orders):
+   - Apenas substitui visualmente cards/tabela/badges/botoes/paginacao.
+   - Mantem 100% do JS (modal de exclusao, tooltips) intacto.
+   - Convive com .navbar.ui-modern (Fase 5) e theme-toggle (Fase 6).
+   - Paleta sincronizada com Union (#0D47A1 + #2196F3).
+   ============================================================================= */
+
+/* ---------- Tokens locais ---------------------------------------------- */
+.clients-modern {
+    --cl-accent:        #0D47A1;
+    --cl-accent-2:      #2196F3;
+    --cl-accent-soft:   rgba(13, 71, 161, 0.10);
+    --cl-text:          #0f172a;
+    --cl-text-muted:    #64748b;
+    --cl-bg-card:       #ffffff;
+    --cl-bg-card-soft:  #f8fafc;
+    --cl-border:        #e2e8f0;
+    --cl-radius:        14px;
+    --cl-radius-sm:     10px;
+    --cl-radius-pill:   9999px;
+    --cl-shadow-sm:     0 1px 3px rgba(15, 23, 42, 0.06);
+    --cl-shadow-md:     0 4px 14px rgba(15, 23, 42, 0.08);
+
+    /* Tipos PF/PJ */
+    --cl-pf-color:      #0D47A1;
+    --cl-pf-bg:         rgba(13, 71, 161, 0.10);
+    --cl-pj-color:      #6D28D9;       /* indigo */
+    --cl-pj-bg:         rgba(109, 40, 217, 0.10);
+}
+
+/* Dark 100% OPT-IN (29-05-2026): so com .theme-dark (era @media dark, que
+   ligava sozinho no Windows escuro e deixava texto claro em fundo claro). */
+:root.theme-dark .clients-modern {
+    --cl-text:        #e2e8f0;
+    --cl-text-muted:  #94a3b8;
+    --cl-bg-card:     #1e293b;
+    --cl-bg-card-soft:#0f172a;
+    --cl-border:      #334155;
+}
+
+/* ============================================================================
+   HEADER — titulo + botao "Novo Cliente"
+   ============================================================================ */
+.clients-modern > .d-flex {
+    background: linear-gradient(135deg, var(--cl-accent) 0%, var(--cl-accent-2) 100%);
+    color: #ffffff;
+    padding: 1.1rem 1.4rem !important;
+    border-radius: var(--cl-radius);
+    box-shadow: var(--cl-shadow-md);
+    margin-bottom: 1.5rem !important;
+}
+
+.clients-modern > .d-flex h2 {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 1.4rem !important;
+    margin: 0;
+    letter-spacing: 0.01em;
+}
+.clients-modern > .d-flex h2 i {
+    color: rgba(255, 255, 255, 0.92) !important;
+    margin-right: 0.5rem;
+}
+
+.clients-modern > .d-flex .btn-primary {
+    background: rgba(255, 255, 255, 0.18) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    color: #ffffff !important;
+    border-radius: var(--cl-radius-pill) !important;
+    padding: 0.45rem 1.05rem !important;
+    font-weight: 500;
+    transition: background 0.18s ease, transform 0.15s ease;
+    backdrop-filter: blur(6px);
+}
+.clients-modern > .d-flex .btn-primary:hover {
+    background: rgba(255, 255, 255, 0.30) !important;
+    transform: translateY(-1px);
+}
+
+/* ============================================================================
+   CARD DE FILTROS
+   ============================================================================ */
+.clients-modern > .card.mb-4.shadow-sm {
+    background: var(--cl-bg-card) !important;
+    border: 1px solid var(--cl-border) !important;
+    border-radius: var(--cl-radius) !important;
+    box-shadow: var(--cl-shadow-sm) !important;
+}
+
+.clients-modern .card-body .form-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--cl-text-muted);
+    margin-bottom: 0.35rem;
+}
+
+.clients-modern .form-control,
+.clients-modern .form-select {
+    border-radius: var(--cl-radius-sm) !important;
+    border-color: var(--cl-border) !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    font-size: 0.92rem;
+}
+.clients-modern .form-control:focus,
+.clients-modern .form-select:focus {
+    border-color: var(--cl-accent-2) !important;
+    box-shadow: 0 0 0 3px var(--cl-accent-soft) !important;
+}
+
+.clients-modern .input-group-text {
+    background: var(--cl-bg-card-soft);
+    border-color: var(--cl-border);
+    color: var(--cl-text-muted);
+    border-top-left-radius: var(--cl-radius-sm) !important;
+    border-bottom-left-radius: var(--cl-radius-sm) !important;
+}
+
+.clients-modern .btn-secondary {
+    background: var(--cl-accent) !important;
+    border-color: var(--cl-accent) !important;
+    color: #ffffff !important;
+    border-radius: var(--cl-radius-pill) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+.clients-modern .btn-secondary:hover {
+    background: var(--cl-accent-2) !important;
+    border-color: var(--cl-accent-2) !important;
+    transform: translateY(-1px);
+}
+
+/* ============================================================================
+   CARD DE LISTAGEM + TABELA
+   ============================================================================ */
+.clients-modern > .card.shadow-sm {
+    background: var(--cl-bg-card) !important;
+    border: 1px solid var(--cl-border) !important;
+    border-radius: var(--cl-radius) !important;
+    box-shadow: var(--cl-shadow-sm) !important;
+    overflow: hidden;
+}
+
+.clients-modern .table {
+    margin-bottom: 0;
+    color: var(--cl-text);
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--cl-text);
+    --bs-table-hover-bg: var(--cl-accent-soft);
+}
+
+.clients-modern .table thead.table-light {
+    background: var(--cl-bg-card-soft) !important;
+}
+.clients-modern .table thead th {
+    font-size: 0.74rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    color: var(--cl-text-muted) !important;
+    font-weight: 700 !important;
+    background: var(--cl-bg-card-soft) !important;
+    border-bottom: 1px solid var(--cl-border) !important;
+    padding: 0.7rem 0.85rem !important;
+    white-space: nowrap;
+}
+
+.clients-modern .table tbody tr {
+    transition: background 0.15s ease;
+}
+.clients-modern .table tbody tr:hover {
+    background: var(--cl-accent-soft) !important;
+}
+
+.clients-modern .table tbody td {
+    padding: 0.65rem 0.85rem !important;
+    border-color: var(--cl-border) !important;
+    color: var(--cl-text);
+    vertical-align: middle;
+    font-size: 0.92rem;
+}
+
+/* Nome do cliente em destaque */
+.clients-modern .table tbody td:first-child {
+    font-weight: 600;
+    color: var(--cl-text);
+}
+
+/* ============================================================================
+   COLUNA TIPO — convertendo texto em chip PF/PJ
+   ============================================================================ */
+/* Heuristica: a 2a coluna contem "Pessoa Fisica" ou "Pessoa Juridica".
+   Como o texto vem do template (sem badge), aplicamos um efeito visual
+   sem alterar HTML — usando data-* nao funciona aqui, entao apenas
+   estilizamos como pill discreta. */
+.clients-modern .table tbody td:nth-child(2) {
+    font-size: 0.85rem;
+    color: var(--cl-text-muted);
+    font-weight: 500;
+}
+
+/* ============================================================================
+   COLUNA CONTATO — emojis + WhatsApp button refinado
+   ============================================================================ */
+.clients-modern .table tbody td:nth-child(4) > div {
+    margin-bottom: 0.18rem;
+    line-height: 1.45;
+}
+.clients-modern .table tbody td:nth-child(4) > div:last-child {
+    margin-bottom: 0;
+}
+
+/* Botao WhatsApp inline */
+.clients-modern .table tbody td:nth-child(4) .btn-success {
+    background: #25D366 !important;
+    border: 1px solid #25D366 !important;
+    color: #ffffff !important;
+    border-radius: var(--cl-radius-pill) !important;
+    padding: 0.18rem 0.55rem !important;
+    font-size: 0.72rem !important;
+    font-weight: 600;
+    margin-left: 0.4rem !important;
+    transition: background 0.15s ease, transform 0.12s ease;
+}
+.clients-modern .table tbody td:nth-child(4) .btn-success:hover {
+    background: #128C7E !important;
+    border-color: #128C7E !important;
+    transform: translateY(-1px);
+}
+
+/* ============================================================================
+   BOTOES DE ACAO
+   ============================================================================ */
+.clients-modern .btn-group .btn {
+    border-radius: 8px !important;
+    margin: 0 1px;
+    padding: 0.32rem 0.55rem !important;
+    border: none !important;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+    font-size: 0.85rem;
+}
+.clients-modern .btn-group .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(15, 23, 42, 0.15);
+}
+.clients-modern .btn-group .btn.btn-success {
+    background: #2E7D32 !important;     /* verde "nova OS" */
+    color: #ffffff !important;
+}
+.clients-modern .btn-group .btn.btn-primary {
+    background: var(--cl-accent) !important;
+    color: #ffffff !important;
+}
+.clients-modern .btn-group .btn.btn-warning {
+    background: #F57C00 !important;
+    color: #ffffff !important;
+}
+.clients-modern .btn-group .btn.btn-danger {
+    background: #DC2626 !important;
+    color: #ffffff !important;
+}
+
+/* ============================================================================
+   PAGINACAO
+   ============================================================================ */
+.clients-modern .pagination {
+    margin-top: 1.3rem;
+    gap: 0.25rem;
+}
+
+.clients-modern .pagination .page-link {
+    border: 1px solid var(--cl-border) !important;
+    border-radius: var(--cl-radius-sm) !important;
+    color: var(--cl-text-muted);
+    padding: 0.4rem 0.75rem !important;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.clients-modern .pagination .page-link:hover {
+    background: var(--cl-accent-soft) !important;
+    color: var(--cl-accent) !important;
+    border-color: var(--cl-accent) !important;
+}
+.clients-modern .pagination .page-item.active .page-link {
+    background: var(--cl-accent) !important;
+    border-color: var(--cl-accent) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(13, 71, 161, 0.25);
+}
+.clients-modern .pagination .page-item.disabled .page-link {
+    background: var(--cl-bg-card-soft) !important;
+    color: #cbd5e1 !important;
+    border-color: var(--cl-border) !important;
+}
+
+/* ============================================================================
+   ESTADO VAZIO
+   ============================================================================ */
+.clients-modern .table tbody tr td.text-center.py-4 {
+    background: var(--cl-bg-card-soft);
+}
+.clients-modern .table tbody .bi-inbox {
+    color: var(--cl-accent-2);
+    opacity: 0.6;
+}
+
+/* ============================================================================
+   RESPONSIVO
+   ============================================================================ */
+@media (max-width: 991.98px) {
+    .clients-modern > .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.75rem;
+    }
+    .clients-modern > .d-flex .btn-primary {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .clients-modern .table thead th {
+        font-size: 0.7rem !important;
+        padding: 0.55rem 0.55rem !important;
+    }
+    .clients-modern .table tbody td {
+        padding: 0.55rem 0.55rem !important;
+        font-size: 0.85rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .clients-modern .btn-group .btn,
+    .clients-modern > .d-flex .btn-primary,
+    .clients-modern .btn-secondary,
+    .clients-modern .table tbody tr {
+        transition: none !important;
+        transform: none !important;
+    }
+}

@@ -1,0 +1,755 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4 dash-shell">
+    <!-- Primeira linha - Indicadores principais -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-3">
+            <div class="card dashboard-card primary-gradient" id="total-orders">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-subtitle mb-2">Total de OS</h6>
+                            <h2 class="card-value mb-0">{{ total_orders }}</h2>
+                        </div>
+                        <div class="card-icon">
+                            <i class="bi bi-folder"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card warning-gradient" id="pending-orders">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-subtitle mb-2">OS Aguardando</h6>
+                            <h2 class="card-value mb-0">{{ pending_orders }}</h2>
+                        </div>
+                        <div class="card-icon">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card info-gradient" id="in-progress-orders">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-subtitle mb-2">OS em Manutenção</h6>
+                            <h2 class="card-value mb-0">{{ in_progress_orders }}</h2>
+                        </div>
+                        <div class="card-icon">
+                            <i class="bi bi-tools"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card success-gradient" id="completed-orders">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-subtitle mb-2">OS Concluídas</h6>
+                            <h2 class="card-value mb-0">{{ completed_orders }}</h2>
+                        </div>
+                        <div class="card-icon">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Segunda linha - Indicadores de atraso e críticos -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-3">
+            <div class="card dashboard-card" id="delayed-orders">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                <h6 class="card-subtitle mb-0 text-warning">OS em Atraso</h6>
+                            </div>
+                            <h2 class="card-value text-warning mb-1">{{ delayed_orders }}</h2>
+                            <small class="text-muted">OS abertas há mais de 7 dias</small>
+                        </div>
+                        <div class="status-indicator warning"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card" id="critical-orders">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-exclamation-circle text-danger me-2"></i>
+                                <h6 class="card-subtitle mb-0 text-danger">OS Críticas</h6>
+                            </div>
+                            <h2 class="card-value text-danger mb-1">{{ critical_orders }}</h2>
+                            <small class="text-muted">OS abertas há mais de 10 dias</small>
+                        </div>
+                        <div class="status-indicator danger"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card" id="accounts-payable">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-cash-stack text-danger me-2"></i>
+                                <h6 class="card-subtitle mb-0 text-danger">Contas a Pagar</h6>
+                            </div>
+                            <h2 class="card-value text-danger mb-1">{{ contas_pagar_vencidas }}</h2>
+                            <small class="text-muted">Vencidas</small>
+                            <div class="mt-2">
+                                <strong class="text-danger">R$ {{ "%.2f"|format(total_pagar_pendente) }}</strong>
+                                <small class="text-muted">pendente</small>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('finance.accounts', type='pagar', status='pendente') }}" class="btn btn-sm btn-outline-danger mt-2">
+                            <i class="bi bi-arrow-right"></i> Ver Todas
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card" id="accounts-receivable">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-cash text-success me-2"></i>
+                                <h6 class="card-subtitle mb-0 text-success">Contas a Receber</h6>
+                            </div>
+                            <h2 class="card-value text-success mb-1">{{ contas_receber_vencidas }}</h2>
+                            <small class="text-muted">Vencidas</small>
+                            <div class="mt-2">
+                                <strong class="text-success">R$ {{ "%.2f"|format(total_receber_pendente) }}</strong>
+                                <small class="text-muted">pendente</small>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('finance.accounts', type='receber', status='pendente') }}" class="btn btn-sm btn-outline-success mt-2">
+                            <i class="bi bi-arrow-right"></i> Ver Todas
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if peliculas_enabled %}
+    <!-- Acesso rápido - Películas -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-4 col-lg-3">
+            <a href="{{ url_for('peliculas.index') }}" class="text-decoration-none">
+                <div class="card dashboard-card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); cursor: pointer;">
+                    <div class="card-body text-white d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="bi bi-phone" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 text-white">Peliculas Compativeis</h6>
+                            <small class="opacity-75">Consultar compatibilidade</small>
+                        </div>
+                        <i class="bi bi-arrow-right ms-auto" style="font-size: 1.2rem;"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Terceira linha - Gráficos -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title">OS por Status</h5>
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title">OS por Dia da Semana</h5>
+                    <div class="chart-container">
+                        <canvas id="weekdayChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quarta linha - Técnicos e Clientes -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-header border-0 bg-transparent">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title text-dark fw-bold">Técnicos Mais Produtivos</h5>
+                            <small class="text-dark fw-bold">Últimos 30 dias</small>
+                        </div>
+                        <i class="bi bi-trophy text-warning"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="text-dark fw-bold">Técnico</th>
+                                    <th class="text-end text-dark fw-bold">OS Concluídas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tech in top_technicians %}
+                                <tr>
+                                    <td class="fw-bold text-dark">{{ tech.username }}</td>
+                                    <td class="text-end">{{ tech.total_orders }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-header border-0 bg-transparent">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title text-dark fw-bold">Clientes Mais Frequentes</h5>
+                            <small class="text-dark fw-bold">Últimos 30 dias</small>
+                        </div>
+                        <i class="bi bi-people text-primary"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="text-dark fw-bold">Cliente</th>
+                                    <th class="text-end text-dark fw-bold">Total de OS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for client in top_clients %}
+                                <tr>
+                                    <td class="fw-bold text-dark">{{ client[0] }}</td>
+                                    <td class="text-end">{{ client[1] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ===================================================================== #}
+    {# Quinta linha — Ranking de pecas (mais vendidas + estoque critico)     #}
+    {# Bloco isolado em .dash-ranking — nao afeta cards/graficos existentes  #}
+    {# ===================================================================== #}
+    <div class="row mb-4 g-3 dash-ranking">
+        <div class="col-lg-7">
+            <div class="ranking-card">
+                <div class="ranking-header">
+                    <div>
+                        <h5 class="ranking-title">
+                            <i class="bi bi-trophy-fill"></i>
+                            Peças Mais Vendidas
+                        </h5>
+                        <div class="ranking-subtitle">Top 10 — últimos 30 dias</div>
+                    </div>
+                    <i class="bi bi-bar-chart-fill text-primary fs-5"></i>
+                </div>
+                <div class="ranking-body">
+                    {% if top_pecas_vendidas and top_pecas_vendidas|length > 0 %}
+                    <ol class="top-list">
+                        {% for p in top_pecas_vendidas %}
+                        <li>
+                            <span class="top-rank">{{ loop.index }}</span>
+                            <div>
+                                <div class="top-name" title="{{ p.name }}">{{ p.name }}</div>
+                                <div class="top-meta">
+                                    Estoque: {{ "%.0f"|format(p.quantity) }} un
+                                    <span class="mini-badge {{ p.stock_status }}">{{ p.stock_status_label }}</span>
+                                </div>
+                            </div>
+                            <div class="top-qty">
+                                {{ "%.0f"|format(p.total_vendido) }}
+                                <small>vendidas</small>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ol>
+                    <div class="chart-wrap">
+                        <canvas id="topVendasChart" aria-label="Gráfico de barras das peças mais vendidas"></canvas>
+                    </div>
+                    {% else %}
+                    <div class="ranking-empty">
+                        <i class="bi bi-cart-x"></i>
+                        <div>Nenhuma venda confirmada nos últimos 30 dias.</div>
+                        <div class="mt-1 small">Registre vendas para ver o ranking aparecer aqui.</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="ranking-card">
+                <div class="ranking-header">
+                    <div>
+                        <h5 class="ranking-title" style="color: var(--dash-critico);">
+                            <i class="bi bi-exclamation-octagon-fill" style="color: var(--dash-critico);"></i>
+                            Estoque Crítico
+                        </h5>
+                        <div class="ranking-subtitle">Itens precisando de reposição imediata</div>
+                    </div>
+                    <a href="{{ url_for('inventory.index', status='critico') }}"
+                       class="btn btn-sm btn-outline-danger" title="Ver todos os itens críticos no estoque">
+                        Ver todos
+                    </a>
+                </div>
+                <div class="ranking-body">
+                    {% if pecas_criticas and pecas_criticas|length > 0 %}
+                    <ul class="critico-list">
+                        {% for p in pecas_criticas %}
+                        <li class="is-{{ p.stock_status }}">
+                            <div class="critico-info">
+                                <span class="nome" title="{{ p.name }}">{{ p.name }}</span>
+                                <div class="estoque">
+                                    Mínimo: {{ "%.0f"|format(p.minimum_quantity) }} un
+                                    {% if p.stock_percentage <= 999 %}· {{ p.stock_percentage }}% do mínimo{% endif %}
+                                </div>
+                            </div>
+                            <div class="critico-qty {{ 'atencao' if p.stock_status == 'atencao' else '' }}">
+                                {{ "%.0f"|format(p.quantity) }}
+                                <small>em estoque</small>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="ranking-empty">
+                        <i class="bi bi-check-circle text-success"></i>
+                        <div>Nenhum item em estado crítico.</div>
+                        <div class="mt-1 small">Estoque saudável!</div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="ranking-footer">
+                    <a href="{{ url_for('inventory.index') }}">
+                        <i class="bi bi-box-seam"></i> Abrir controle de estoque
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Link de acesso à rede -->
+<div class="position-fixed bottom-0 end-0 p-3">
+    <div class="network-access">
+        <small class="text-muted">
+            Acesso em rede: <strong>{{ network_url }}</strong>
+            <button class="btn btn-sm btn-outline-secondary" 
+                    onclick="copyNetworkUrl('{{ network_url }}')">
+                <i class="bi bi-clipboard"></i>
+            </button>
+        </small>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+{# CSS escopado em .dash-shell — Fase 4 (modernizacao cosmetica do dashboard) #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-shell.css') }}?v=20260529-tema">
+{# CSS escopado em .dash-ranking — adicionado pela Fase 3 (ranking de pecas) #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-modern.css') }}?v=20260529-tema">
+<style>
+/* Card Styles */
+.dashboard-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Gradient Backgrounds */
+.primary-gradient {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+}
+
+.warning-gradient {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+    color: white;
+}
+
+.info-gradient {
+    background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%);
+    color: white;
+}
+
+.success-gradient {
+    background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+    color: white;
+}
+
+/* Card Components */
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-subtitle {
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-value {
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.card-icon {
+    font-size: 2rem;
+    opacity: 0.8;
+    margin-top: -0.5rem;
+}
+
+/* Status Indicators */
+.status-indicator {
+    width: 8px;
+    height: 100%;
+    border-radius: 4px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.status-indicator.warning {
+    background-color: #ffc107;
+}
+
+.status-indicator.danger {
+    background-color: #dc3545;
+}
+
+/* Chart Container */
+.chart-container {
+    position: relative;
+    height: 250px;
+    margin-top: 1rem;
+}
+
+/* Table Styles */
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    color: #2c3e50;
+    padding: 1rem 0.75rem;
+}
+
+.table td {
+    vertical-align: middle;
+    padding: 0.75rem;
+    color: #212529;
+    font-weight: 500;
+}
+
+.table td.text-dark {
+    color: #000 !important;
+}
+
+/* Network Access */
+.network-access {
+    background: white;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.network-access button {
+    padding: 0.25rem 0.5rem;
+    margin-left: 0.5rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .card-value {
+        font-size: 1.5rem;
+    }
+    
+    .card-icon {
+        font-size: 1.5rem;
+    }
+    
+    .chart-container {
+        height: 200px;
+    }
+}
+
+/* Card Components */
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding: 1.5rem;
+}
+
+.card-header .card-title {
+    color: #2c3e50;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.card-header small {
+    color: #2c3e50;
+    font-size: 0.9rem;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.text-primary {
+    color: #0d6efd !important;
+}
+
+.table thead th {
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table tbody td {
+    color: #2c3e50;
+    font-weight: 500;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Dados dos gráficos
+const statusLabels = {{ status_labels|tojson|safe }};
+const statusData = {{ status_data|tojson|safe }};
+const weekdayLabels = {{ weekday_labels|tojson|safe }};
+const weekdayData = {{ weekday_data|tojson|safe }};
+
+function refreshDashboard() {
+    fetch(window.location.href)
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const newDoc = parser.parseFromString(html, 'text/html');
+            
+            // Atualiza os números
+            ['total', 'pending', 'in-progress', 'completed', 'delayed', 'critical'].forEach(type => {
+                const element = document.querySelector(`#${type}-orders .card-value`);
+                const newValue = newDoc.querySelector(`#${type}-orders .card-value`);
+                if (element && newValue) {
+                    element.textContent = newValue.textContent;
+                }
+            });
+            
+            // Atualiza os gráficos
+            if (window.statusChart) {
+                window.statusChart.data = {
+                    labels: statusLabels,
+                    datasets: [{
+                        data: statusData,
+                        backgroundColor: ['#ffc107', '#0dcaf0', '#198754', '#dc3545'],
+                        borderWidth: 0,
+                        borderRadius: 4
+                    }]
+                };
+                window.statusChart.update();
+            }
+            
+            if (window.weekdayChart) {
+                window.weekdayChart.data = {
+                    labels: weekdayLabels,
+                    datasets: [{
+                        label: 'OS Abertas',
+                        data: weekdayData,
+                        backgroundColor: '#0d6efd',
+                        borderRadius: 4,
+                        borderWidth: 0
+                    }]
+                };
+                window.weekdayChart.update();
+            }
+        });
+}
+
+// Atualiza o dashboard a cada 30 segundos
+setInterval(refreshDashboard, 30000);
+
+function copyNetworkUrl(url) {
+    navigator.clipboard.writeText(url).then(() => {
+        alert('URL copiada para a área de transferência!');
+    });
+}
+
+// Configuração do gráfico de status
+const statusCtx = document.getElementById('statusChart').getContext('2d');
+window.statusChart = new Chart(statusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: statusLabels,
+        datasets: [{
+            data: statusData,
+            backgroundColor: ['#ffc107', '#0dcaf0', '#198754', '#dc3545'],
+            borderWidth: 0,
+            borderRadius: 4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 20,
+                    usePointStyle: true,
+                    pointStyle: 'circle'
+                }
+            }
+        },
+        cutout: '75%'
+    }
+});
+
+// Configuração do gráfico de dias da semana
+const weekdayCtx = document.getElementById('weekdayChart').getContext('2d');
+window.weekdayChart = new Chart(weekdayCtx, {
+    type: 'bar',
+    data: {
+        labels: weekdayLabels,
+        datasets: [{
+            label: 'OS Abertas',
+            data: weekdayData,
+            backgroundColor: '#0d6efd',
+            borderRadius: 4,
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                },
+                grid: {
+                    drawBorder: false
+                }
+            },
+            x: {
+                grid: {
+                    display: false
+                }
+            }
+        }
+    }
+});
+
+/* =========================================================================
+   Grafico horizontal das pecas mais vendidas (Fase 3 — ranking de pecas)
+   - Reaproveita o Chart.js ja carregado pelo bloco principal acima.
+   - Renderiza apenas se houver dados; senao, ignora silenciosamente.
+   - Escopo isolado em .dash-ranking (canvas com pointer-events re-habilitado).
+   ========================================================================= */
+(function () {
+    var canvas = document.getElementById('topVendasChart');
+    if (!canvas) return;
+
+    var labels = {{ (top_pecas_vendidas | map(attribute='name') | list) | tojson | safe }};
+    var dados  = {{ (top_pecas_vendidas | map(attribute='total_vendido') | list) | tojson | safe }};
+    if (!labels || labels.length === 0) return;
+
+    /* Limita o tamanho do label para nao quebrar o eixo */
+    var labelsCurtos = labels.map(function (n) {
+        return n.length > 28 ? n.substring(0, 26) + '...' : n;
+    });
+
+    new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: labelsCurtos,
+            datasets: [{
+                label: 'Unidades vendidas',
+                data: dados,
+                backgroundColor: 'rgba(79, 70, 229, 0.85)',
+                borderColor: 'rgba(79, 70, 229, 1)',
+                borderWidth: 1,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { beginAtZero: true, ticks: { precision: 0 } },
+                y: { ticks: { font: { size: 11 } } }
+            }
+        }
+    });
+})();
+</script>
+{% endblock %}

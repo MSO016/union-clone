@@ -1,0 +1,777 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/inventory-modern.css') }}?v=20260529-tema">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 inv-modern">
+    <h1 class="mt-4">Controle de Estoque</h1>
+
+    {# ===================================================================== #}
+    {# Resumo do estoque — 5 cards de KPI alimentados pela rota.             #}
+    {# Aproveita Inventory.minimum_quantity ja existente no banco.            #}
+    {# ===================================================================== #}
+    {% if resumo is defined %}
+    <div class="resumo-row">
+        <div class="resumo-card total">
+            <span class="resumo-label">Total de itens</span>
+            <span class="resumo-valor">{{ resumo.total }}</span>
+            <span class="resumo-hint">no estoque</span>
+        </div>
+        <div class="resumo-card critico">
+            <span class="resumo-label">Crítico</span>
+            <span class="resumo-valor">{{ resumo.critico }}</span>
+            <span class="resumo-hint">precisa repor já</span>
+        </div>
+        <div class="resumo-card atencao">
+            <span class="resumo-label">Atenção</span>
+            <span class="resumo-valor">{{ resumo.atencao }}</span>
+            <span class="resumo-hint">programar reposição</span>
+        </div>
+        <div class="resumo-card ok">
+            <span class="resumo-label">OK</span>
+            <span class="resumo-valor">{{ resumo.ok }}</span>
+            <span class="resumo-hint">estoque saudável</span>
+        </div>
+        <div class="resumo-card valor">
+            <span class="resumo-label">Valor total</span>
+            <span class="resumo-valor">R$ {{ "%.2f"|format(resumo.valor_total) }}</span>
+            <span class="resumo-hint">qtd × custo unitário</span>
+        </div>
+    </div>
+
+    {# Chips de filtro rapido — links diretos preservando demais query params #}
+    {% set base_args = request.args.copy() %}
+    {% if base_args.pop('status', None) %}{% endif %}
+    {% if base_args.pop('page', None) %}{% endif %}
+    <div class="chips-row" role="tablist" aria-label="Filtrar por status do estoque">
+        <a class="chip {% if not status_atual %}active{% endif %}"
+           href="{{ url_for('inventory.index', **base_args) }}"
+           role="tab" aria-selected="{{ 'true' if not status_atual else 'false' }}">
+            Todos <span class="chip-count">{{ resumo.total }}</span>
+        </a>
+        <a class="chip critico {% if status_atual == 'critico' %}active{% endif %}"
+           href="{{ url_for('inventory.index', status='critico', **base_args) }}"
+           role="tab" aria-selected="{{ 'true' if status_atual == 'critico' else 'false' }}">
+            <i class="bi bi-exclamation-octagon-fill"></i>
+            Crítico <span class="chip-count">{{ resumo.critico }}</span>
+        </a>
+        <a class="chip atencao {% if status_atual == 'atencao' %}active{% endif %}"
+           href="{{ url_for('inventory.index', status='atencao', **base_args) }}"
+           role="tab" aria-selected="{{ 'true' if status_atual == 'atencao' else 'false' }}">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            Atenção <span class="chip-count">{{ resumo.atencao }}</span>
+        </a>
+        <a class="chip ok {% if status_atual == 'ok' %}active{% endif %}"
+           href="{{ url_for('inventory.index', status='ok', **base_args) }}"
+           role="tab" aria-selected="{{ 'true' if status_atual == 'ok' else 'false' }}">
+            <i class="bi bi-check-circle-fill"></i>
+            OK <span class="chip-count">{{ resumo.ok }}</span>
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="bi bi-box-seam me-1"></i>
+                    Itens em Estoque
+                </div>
+                <div>
+                    {# F6a: gestao de "Fornecedores" temporariamente oculta. A tela
+                       antiga criava produtos-fantasma (hack) que poluiam o estoque.
+                       O fornecedor agora e texto livre + sugestoes (datalist) no
+                       form de produto. Sera reativada como tela propria quando
+                       existir a tabela 'suppliers' real (F6b). NAO remover a rota. #}
+                    <a href="{{ url_for('inventory.create') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Novo Item
+                    </a>
+                    <a href="{{ url_for('inventory.sale') }}" class="btn btn-success btn-sm">
+                        <i class="bi bi-cart"></i> Registrar Venda
+                    </a>
+                    <button type="button" class="btn btn-info btn-sm" onclick="abrirModalOrcamento()">
+                        <i class="bi bi-whatsapp"></i> Orçamento Rápido
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="name-filter" 
+                               placeholder="Buscar por nome do produto..."
+                               value="{{ request.args.get('search', '') }}">
+                        <button class="btn btn-outline-primary" type="button" onclick="updateFilters()">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select" id="category-filter">
+                        <option value="">Todas as Categorias</option>
+                        {% for value, label in Inventory.CATEGORY_CHOICES.items() %}
+                        <option value="{{ value }}" {% if value == request.args.get('category') %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 legacy-status-filter">
+                    {# Mantido para compatibilidade com o JS legado de updateFilters().    #}
+                    {# A UI principal de status agora sao os chips no topo da pagina.     #}
+                    <select class="form-select" id="status-filter" aria-hidden="true" tabindex="-1">
+                        <option value="">Todos os Status</option>
+                        <option value="critico" {% if 'critico' == request.args.get('status') %}selected{% endif %}>Crítico</option>
+                        <option value="atencao" {% if 'atencao' == request.args.get('status') %}selected{% endif %}>Atenção</option>
+                        <option value="ok" {% if 'ok' == request.args.get('status') %}selected{% endif %}>OK</option>
+                        <option value="low" {% if 'low' == request.args.get('status') %}selected{% endif %}>Abaixo do Mínimo (legado)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th class="stock-cell">Status</th>
+                        <th>Nome</th>
+                        <th>Categoria</th>
+                        <th>Quantidade</th>
+                        <th>Quantidade Mínima</th>
+                        <th>Preço Unitário</th>
+                        <th>Preço de Saída</th>
+                        <th>Observações</th>
+                        <th>Fornecedor</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    {# Status calculado pelas properties stock_status/stock_percentage do model #}
+                    {% set st = item.stock_status %}
+                    {% set pct = item.stock_percentage %}
+                    {% set fill_pct = pct if pct <= 100 else 100 %}
+                    <tr class="row-{{ st }}" data-stock-status="{{ st }}">
+                        <td class="stock-cell">
+                            <span class="stock-badge {{ st }}" title="Quantidade {{ '%.2f'|format(item.quantity) }} / mínimo {{ '%.2f'|format(item.minimum_quantity) }}">
+                                {{ item.stock_status_label }}
+                            </span>
+                            <div class="stock-bar" aria-hidden="true">
+                                <div class="stock-bar-fill {{ st }}" data-fill="{{ fill_pct }}"></div>
+                            </div>
+                            <small class="stock-percent">{{ pct }}% do mínimo</small>
+                        </td>
+                        <td><span class="item-name">{{ item.name }}</span></td>
+                        <td>{{ item.get_category_display() }}</td>
+                        <td>{{ "%.2f"|format(item.quantity) }}</td>
+                        <td>{{ "%.2f"|format(item.minimum_quantity) }}</td>
+                        <td>R$ {{ "%.2f"|format(item.price_per_unit) if item.price_per_unit else '0.00' }}</td>
+                        <td>R$ {{ "%.2f"|format(item.sale_price) if item.sale_price else '0.00' }}</td>
+                        <td>{{ item.notes[:50] + '...' if item.notes and item.notes|length > 50 else item.notes }}</td>
+                        <td>{{ item.supplier or '-' }}</td>
+                        <td class="text-right">
+                            <a href="{{ url_for('inventory.view', id=item.id) }}" class="btn btn-info btn-sm" title="Visualizar">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{{ url_for('inventory.edit', id=item.id) }}" class="btn btn-primary btn-sm" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{{ url_for('inventory.movement', id=item.id) }}" class="btn btn-success btn-sm" title="Movimentação">
+                                <i class="bi bi-arrow-left-right"></i>
+                            </a>
+                            {% if current_user.role in ['admin', 'developer'] %}
+                            <button type="button" class="btn btn-danger btn-sm" title="Excluir" onclick="deleteItem('{{ item.id }}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center">Nenhum item cadastrado</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Paginação -->
+            {% if pagination.pages > 1 %}
+            <nav aria-label="Navegação de páginas">
+                <ul class="pagination justify-content-center">
+                    <!-- Botão Anterior -->
+                    <li class="page-item {{ 'disabled' if not pagination.has_prev }}">
+                        {% set args = request.args.copy() %}
+                        {% do args.pop('page', None) %}
+                        <a class="page-link rounded-start" href="{{ url_for('inventory.index', page=pagination.prev_num, **args) if pagination.has_prev else '#' }}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    
+                    <!-- Páginas -->
+                    {% for page in pagination.iter_pages(left_edge=1, left_current=2, right_current=2, right_edge=1) %}
+                        {% if page %}
+                            {% set args = request.args.copy() %}
+                            {% do args.pop('page', None) %}
+                            <li class="page-item {{ 'active' if page == pagination.page else '' }}">
+                                <a class="page-link" href="{{ url_for('inventory.index', page=page, **args) }}">{{ page }}</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <!-- Botão Próximo -->
+                    <li class="page-item {{ 'disabled' if not pagination.has_next }}">
+                        {% set args = request.args.copy() %}
+                        {% do args.pop('page', None) %}
+                        <a class="page-link rounded-end" href="{{ url_for('inventory.index', page=pagination.next_num, **args) if pagination.has_next else '#' }}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="text-center text-muted small mt-2">
+                {% set start_item = (pagination.page - 1) * pagination.per_page + 1 %}
+                {% set end_item = pagination.page * pagination.per_page %}
+                {% if end_item > pagination.total %}{% set end_item = pagination.total %}{% endif %}
+                Mostrando {{ start_item }} a {{ end_item }}
+                de {{ pagination.total }} itens (Página {{ pagination.page }} de {{ pagination.pages }})
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Orçamento Rápido -->
+<div class="modal fade" id="orcamentoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-whatsapp text-success"></i>
+                    Orçamento Rápido via WhatsApp
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="orcamentoForm">
+                    <!-- Dados do Cliente -->
+                    <div class="mb-3">
+                        <label class="form-label">Cliente</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="clientName" 
+                                   placeholder="Digite o nome do cliente (mín. 2 caracteres)" required>
+                            <button class="btn btn-outline-primary" type="button" onclick="buscarCliente()"
+                                    data-bs-toggle="tooltip" data-bs-placement="top" 
+                                    title="Buscar cliente com WhatsApp cadastrado">
+                                <i class="bi bi-search me-1"></i>
+                                Buscar
+                            </button>
+                        </div>
+                        <input type="hidden" id="clientId">
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle"></i>
+                            Apenas clientes com WhatsApp cadastrado serão exibidos
+                        </small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">WhatsApp</label>
+                        <input type="text" class="form-control" id="whatsapp" 
+                               placeholder="(00) 00000-0000 - Digite o número ou selecione um cliente" 
+                               required>
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle"></i>
+                            Você pode digitar o número manualmente ou selecionar um cliente cadastrado
+                        </small>
+                    </div>
+                    
+                    <!-- Seleção de Produtos -->
+                    <div class="mb-3">
+                        <label class="form-label">Produtos</label>
+                        <div id="produtosSelecionados">
+                            <!-- Produtos serão adicionados aqui -->
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="adicionarProduto()">
+                            <i class="bi bi-plus-lg"></i> Adicionar Produto
+                        </button>
+                    </div>
+                    
+                    <!-- Observações -->
+                    <div class="mb-3">
+                        <label class="form-label">Observações</label>
+                        <textarea class="form-control" id="observacoes" rows="3" 
+                                 placeholder="Informações adicionais para o cliente"></textarea>
+                    </div>
+                    
+                    <!-- Total -->
+                    <div class="mb-3">
+                        <h5>Total: <span id="totalOrcamento" class="text-success">R$ 0,00</span></h5>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="enviarOrcamento()">
+                    <i class="bi bi-whatsapp me-2"></i>Enviar Orçamento
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template para linha de produto -->
+<template id="linhaProdutoTemplate">
+    <div class="produto-linha border rounded p-2 mb-2">
+        <div class="row g-2">
+            <div class="col-md-4">
+                <select class="form-select produto-select" onchange="atualizarPrecoProduto(this)">
+                    <option value="">Selecione um produto...</option>
+                    {% for item in items %}
+                    <option value="{{ item.id }}" 
+                            data-price="{{ item.sale_price }}"
+                            data-stock="{{ item.quantity }}">
+                        {{ item.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <div class="input-group">
+                    <input type="number" class="form-control produto-qtd" 
+                           placeholder="Qtd" min="1" step="1" value="1"
+                           onchange="atualizarTotal()">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="input-group">
+                    <span class="input-group-text">R$</span>
+                    <input type="number" class="form-control produto-preco" 
+                           placeholder="Preço" step="0.01"
+                           onchange="atualizarTotal()">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control produto-subtotal" 
+                       placeholder="Subtotal" readonly>
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-danger btn-sm" 
+                        onclick="removerProduto(this)">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</template>
+
+{% block scripts %}
+{{ super() }}
+<script>
+// Aplica largura das barras de estoque a partir do data-fill (evita inline-style com Jinja)
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.inv-modern .stock-bar-fill[data-fill]').forEach(function (el) {
+        var v = parseInt(el.getAttribute('data-fill'), 10);
+        if (isNaN(v)) v = 0;
+        if (v < 0) v = 0;
+        if (v > 100) v = 100;
+        el.style.width = v + '%';
+    });
+});
+
+async function deleteItem(id) {
+    if (!confirm('Tem certeza que deseja excluir este item?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`{{ url_for('inventory.delete', id=0) }}`.replace('0', id), {
+            method: 'DELETE',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert(data.message || 'Erro ao excluir item');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao excluir item');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const categoryFilter = document.getElementById('category-filter');
+    const statusFilter = document.getElementById('status-filter');
+    const nameFilter = document.getElementById('name-filter');
+    
+    function updateFilters() {
+        const params = new URLSearchParams(window.location.search);
+        
+        if (categoryFilter.value) {
+            params.set('category', categoryFilter.value);
+        } else {
+            params.delete('category');
+        }
+        
+        if (statusFilter.value) {
+            params.set('status', statusFilter.value);
+        } else {
+            params.delete('status');
+        }
+        
+        if (nameFilter.value.trim()) {
+            params.set('search', nameFilter.value.trim());
+        } else {
+            params.delete('search');
+        }
+        
+        window.location.search = params.toString();
+    }
+    
+    categoryFilter.addEventListener('change', updateFilters);
+    statusFilter.addEventListener('change', updateFilters);
+    nameFilter.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            updateFilters();
+        }
+    });
+    
+    // Set initial values from URL
+    const params = new URLSearchParams(window.location.search);
+    categoryFilter.value = params.get('category') || '';
+    statusFilter.value = params.get('status') || '';
+    nameFilter.value = params.get('search') || '';
+});
+
+// Funções do orçamento rápido
+function abrirModalOrcamento() {
+    // Limpa o formulário
+    document.getElementById('orcamentoForm').reset();
+    document.getElementById('produtosSelecionados').innerHTML = '';
+    document.getElementById('totalOrcamento').textContent = 'R$ 0,00';
+    
+    // Adiciona primeira linha de produto
+    adicionarProduto();
+    
+    // Abre o modal
+    const modal = new bootstrap.Modal(document.getElementById('orcamentoModal'));
+    modal.show();
+}
+
+function adicionarProduto() {
+    const template = document.getElementById('linhaProdutoTemplate');
+    const clone = template.content.cloneNode(true);
+    document.getElementById('produtosSelecionados').appendChild(clone);
+}
+
+function removerProduto(button) {
+    button.closest('.produto-linha').remove();
+    atualizarTotal();
+}
+
+function atualizarPrecoProduto(select) {
+    const option = select.options[select.selectedIndex];
+    const linha = select.closest('.produto-linha');
+    const precoInput = linha.querySelector('.produto-preco');
+    
+    if (option.value) {
+        precoInput.value = option.dataset.price;
+        atualizarTotal();
+    }
+}
+
+function atualizarTotal() {
+    let total = 0;
+    
+    document.querySelectorAll('.produto-linha').forEach(linha => {
+        const quantidade = parseFloat(linha.querySelector('.produto-qtd').value) || 0;
+        const preco = parseFloat(linha.querySelector('.produto-preco').value) || 0;
+        const subtotal = quantidade * preco;
+        
+        linha.querySelector('.produto-subtotal').value = `R$ ${subtotal.toFixed(2)}`;
+        total += subtotal;
+    });
+    
+    document.getElementById('totalOrcamento').textContent = `R$ ${total.toFixed(2)}`;
+}
+
+async function buscarCliente() {
+    const clientName = document.getElementById('clientName').value.trim();
+    if (!clientName || clientName.length < 2) {
+        alert('Digite pelo menos 2 caracteres para buscar');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/clients/search?q=${encodeURIComponent(clientName)}`);
+        if (!response.ok) {
+            throw new Error('Erro ao buscar clientes');
+        }
+
+        const clients = await response.json();
+        
+        // Filtra apenas clientes com WhatsApp
+        const clientsWithWhatsapp = clients.filter(client => 
+            client.phone && client.phone.replace(/\D/g, '').length >= 10
+        );
+
+        if (clientsWithWhatsapp.length === 0) {
+            alert('Nenhum cliente encontrado com WhatsApp cadastrado');
+            return;
+        }
+
+        // Se encontrou apenas um cliente, seleciona automaticamente
+        if (clientsWithWhatsapp.length === 1) {
+            const client = clientsWithWhatsapp[0];
+            document.getElementById('clientId').value = client.id;
+            document.getElementById('clientName').value = client.name;
+            document.getElementById('whatsapp').value = client.phone || '';
+            return;
+        }
+
+        // Se encontrou múltiplos clientes, mostra um modal de seleção
+        let html = '<div class="list-group">';
+        clientsWithWhatsapp.forEach(client => {
+            html += `
+                <button type="button" class="list-group-item list-group-item-action"
+                        onclick="selecionarCliente(${client.id}, '${client.name}', '${client.phone || ''}')">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">${client.name}</h6>
+                        <small class="text-success">
+                            <i class="bi bi-whatsapp"></i> 
+                            ${client.phone || ''}
+                        </small>
+                    </div>
+                    ${client.document ? `<small class="text-muted">Doc: ${client.document}</small><br>` : ''}
+                    ${client.email ? `<small class="text-muted">Email: ${client.email}</small>` : ''}
+                </button>`;
+        });
+        html += '</div>';
+
+        // Cria um modal para seleção
+        const modalHtml = `
+            <div class="modal fade" id="clientSelectionModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="bi bi-whatsapp text-success me-2"></i>
+                                Selecione o Cliente
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            ${html}
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+
+        // Remove modal anterior se existir
+        const oldModal = document.getElementById('clientSelectionModal');
+        if (oldModal) {
+            oldModal.remove();
+        }
+
+        // Adiciona o novo modal ao DOM
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        // Inicializa e mostra o modal
+        const modal = new bootstrap.Modal(document.getElementById('clientSelectionModal'));
+        modal.show();
+
+        // Inicializa os tooltips
+        const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltips.forEach(tooltip => new bootstrap.Tooltip(tooltip));
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao buscar clientes. Por favor, tente novamente.');
+    }
+}
+
+function selecionarCliente(id, name, phone) {
+    document.getElementById('clientId').value = id;
+    document.getElementById('clientName').value = name;
+    document.getElementById('whatsapp').value = phone;
+    
+    // Fecha o modal de seleção
+    const modal = bootstrap.Modal.getInstance(document.getElementById('clientSelectionModal'));
+    modal.hide();
+}
+
+async function enviarOrcamento() {
+    const form = document.getElementById('orcamentoForm');
+    
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return;
+    }
+    
+    // Coleta os dados do formulário
+    const items = [];
+    document.querySelectorAll('.produto-linha').forEach(linha => {
+        const select = linha.querySelector('.produto-select');
+        if (select.value) {
+            items.push({
+                id: select.value,
+                quantity: linha.querySelector('.produto-qtd').value,
+                price: linha.querySelector('.produto-preco').value
+            });
+        }
+    });
+    
+    if (items.length === 0) {
+        alert('Selecione pelo menos um produto');
+        return;
+    }
+    
+    const data = {
+        client_id: document.getElementById('clientId').value || null,
+        client_name: document.getElementById('clientName').value,
+        whatsapp: document.getElementById('whatsapp').value.replace(/\D/g, ''),
+        notes: document.getElementById('observacoes').value,
+        items: items
+    };
+    
+    try {
+        const response = await fetch('/inventory/quick_quote', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Fecha o modal
+            bootstrap.Modal.getInstance(document.getElementById('orcamentoModal')).hide();
+            
+            // Abre o WhatsApp
+            window.open(`https://wa.me/55${result.whatsapp}?text=${encodeURIComponent(result.message)}`, '_blank');
+            
+            // Se tiver um ID de venda, oferece para ir para a página de vendas
+            if (result.sale_id && confirm('Orçamento salvo como rascunho de venda. Deseja ir para a página de vendas?')) {
+                window.location.href = `/sales/${result.sale_id}`;
+            }
+        } else {
+            alert(result.message || 'Erro ao gerar orçamento');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao gerar orçamento');
+    }
+}
+</script>
+{% endblock %}
+
+<style>
+/* Estilos da paginação */
+.pagination {
+    margin: 20px 0;
+    gap: 3px;
+}
+
+.page-link {
+    color: #0d6efd;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    padding: 8px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    transition: all 0.2s ease-in-out;
+}
+
+.page-link:hover {
+    color: #0a58ca;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+    z-index: 2;
+}
+
+.page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+    font-weight: 500;
+}
+
+.page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #fff;
+    border-color: #dee2e6;
+    opacity: 0.6;
+}
+
+/* Efeito de hover suave */
+.page-link:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Estilo para os botões de navegação */
+.page-item:first-child .page-link,
+.page-item:last-child .page-link {
+    padding: 8px 10px;
+}
+
+.btn {
+    padding: 6px 12px;
+    margin: 0 2px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 0.875rem;
+}
+
+.table td {
+    vertical-align: middle;
+}
+</style>
+{% endblock %}

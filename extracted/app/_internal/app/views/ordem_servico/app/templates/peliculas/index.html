@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block inner_content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i class="bi bi-phone"></i> Consulta de Peliculas Compativeis
+            </h4>
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Voltar ao Dashboard
+            </a>
+        </div>
+        <hr>
+    </div>
+</div>
+
+<!-- Busca -->
+<div class="row mb-4">
+    <div class="col-md-8 col-lg-6 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <label for="busca-pelicula" class="form-label fw-bold">
+                    <i class="bi bi-search"></i> Buscar modelo do aparelho
+                </label>
+                <div class="input-group">
+                    <input type="text" 
+                           id="busca-pelicula" 
+                           class="form-control form-control-lg" 
+                           placeholder="Ex: Galaxy A52, iPhone 13, Moto G..."
+                           autocomplete="off"
+                           autofocus>
+                    <button class="btn btn-primary" type="button" id="btn-buscar" onclick="buscarPeliculas()">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+                <small class="text-muted mt-1 d-block">
+                    Digite pelo menos 2 caracteres para buscar. A busca encontra todos os modelos que usam a mesma pelicula.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status / Loading -->
+<div id="status-area" class="row mb-3" style="display:none;">
+    <div class="col-md-8 col-lg-6 mx-auto text-center">
+        <div id="loading-indicator" style="display:none;">
+            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+            <span class="ms-2 text-muted">Buscando...</span>
+        </div>
+        <div id="erro-msg" class="alert alert-warning" style="display:none;"></div>
+        <div id="sem-resultados" class="alert alert-info" style="display:none;">
+            <i class="bi bi-info-circle"></i> Nenhum modelo encontrado para o termo buscado.
+        </div>
+    </div>
+</div>
+
+<!-- Resultados -->
+<div id="resultados-area" class="row" style="display:none;">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <span class="fw-bold">
+                    <i class="bi bi-check-circle text-success"></i>
+                    Modelos com pelicula compativel
+                </span>
+                <span id="total-badge" class="badge bg-primary"></span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 35%;">Modelo do aparelho</th>
+                                <th style="width: 65%;">Películas compatíveis (mesmo grupo)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-resultados">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estatísticas -->
+<div class="row mt-4">
+    <div class="col-md-8 col-lg-6 mx-auto">
+        <div id="stats-area" class="text-center">
+            <small class="text-muted" id="stats-text">Carregando informacoes da base...</small>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Busca ao pressionar Enter
+    document.getElementById('busca-pelicula').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            buscarPeliculas();
+        }
+    });
+
+    // Debounce para busca automática ao digitar
+    var debounceTimer = null;
+    document.getElementById('busca-pelicula').addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        var termo = this.value.trim();
+        if (termo.length >= 3) {
+            debounceTimer = setTimeout(function() {
+                buscarPeliculas();
+            }, 400);
+        }
+    });
+
+    function buscarPeliculas() {
+        var termo = document.getElementById('busca-pelicula').value.trim();
+        if (termo.length < 2) return;
+
+        // Mostra loading
+        document.getElementById('status-area').style.display = '';
+        document.getElementById('loading-indicator').style.display = '';
+        document.getElementById('erro-msg').style.display = 'none';
+        document.getElementById('sem-resultados').style.display = 'none';
+        document.getElementById('resultados-area').style.display = 'none';
+
+        fetch('{{ url_for("peliculas.buscar") }}?q=' + encodeURIComponent(termo))
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                document.getElementById('loading-indicator').style.display = 'none';
+
+                if (data.erro) {
+                    document.getElementById('erro-msg').textContent = data.erro;
+                    document.getElementById('erro-msg').style.display = '';
+                    return;
+                }
+
+                if (data.total === 0) {
+                    document.getElementById('sem-resultados').style.display = '';
+                    return;
+                }
+
+                // Preenche tabela (uma linha por modelo buscado + seus compativeis,
+                // organizado igual ao app principal)
+                document.getElementById('status-area').style.display = 'none';
+                document.getElementById('resultados-area').style.display = '';
+                document.getElementById('total-badge').textContent =
+                    data.total + ' resultado' + (data.total === 1 ? '' : 's');
+
+                var tbody = document.getElementById('tabela-resultados');
+                tbody.innerHTML = '';
+
+                (data.linhas || []).forEach(function(linha) {
+                    var tr = document.createElement('tr');
+
+                    var marca = linha.marca
+                        ? '<span class="badge bg-secondary me-1">' + escapeHtml(linha.marca) + '</span>'
+                        : '';
+                    var codigo = linha.codigo
+                        ? ' <code class="small">' + escapeHtml(linha.codigo) + '</code>'
+                        : '';
+
+                    var compat;
+                    if (linha.compativeis && linha.compativeis.length) {
+                        compat = linha.compativeis.map(function(c) {
+                            return '<span class="badge bg-light text-dark border me-1 mb-1">' +
+                                   escapeHtml(c.modelo) + '</span>';
+                        }).join('');
+                    } else {
+                        compat = '<span class="text-muted fst-italic">Sem compatíveis adicionais</span>';
+                    }
+
+                    tr.innerHTML =
+                        '<td class="fw-bold">' + marca + escapeHtml(linha.modelo) + codigo + '</td>' +
+                        '<td>' + compat + '</td>';
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(function(err) {
+                document.getElementById('loading-indicator').style.display = 'none';
+                document.getElementById('erro-msg').textContent = 'Erro de conexao com o servidor.';
+                document.getElementById('erro-msg').style.display = '';
+            });
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(text));
+        return div.innerHTML;
+    }
+
+    // Carrega estatísticas ao abrir a página
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('{{ url_for("peliculas.estatisticas") }}')
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.disponivel) {
+                    document.getElementById('stats-text').innerHTML = 
+                        '<i class="bi bi-database-check text-success"></i> ' +
+                        '<strong>' + data.total_modelos + '</strong> modelos cadastrados';
+                } else {
+                    document.getElementById('stats-text').innerHTML = 
+                        '<i class="bi bi-exclamation-triangle text-warning"></i> ' +
+                        'Base de peliculas indisponivel. Sincronize no aplicativo principal.';
+                }
+            })
+            .catch(function() {
+                document.getElementById('stats-text').textContent = '';
+            });
+    });
+</script>
+{% endblock %}
