@@ -1,0 +1,2199 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+{# Fase 11 - Modernizacao cosmetica VIEW (escopado em .view-modern).
+   Carregado ANTES do {% block styles %} (override de modal/container PyWebView).
+   Nao mexe em handlePDF, status update, generate_budget, WhatsApp modal,
+   reopenOrder, andamentos, modais Bootstrap 5, tooltips, ORDER_ID. #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/view-modern.css') }}?v=20260529-tema">
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+/* Reset e configurações base para PyWebView */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+body {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    background-color: #f8f9fa;
+    padding-top: 60px;
+    position: relative;
+}
+
+/* Ajustes para modal no PyWebView */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1055;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    outline: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1050;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-dialog {
+    position: relative;
+    width: auto;
+    margin: 0.5rem;
+    pointer-events: none;
+    z-index: 1056;
+}
+
+.modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    outline: 0;
+}
+
+/* Container principal */
+.container {
+    position: relative;
+    z-index: 1;
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 view-modern">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">OS #{{ order.id }}</h2>
+        <div class="btn-group">
+            {% if order.status != 'finalizada' %}
+            <a href="{{ url_for('orders.edit', id=order.id) }}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+            {% endif %}
+            
+            <!-- Botão WhatsApp -->
+            {% if order.client and order.client.whatsapp %}
+            <button type="button" class="btn btn-success" onclick="openWhatsAppModal()">
+                <i class="bi bi-whatsapp"></i> WhatsApp
+            </button>
+            {% else %}
+            <button type="button" class="btn btn-success" disabled title="Cliente sem WhatsApp cadastrado">
+                <i class="bi bi-whatsapp"></i> WhatsApp
+            </button>
+            {% endif %}
+
+            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                <i class="bi bi-check2-square"></i> Checklists
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="{{ url_for('checklists.new_checklist', order_id=order.id, type='entrada') }}" 
+                       class="dropdown-item">
+                        <i class="bi bi-box-arrow-in-right"></i> Novo Checklist de Entrada
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('checklists.new_checklist', order_id=order.id, type='saida') }}" 
+                       class="dropdown-item">
+                        <i class="bi bi-box-arrow-right"></i> Novo Checklist de Saída
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a href="{{ url_for('checklists.attach_existing', order_id=order.id) }}" 
+                       class="dropdown-item">
+                        <i class="bi bi-link"></i> Anexar Checklist Existente
+                    </a>
+                </li>
+            </ul>
+            {% if order.status not in ['concluido_sucesso', 'concluido_falha', 'nao_autorizado'] %}
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#statusModal">
+                <i class="fas fa-sync-alt"></i> Atualizar Status
+            </button>
+            {% endif %}
+            <a href="{{ url_for('orders.list') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+            <!-- Botão de Encerramento -->
+            {% if not order.is_warranty and order.status != 'finalizada' %}
+                <a href="{{ url_for('orders.close_order', id=order.id) }}" class="btn btn-danger">
+                    <i class="fas fa-power-off"></i> Encerrar OS
+                </a>
+            {% endif %}
+            {% if order.can_reopen_warranty() %}
+                <a href="{{ url_for('orders.reopen_warranty', id=order.id) }}" class="btn btn-success">
+                    <i class="fas fa-shield-alt"></i> Reabrir em Garantia
+                </a>
+            {% endif %}
+            {% if order.is_warranty and order.can_close_warranty() %}
+                <a href="{{ url_for('orders.close_warranty', id=order.id) }}" class="btn btn-primary">
+                    <i class="fas fa-check"></i> Finalizar Garantia
+                </a>
+            {% endif %}
+            <!-- Botão de orçamento na barra de ações -->
+            {% if order.status in ['aguardando_diagnostico', 'em_diagnostico', 'aguardando_autorizacao', 'autorizado', 'em_manutencao'] %}
+            <a href="{{ url_for('orders.generate_budget', id=order.id) }}" class="btn btn-outline-primary">
+                <i class="bi bi-file-earmark-text"></i> Gerar Orçamento
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-file-pdf"></i> Documentos da OS
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- PDF de Recebimento -->
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-file-earmark-pdf text-primary"></i>
+                                PDF de Recebimento
+                            </h6>
+                            <div class="mb-2">
+                                <label class="form-label fw-bold">Formato A4:</label>
+                                <div class="btn-group w-100">
+                                    <button onclick="handlePDF('{{ url_for('reports.service_order_pdf', id=order.id, type='recebimento') }}', false)" 
+                                            class="btn btn-primary">
+                                        <i class="bi bi-eye"></i> Visualizar
+                                    </button>
+                                    <button onclick="handlePDF('{{ url_for('reports.service_order_pdf', id=order.id, type='recebimento') }}', true)" 
+                                            class="btn btn-secondary">
+                                        <i class="bi bi-download"></i> Baixar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label fw-bold">Formato Térmico:</label>
+                                <div class="btn-group w-100 mb-1">
+                                    <button onclick="handlePDF('{{ url_for('reports.service_order_thermal', id=order.id, type='recebimento', width=80) }}', false)" 
+                                            class="btn btn-info btn-sm" title="Impressora térmica padrão">
+                                        <i class="bi bi-printer"></i> 80mm
+                                    </button>
+                                    <button onclick="handlePDF('{{ url_for('reports.service_order_thermal', id=order.id, type='recebimento', width=58) }}', false)" 
+                                            class="btn btn-outline-info btn-sm" title="Impressora portátil/compacta">
+                                        <i class="bi bi-printer"></i> 58mm
+                                    </button>
+                                </div>
+                                <div class="btn-group w-100">
+                                    <button onclick="printPdf('{{ url_for('reports.service_order_thermal', id=order.id, type='recebimento', width=80) }}')"
+                                       class="btn btn-outline-dark btn-sm" title="Enviar para impressora (80mm)">
+                                        <i class="bi bi-printer-fill"></i> Imprimir 80mm
+                                    </button>
+                                    <button onclick="printPdf('{{ url_for('reports.service_order_thermal', id=order.id, type='recebimento', width=58) }}')"
+                                       class="btn btn-outline-dark btn-sm" title="Enviar para impressora (58mm)">
+                                        <i class="bi bi-printer-fill"></i> Imprimir 58mm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PDF de Encerramento -->
+                <div class="col-md-4">
+                    {% set final_status = ['concluido_sucesso', 'concluido_falha', 'nao_autorizado', 'finalizada'] %}
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-file-earmark-pdf text-success"></i>
+                                PDF de Encerramento
+                            </h6>
+                            <div class="mb-2">
+                                <label class="form-label fw-bold">Formato A4:</label>
+                                <div class="btn-group w-100">
+                                    <button onclick="handlePDF('{{ url_for('reports.service_order_pdf', id=order.id, type='encerramento') }}', false)"
+                                       class="btn btn-success {{ 'disabled' if order.status not in final_status }}"
+                                       {{ 'disabled' if order.status not in final_status }}
+                                       title="{{ 'OS precisa estar finalizada' if order.status not in final_status }}">
+                                        <i class="bi bi-eye"></i> Visualizar
+                                    </button>
+                                    <button onclick="handlePDF('{{ url_for('reports.service_order_pdf', id=order.id, type='encerramento') }}', true)" 
+                                            class="btn btn-outline-success {{ 'disabled' if order.status not in final_status }}"
+                                            {{ 'disabled' if order.status not in final_status }}
+                                            title="{{ 'OS precisa estar finalizada' if order.status not in final_status }}">
+                                        <i class="bi bi-download"></i> Baixar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label fw-bold">Formato Térmico:</label>
+                                <div class="btn-group w-100 mb-1">
+                                    <button onclick="handlePDF('{{ url_for('reports.service_order_thermal', id=order.id, type='encerramento', width=80) }}', false)"
+                                       class="btn btn-info btn-sm {{ 'disabled' if order.status not in final_status }}"
+                                       {{ 'disabled' if order.status not in final_status }}
+                                       title="{{ 'OS precisa estar finalizada' if order.status not in final_status else 'Impressora térmica padrão' }}">
+                                        <i class="bi bi-printer"></i> 80mm
+                                    </button>
+                                    <button onclick="handlePDF('{{ url_for('reports.service_order_thermal', id=order.id, type='encerramento', width=58) }}', false)" 
+                                            class="btn btn-outline-info btn-sm {{ 'disabled' if order.status not in final_status }}"
+                                            {{ 'disabled' if order.status not in final_status }}
+                                            title="{{ 'OS precisa estar finalizada' if order.status not in final_status else 'Impressora portátil/compacta' }}">
+                                        <i class="bi bi-printer"></i> 58mm
+                                    </button>
+                                </div>
+                                <div class="btn-group w-100">
+                                    <button onclick="printPdf('{{ url_for('reports.service_order_thermal', id=order.id, type='encerramento', width=80) }}')"
+                                       class="btn btn-outline-dark btn-sm {{ 'disabled' if order.status not in final_status }}"
+                                       {{ 'disabled' if order.status not in final_status }}
+                                       title="{{ 'OS precisa estar finalizada' if order.status not in final_status else 'Enviar para impressora (80mm)' }}">
+                                        <i class="bi bi-printer-fill"></i> Imprimir 80mm
+                                    </button>
+                                    <button onclick="printPdf('{{ url_for('reports.service_order_thermal', id=order.id, type='encerramento', width=58) }}')"
+                                       class="btn btn-outline-dark btn-sm {{ 'disabled' if order.status not in final_status }}"
+                                       {{ 'disabled' if order.status not in final_status }}
+                                       title="{{ 'OS precisa estar finalizada' if order.status not in final_status else 'Enviar para impressora (58mm)' }}">
+                                        <i class="bi bi-printer-fill"></i> Imprimir 58mm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PDF de Andamentos -->
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-file-earmark-pdf text-info"></i>
+                                PDF de Andamentos
+                            </h6>
+                            <div class="btn-group w-100">
+                                <button onclick="handlePDF('/reports/service_order_history/{{ order.id }}', false)"
+                                   class="btn btn-info">
+                                    <i class="bi bi-eye"></i> Visualizar
+                                </button>
+                                <button onclick="handlePDF('/reports/service_order_history/{{ order.id }}', true)"
+                                   class="btn btn-secondary">
+                                    <i class="bi bi-download"></i> Baixar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Etiqueta da OS -->
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-tag text-success"></i>
+                                Etiqueta da OS
+                            </h6>
+                            <div class="btn-group w-100">
+                                <button onclick="handlePDF('{{ url_for('reports.service_order_label', id=order.id) }}', false)"
+                                   class="btn btn-success">
+                                    <i class="bi bi-eye"></i> Visualizar
+                                </button>
+                                <button onclick="handlePDF('{{ url_for('reports.service_order_label', id=order.id) }}', true)"
+                                   class="btn btn-secondary">
+                                    <i class="bi bi-download"></i> Baixar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PDF de Orçamento -->
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-file-earmark-text text-warning"></i>
+                                PDF de Orçamento
+                            </h6>
+                            <div class="mb-2">
+                                <label class="form-label fw-bold">Formato A4:</label>
+                                <div class="btn-group w-100">
+                                    <button onclick="handlePDF('{{ url_for('reports.service_order_pdf', id=order.id, type='orcamento') }}', false)"
+                                       class="btn btn-warning {{ 'disabled' if not order.total_value }}"
+                                       {{ 'disabled' if not order.total_value }}
+                                       title="{{ 'É necessário gerar um orçamento primeiro' if not order.total_value }}">
+                                        <i class="bi bi-eye"></i> Visualizar
+                                    </button>
+                                    <button onclick="handlePDF('{{ url_for('reports.service_order_pdf', id=order.id, type='orcamento') }}', true)" 
+                                            class="btn btn-outline-warning {{ 'disabled' if not order.total_value }}"
+                                            {{ 'disabled' if not order.total_value }}
+                                            title="{{ 'É necessário gerar um orçamento primeiro' if not order.total_value }}">
+                                        <i class="bi bi-download"></i> Baixar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label fw-bold">Formato Térmico:</label>
+                                <div class="btn-group w-100 mb-1">
+                                    <button onclick="handlePDF('{{ url_for('reports.service_order_thermal', id=order.id, type='orcamento', width=80) }}', false)"
+                                       class="btn btn-info btn-sm {{ 'disabled' if not order.total_value }}"
+                                       {{ 'disabled' if not order.total_value }}
+                                       title="{{ 'É necessário gerar um orçamento primeiro' if not order.total_value else 'Impressora térmica padrão' }}">
+                                        <i class="bi bi-printer"></i> 80mm
+                                    </button>
+                                    <button onclick="handlePDF('{{ url_for('reports.service_order_thermal', id=order.id, type='orcamento', width=58) }}', false)" 
+                                            class="btn btn-outline-info btn-sm {{ 'disabled' if not order.total_value }}"
+                                            {{ 'disabled' if not order.total_value }}
+                                            title="{{ 'É necessário gerar um orçamento primeiro' if not order.total_value else 'Impressora portátil/compacta' }}">
+                                        <i class="bi bi-printer"></i> 58mm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nova seção de Orçamento -->
+    {% if order.status in ['aguardando_diagnostico', 'em_diagnostico', 'aguardando_autorizacao', 'autorizado', 'em_manutencao'] %}
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-file-earmark-text"></i> Orçamento
+                <small class="text-white-50">(Disponível para gerar novos orçamentos quando necessário)</small>
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <h6 class="mb-0 me-3">Último Orçamento Gerado:</h6>
+                        {% if order.total_value %}
+                        <span class="badge bg-success">{{ format_money(order.total_value) if format_money else 'R$ %.2f'|format(order.total_value) }}</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Nenhum orçamento gerado</span>
+                        {% endif %}
+                    </div>
+                    {% if order.observations %}
+                    <div class="mb-3">
+                        <h6>Diagnóstico Técnico:</h6>
+                        <p class="border rounded p-2 bg-light">{{ order.observations }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ url_for('orders.generate_budget', id=order.id) }}" class="btn btn-primary me-2">
+                            <i class="bi bi-file-earmark-text"></i> Gerar Novo Orçamento
+                        </a>
+                        {% if order.total_value and order.status == 'aguardando_autorizacao' %}
+                        <button type="button" class="btn btn-success" id="authorizeOrder"
+                                data-bs-toggle="tooltip" data-bs-placement="top" 
+                                title="Autorize o orçamento após aprovação do cliente">
+                            <i class="bi bi-check-circle"></i> Autorizar Orçamento
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Informações do Cliente</h5>
+                    <table class="table table-sm">
+                        <tr>
+                            <th width="30%">Nome:</th>
+                            <td>{{ order.client.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>{% if locale and locale.code == 'PT' %}{{ locale.tax_id_label }}{% elif locale and locale.code == 'US' %}{{ locale.tax_id_pf if order.client.type == 'PF' else locale.tax_id_pj }}{% else %}{{ 'CPF' if order.client.type == 'PF' else 'CNPJ' }}{% endif %}:</th>
+                            <td>{{ order.client.document }}</td>
+                        </tr>
+                        <tr>
+                            <th>Telefone:</th>
+                            <td>{{ order.client.phone or 'Não informado' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>{{ order.client.email or 'Não informado' }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h5>Informações da OS</h5>
+                    <table class="table table-sm">
+                        <tr>
+                            <th width="30%">Status:</th>
+                            <td>
+                                <span class="badge bg-{{ {
+                                    'aguardando_diagnostico': 'warning',
+                                    'em_diagnostico': 'info',
+                                    'aguardando_autorizacao': 'secondary',
+                                    'autorizado': 'primary',
+                                    'em_manutencao': 'info',
+                                    'concluido_sucesso': 'success',
+                                    'concluido_falha': 'danger',
+                                    'nao_autorizado': 'danger'
+                                }[order.status] }}">
+                                    {{ order.get_status_description() }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Data de Entrada:</th>
+                            <td>{{ order.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                        </tr>
+                        {% if order.status in ['concluido_sucesso', 'concluido_falha'] %}
+                        <tr>
+                            <th>Data de Saída:</th>
+                            <td>{{ order.updated_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <th>Técnico:</th>
+                            <td>{{ order.technician.name if order.technician else 'Não atribuído' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Seção de Equipamento existente -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <h5>Equipamento</h5>
+                    <table class="table table-sm">
+                        <tr>
+                            <th width="15%">Tipo de Serviço:</th>
+                            <td>{{ order.service_type.name if order.service_type else 'Não especificado' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Equipamento:</th>
+                            <td>{{ order.equipment }}</td>
+                        </tr>
+                        <tr>
+                            <th>Marca/Modelo:</th>
+                            <td>{{ order.brand or '' }} {{ order.model or '' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nº de Série:</th>
+                            <td>{{ order.serial_number or 'Não informado' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Nova seção de Peças -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-tools me-2"></i>Peças Utilizadas
+                    </h5>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="addPart()">
+                        <i class="bi bi-plus-lg"></i> Adicionar Peça
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Peça</th>
+                                    <th>Quantidade</th>
+                                    <th>Preço Unit.</th>
+                                    <th>Subtotal</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="parts-table-body">
+                                {% if order.parts %}
+                                    {% for part in order.parts %}
+                                    <tr>
+                                        <td>{{ part.name }}</td>
+                                        <td>{{ part.quantity }}</td>
+                                        <td>{{ format_money(part.price_per_unit) if format_money else 'R$ %.2f'|format(part.price_per_unit) }}</td>
+                                        <td>{{ format_money(part.quantity * part.price_per_unit) if format_money else 'R$ %.2f'|format(part.quantity * part.price_per_unit) }}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-danger" 
+                                                        onclick="removePart({{ part.id }})">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr id="no-parts-row">
+                                        <td colspan="5" class="text-center text-muted">
+                                            Nenhuma peça adicionada
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                    <td><strong>R$ <span id="total-parts">0,00</span></strong></td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de Adicionar/Editar Peça -->
+            <div class="modal fade" id="partModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="partModalTitle">Adicionar Peça</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="partForm" class="needs-validation" novalidate>
+                                <input type="hidden" id="part_id" name="part_id">
+                                
+                                <div class="mb-3">
+                                    <label for="part_select" class="form-label required">Peça *</label>
+                                    <select class="form-select" id="part_select" name="part_id" required>
+                                        <option value="">Selecione uma peça...</option>
+                                        {% for item in inventory_items %}
+                                        <option value="{{ item.id }}" 
+                                                data-price="{{ item.price_per_unit }}"
+                                                data-stock="{{ item.quantity }}">
+                                            {{ item.name }} (Disponível: {{ item.quantity }})
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Por favor, selecione uma peça do estoque.
+                                    </div>
+                                    <div class="form-text">
+                                        Selecione a peça do estoque. O preço será preenchido automaticamente.
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="quantity" class="form-label required">Quantidade *</label>
+                                    <input type="number" class="form-control" id="quantity" name="quantity"
+                                           min="0.01" step="0.01" required
+                                           placeholder="Informe a quantidade necessária">
+                                    <div class="invalid-feedback">
+                                        Por favor, informe uma quantidade válida.
+                                    </div>
+                                    <div class="form-text">
+                                        Quantidade disponível: <span id="available_quantity">-</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">Preço Unitário (R$)</label>
+                                    <input type="number" class="form-control" id="price" name="price"
+                                           min="0.01" step="0.01" readonly
+                                           placeholder="Preço será preenchido automaticamente">
+                                    <div class="form-text">
+                                        Preço de custo (apenas visualização). O sistema utilizará automaticamente o preço de venda cadastrado no estoque.
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="observations" class="form-label">Observações</label>
+                                    <textarea class="form-control" id="observations" name="observations"
+                                              rows="2" placeholder="Observações sobre a peça (opcional)..."></textarea>
+                                    <div class="form-text">
+                                        Adicione observações relevantes sobre a peça, se necessário.
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-primary" onclick="savePart()">
+                                <i class="bi bi-save"></i> Salvar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h5>Problema Relatado</h5>
+                    <p class="border rounded p-3 bg-light">{{ order.problem }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Solução</h5>
+                    <p class="border rounded p-3 bg-light">{{ order.solution or 'Não informada' }}</p>
+                </div>
+            </div>
+
+            {% if order.status == 'finalizada' %}
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h5>Informações de Garantia</h5>
+                    <table class="table table-sm">
+                        <tr>
+                            <th width="30%">Garantia:</th>
+                            <td>{{ order.warranty_days }} dias</td>
+                        </tr>
+                        <tr>
+                            <th>Válida até:</th>
+                            <td>
+                                {{ order.warranty_end_date.strftime('%d/%m/%Y') if order.warranty_end_date else 'Não definida' }}
+                                {% if order.warranty_end_date %}
+                                    {% if order.is_in_warranty() %}
+                                        <span class="badge bg-success">Em Garantia</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Expirada</span>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h5>Informações de Pagamento</h5>
+                    <table class="table table-sm">
+                        <tr>
+                            <th width="30%">Valor do Serviço:</th>
+                            <td>{{ format_money(order.service_value) if format_money else 'R$ %.2f'|format(order.service_value) }}</td>
+                        </tr>
+                        <tr>
+                            <th>Valor das Peças:</th>
+                            <td>{{ format_money(order.parts_total_value) if format_money else 'R$ %.2f'|format(order.parts_total_value) }}</td>
+                        </tr>
+                        <tr>
+                            <th>Valor Total:</th>
+                            <td><strong>{{ format_money(order.total_value or 0) if format_money else 'R$ %.2f'|format(order.total_value or 0) }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Forma de Pagamento:</th>
+                            <td>
+                                {{ {
+                                    'dinheiro': 'Dinheiro',
+                                    'cartao_credito': 'Cartão de Crédito',
+                                    'cartao_debito': 'Cartão de Débito',
+                                    'cartao': 'Cartão',
+                                    'pix': 'PIX',
+                                    'transferencia': 'Transferência Bancária',
+                                    'boleto': 'Boleto'
+                                }[order.payment_method] if order.payment_method else 'Não informado' }}
+                                {# Botao QR Code PIX aparece se OS fechou no PIX e ha imagem cadastrada #}
+                                {% if pix_qrcode_url and order.payment_method == 'pix' %}
+                                <button type="button" class="btn btn-outline-success btn-sm ms-2"
+                                        data-bs-toggle="modal" data-bs-target="#modalPixQrCodeOS">
+                                    <i class="bi bi-qr-code"></i> QR Code
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if order.observations %}
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <h5>Observações</h5>
+                    <p class="border rounded p-3 bg-light">{{ order.observations }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <p><strong>Cliente:</strong> {{ order.client.name }}</p>
+                    <p><strong>Equipamento:</strong> {{ order.equipment }}</p>
+                    <p><strong>Problema:</strong> {{ order.problem }}</p>
+                    <p><strong>Tipo de Serviço:</strong> {{ order.service_type.name }}</p>
+                </div>
+                <div class="col-6">
+                    <p><strong>Status:</strong> <span class="badge bg-primary">{{ order.get_status_description() }}</span></p>
+                    <p><strong>Data de Abertura:</strong> {{ order.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+                    <p><strong>Técnico:</strong> {{ order.technician.name if order.technician else 'Não atribuído' }}</p>
+                    {% if order.observations %}
+                    <p><strong>Observações:</strong> {{ order.observations }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status History Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Histórico de Status</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>De</th>
+                            <th>Para</th>
+                            <th>Observações</th>
+                            <th>Alterado por</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for history in order.status_history.order_by(OrderStatusHistory.date.desc()).all() %}
+                        <tr>
+                            <td>{{ history.date.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+                            <td>
+                                {% if history.old_status %}
+                                    <span class="badge bg-secondary">{{ history.get_old_status_description() }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Criação da OS</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ {
+                                    'aguardando_diagnostico': 'warning',
+                                    'em_diagnostico': 'info',
+                                    'aguardando_autorizacao': 'secondary',
+                                    'autorizado': 'primary',
+                                    'em_manutencao': 'info',
+                                    'concluido_sucesso': 'success',
+                                    'concluido_falha': 'danger',
+                                    'nao_autorizado': 'danger',
+                                    'finalizada': 'dark'
+                                }[history.status] }}">
+                                    {{ history.get_status_description() }}
+                                </span>
+                            </td>
+                            <td>{{ history.observations or '-' }}</td>
+                            <td>{{ history.changed_by.username if history.changed_by else '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Área que só aparece na impressão -->
+    <div class="d-none d-print-block mt-5">
+        <div class="row">
+            <div class="col-6">
+                <p class="mb-5">Assinatura do Cliente: _________________________________</p>
+            </div>
+            <div class="col-6">
+                <p class="mb-5">Assinatura do Técnico: _________________________________</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <small>
+                    <strong>Termos de Garantia:</strong><br>
+                    {{ order.service_type.warranty_terms if order.service_type else 'Termos de garantia não especificados.' }}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status Update Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Atualizar Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="statusForm" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label required">Novo Status *</label>
+                        <select class="form-select" name="status" id="newStatus" required>
+                            <option value="">Selecione...</option>
+                            {% for status, desc in order.get_next_status() %}
+                            <option value="{{ status }}">{{ desc }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor, selecione o novo status.
+                        </div>
+                    </div>
+
+                    <!-- Campo de observações padrão para todos os status -->
+                    <div class="mb-3">
+                        <label class="form-label">Observações</label>
+                        <textarea class="form-control" name="observations" id="statusObservations" rows="3"></textarea>
+                        <small class="form-text text-muted">
+                            Descreva os detalhes desta mudança de status.
+                        </small>
+                    </div>
+
+                    <!-- Campos específicos por status -->
+                    <div id="statusSpecificFields">
+                        <!-- Campos para Não Autorizado -->
+                        <div class="status-fields" data-status="nao_autorizado" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label required">Motivo da Não Autorização *</label>
+                                <textarea class="form-control" name="reason" rows="3" required></textarea>
+                                <div class="invalid-feedback">
+                                    Por favor, informe o motivo da não autorização.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campos para Autorizado -->
+                        <div class="status-fields" data-status="autorizado" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label required">Valor do Serviço (R$) *</label>
+                                <input type="number" class="form-control" name="total_value" step="0.01" min="0" required>
+                                <div class="invalid-feedback">
+                                    Por favor, informe um valor válido para o serviço.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campos para Concluído com Sucesso -->
+                        <div class="status-fields" data-status="concluido_sucesso" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label required">Solução Aplicada *</label>
+                                <textarea class="form-control" name="solution" rows="3" required></textarea>
+                                <div class="invalid-feedback">
+                                    Por favor, descreva a solução aplicada.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campos para Concluído com Falha -->
+                        <div class="status-fields" data-status="concluido_falha" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Motivo da Falha *</label>
+                                <textarea class="form-control" name="reason" rows="3" required></textarea>
+                                <div class="invalid-feedback">
+                                    Por favor, informe o motivo da falha.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campo de observações padrão para outros status -->
+                        <div class="status-fields" data-status="default" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Observações</label>
+                                <textarea class="form-control" name="observations" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="updateStatus">Atualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal de Reabertura -->
+<div class="modal fade" id="reopenModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reabrir Ordem de Serviço</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reopenForm" method="POST" action="{{ url_for('orders.reopen_not_authorized', id=order.id) }}">
+                    <div class="mb-3">
+                        <label for="problem" class="form-label">Descrição do Problema *</label>
+                        <textarea class="form-control" id="problem" name="problem" rows="3" required></textarea>
+                        <div class="invalid-feedback">
+                            Por favor, descreva o problema.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="technician_id" class="form-label">Técnico Responsável</label>
+                        <select class="form-select" id="technician_id" name="technician_id">
+                            <option value="">Selecione um técnico...</option>
+                            {% for tech in technicians %}
+                            <option value="{{ tech.id }}">{{ tech.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="reopenOrder()">Reabrir OS</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Checklists -->
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">Checklists</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Data</th>
+                        <th>Criado por</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for checklist in order.checklists %}
+                    <tr>
+                        <td>
+                            <span class="badge bg-primary">{{ checklist.checklist_type|title }}</span>
+                        </td>
+                        <td>{{ checklist.updated_at.strftime('%d/%m/%Y %H:%M:%S') if checklist.updated_at else checklist.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+                        <td>{{ checklist.created_by.username if checklist.created_by else 'N/A' }}</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{{ url_for('checklists.view', checklist_id=checklist.id) }}" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-eye"></i> Visualizar
+                                </a>
+                                {% if checklist.pdf_path %}
+                                <button class="btn btn-info btn-sm pdf-download-btn" 
+                                        data-pdf-url="{{ url_for('checklists.download_pdf', checklist_id=checklist.id) }}"
+                                        data-download="true">
+                                    <i class="bi bi-file-pdf"></i>
+                                </button>
+                                {% endif %}
+                                {% if current_user.role in ['admin', 'developer'] %}
+                                <button class="btn btn-danger btn-sm"
+                                        title="Excluir checklist"
+                                        onclick="excluirChecklist('{{ url_for('checklists.delete_checklist', checklist_id=checklist.id) }}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center">Nenhum checklist registrado</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+         
+            <!-- Botões de ação -->
+            <div class="mt-3">
+                <a href="{{ url_for('checklists.new_checklist', order_id=order.id, type='entrada') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Checklist de Entrada
+                </a>
+                <a href="{{ url_for('checklists.new_checklist', order_id=order.id, type='saida') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Checklist de Saída
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal WhatsApp -->
+<div class="modal fade" id="whatsappModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-whatsapp text-success"></i> Enviar Mensagem
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="whatsappForm">
+                    <div class="mb-3">
+                        <label class="form-label">Cliente</label>
+                        <input type="text" class="form-control" value="{{ order.client.name }}" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Mensagem</label>
+                        <select class="form-select" id="messageType" onchange="updateWhatsAppMessage()">
+                            <option value="custom">Mensagem Personalizada</option>
+                            <option value="budget">Orçamento</option>
+                            <option value="status">Atualização de Status</option>
+                            <option value="conclusion">Conclusão do Serviço</option>
+                        </select>
+                    </div>
+                    
+                    <div id="budgetField" class="mb-3 d-none">
+                        <label class="form-label">Valor do Orçamento</label>
+                        <div class="input-group">
+                            <span class="input-group-text">R$</span>
+                            <input type="number" class="form-control" id="budgetValue" 
+                                   step="0.01" min="0" onchange="updateWhatsAppMessage()">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Mensagem</label>
+                        <textarea class="form-control" id="messageText" rows="5" required></textarea>
+                        <small class="form-text text-muted">
+                            Você pode editar a mensagem antes de enviar.
+                        </small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="sendWhatsAppMessage()">
+                    <i class="bi bi-whatsapp me-2"></i>Enviar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ------------------------------------------------------------------- #}
+{# Modal QR Code PIX para OS - aditivo, so renderiza se imagem existe. #}
+{# ------------------------------------------------------------------- #}
+{% if pix_qrcode_url %}
+<div class="modal fade" id="modalPixQrCodeOS" tabindex="-1" aria-labelledby="modalPixQrCodeOSLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalPixQrCodeOSLabel">
+                    <i class="bi bi-qr-code me-2"></i>QR Code PIX
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <img src="{{ pix_qrcode_url }}" alt="QR Code PIX"
+                     style="max-width: 100%; max-height: 480px; border: 1px solid #dee2e6; padding: 10px; background: #fff;">
+                <p class="text-muted mt-3 mb-0">
+                    <i class="bi bi-camera me-1"></i>
+                    Aponte a camera do celular para escanear
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-1"></i> Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+// Configurações globais
+const ORDER_ID = {{ order.id }};
+const GET_BUDGET_HISTORY_URL = "{{ url_for('orders.get_budget_history', id=order.id) }}";
+const BUDGET_URL = "{{ url_for('orders.generate_budget', id=order.id) }}";
+
+// Função para formatar moeda
+function formatCurrency(value) {
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    }).format(value);
+}
+
+// Função para mostrar alertas
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    document.querySelector('.container').insertAdjacentElement('afterbegin', alertDiv);
+    
+    setTimeout(() => alertDiv.remove(), 5000);
+}
+
+// Função para mostrar erros de campo
+function showFieldError(field, message) {
+    const element = typeof field === 'string' ? document.getElementById(field) : field;
+    if (element) {
+        element.classList.add('is-invalid');
+        const feedback = element.nextElementSibling;
+        if (feedback && feedback.classList.contains('invalid-feedback')) {
+            feedback.textContent = message;
+        } else {
+            const div = document.createElement('div');
+            div.className = 'invalid-feedback';
+            div.textContent = message;
+            element.parentNode.insertBefore(div, element.nextSibling);
+        }
+    }
+}
+
+// Função para limpar erros de campo
+function clearFieldError(field) {
+    const element = typeof field === 'string' ? document.getElementById(field) : field;
+    if (element) {
+        element.classList.remove('is-invalid');
+        const feedback = element.nextElementSibling;
+        if (feedback && feedback.classList.contains('invalid-feedback')) {
+            feedback.textContent = '';
+        }
+    }
+}
+
+// Configuração da localização para português do Brasil
+const locale = {
+    code: 'pt-BR',
+    currency: {
+        style: 'currency',
+        currency: 'BRL',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    },
+    date: {
+        dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+        monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+    }
+};
+
+// Variáveis globais do template
+const ORDER_TOTAL_VALUE = "{{ order.total_value or 0 }}";
+const UPDATE_STATUS_URL = "{{ url_for('orders.update_status', id=order.id) }}";
+const ADD_PART_URL = "{{ url_for('orders.add_part', id=order.id) }}";
+const GET_PARTS_URL = "{{ url_for('orders.list_parts', id=order.id) }}";
+
+$(document).ready(function() {
+    // Gerenciamento dos dropdowns
+    $('.dropdown-toggle').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Atualiza o aria-expanded
+        $(this).attr('aria-expanded', function(i, attr) {
+            return attr === 'true' ? 'false' : 'true';
+        });
+        
+        // Toggle da classe show
+        $(this).toggleClass('show');
+        $(this).next('.dropdown-menu').toggleClass('show');
+        
+        // Fecha outros dropdowns
+        $('.dropdown-toggle').not(this).attr('aria-expanded', 'false');
+        $('.dropdown-toggle').not(this).removeClass('show');
+        $('.dropdown-menu').not($(this).next('.dropdown-menu')).removeClass('show');
+    });
+
+    // Fecha dropdowns quando clicar fora
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.btn-group').length) {
+            $('.dropdown-toggle').attr('aria-expanded', 'false');
+            $('.dropdown-toggle, .dropdown-menu').removeClass('show');
+        }
+    });
+
+    // Controle de exibição dos campos específicos por status
+    $('#newStatus').change(function() {
+        const selectedStatus = $(this).val();
+        $('.status-fields').hide();
+        
+        // Mostra os campos específicos do status selecionado
+        if (selectedStatus) {
+            const specificFields = $(`.status-fields[data-status="${selectedStatus}"]`);
+            if (specificFields.length) {
+                specificFields.show();
+            } else {
+                $('.status-fields[data-status="default"]').show();
+            }
+        }
+    });
+
+    // Atualização de status
+    $('#updateStatus').click(function() {
+        // Remove validações anteriores
+        $('.is-invalid').removeClass('is-invalid');
+        
+        const status = $('#newStatus').val();
+        let isValid = true;
+        
+        // Validação do status
+        if (!status) {
+            $('#newStatus').addClass('is-invalid');
+            isValid = false;
+        }
+        
+        // Validações específicas por status
+        if (status === 'nao_autorizado') {
+            if (!$('[name="reason"]').val()) {
+                $('[name="reason"]').addClass('is-invalid');
+                isValid = false;
+            }
+        }
+        
+        if (status === 'autorizado') {
+            const value = $('[name="total_value"]').val();
+            if (!value || parseFloat(value) <= 0) {
+                $('[name="total_value"]').addClass('is-invalid');
+                isValid = false;
+            }
+        }
+        
+        if (status === 'concluido_sucesso') {
+            if (!$('[name="solution"]').val()) {
+                $('[name="solution"]').addClass('is-invalid');
+                isValid = false;
+            }
+        }
+        
+        if (!isValid) {
+            return;
+        }
+
+        // Continua com o código existente de envio do formulário
+        const form = $('#statusForm')[0];
+        const formData = new FormData(form);
+        
+        $.ajax({
+            url: "{{ url_for('orders.update_status', id=order.id) }}",
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    showAlert('danger', response.message || 'Erro ao atualizar status');
+                }
+            },
+            error: function(xhr) {
+                const response = xhr.responseJSON;
+                showAlert('danger', response ? response.message : 'Erro ao atualizar status');
+            }
+        });
+    });
+
+    // Limpa validações ao mudar o status
+    $('#newStatus').change(function() {
+        $('.is-invalid').removeClass('is-invalid');
+    });
+
+    // Limpa validações ao fechar o modal
+    $('#statusModal').on('hidden.bs.modal', function() {
+        $('.is-invalid').removeClass('is-invalid');
+    });
+
+    // Controle de exibição dos campos específicos por status
+    $('#finalStatus').change(function() {
+        const selectedStatus = $(this).val();
+        $('.close-fields, .status-fields').hide();
+        if (selectedStatus) {
+            $(`.close-fields[data-status="${selectedStatus}"], .status-fields[data-status="${selectedStatus}"]`).show();
+        }
+    });
+
+    // Encerramento da OS
+    $('#closeOrder').click(function() {
+        const form = $('#closeForm');
+        const formData = new FormData(form[0]);
+        
+        // Adiciona as observações gerais aos dados do formulário
+        const generalObservations = form.find('[name="general_observations"]').val();
+        if (generalObservations) {
+            formData.append('general_observations', generalObservations);
+        }
+        
+        $.ajax({
+            url: "{{ url_for('orders.close_order', id=order.id) }}",
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    showAlert('danger', response.message || 'Erro ao encerrar OS');
+                }
+            },
+            error: function(xhr) {
+                showAlert('danger', 'Erro ao encerrar OS');
+                console.error('Erro ao encerrar OS:', xhr);
+            }
+        });
+    });
+
+    // Carrega o histórico de orçamentos inicial
+    loadBudgetHistory();
+});
+
+// Função específica para visualizar orçamentos
+function handleBudgetView(url) {
+    window.open(url, '_blank');
+}
+
+// Função para manipular PDFs
+function handlePDF(url, download) {
+    console.log('handlePDF called with url:', url, 'download:', download);
+    $.get(url)
+        .done(function(response) {
+            console.log('Response received:', response);
+            if (response.success) {
+                if (download) {
+                    // Para download, cria um link temporário e clica nele
+                    const link = document.createElement('a');
+                    link.href = response.pdf_url;
+                    link.download = response.pdf_url.split('/').pop(); // Extrai o nome do arquivo da URL
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    console.log('Download completed');
+                } else {
+                    // Para visualização, abre em uma nova janela
+                    window.open(response.pdf_url, '_blank');
+                    console.log('View window opened');
+                }
+            } else {
+                showAlert('danger', response.message || 'Erro ao gerar PDF');
+            }
+        })
+        .fail(function(xhr) {
+            showAlert('danger', 'Erro ao gerar PDF');
+            console.error('Erro ao gerar PDF:', xhr);
+        });
+}
+
+// Função para imprimir PDF diretamente (com fallback para download)
+function printPdf(url) {
+    console.log('printPdf called with url:', url);
+    $.get(url)
+        .done(function(response) {
+            if (response.success && response.pdf_url) {
+                // Tenta imprimir via iframe oculto
+                try {
+                    var iframe = document.getElementById('print-iframe');
+                    if (!iframe) {
+                        iframe = document.createElement('iframe');
+                        iframe.id = 'print-iframe';
+                        iframe.style.position = 'fixed';
+                        iframe.style.left = '-9999px';
+                        iframe.style.top = '-9999px';
+                        iframe.style.width = '0';
+                        iframe.style.height = '0';
+                        document.body.appendChild(iframe);
+                    }
+                    iframe.onload = function() {
+                        try {
+                            iframe.contentWindow.focus();
+                            iframe.contentWindow.print();
+                        } catch (e) {
+                            // Fallback: abre em nova aba para impressão manual
+                            console.warn('Impressão via iframe falhou, abrindo em nova aba:', e);
+                            window.open(response.pdf_url, '_blank');
+                        }
+                    };
+                    iframe.src = response.pdf_url;
+                } catch (e) {
+                    // Fallback final: abre em nova aba
+                    console.warn('Erro ao criar iframe de impressão:', e);
+                    window.open(response.pdf_url, '_blank');
+                }
+            } else {
+                showAlert('danger', response.message || 'Erro ao gerar PDF para impressão');
+            }
+        })
+        .fail(function(xhr) {
+            showAlert('danger', 'Erro ao gerar PDF para impressão');
+            console.error('Erro ao gerar PDF:', xhr);
+        });
+}
+
+// Função para autorizar orçamento
+$('#authorizeOrder').click(function() {
+    if (!confirm('Deseja realmente autorizar este orçamento?')) {
+        return;
+    }
+    
+    $.ajax({
+        url: UPDATE_STATUS_URL,
+        method: 'POST',
+        data: {
+            status: 'autorizado',
+            observations: 'Orçamento autorizado pelo cliente',
+            total_value: ORDER_TOTAL_VALUE
+        },
+        success: function(response) {
+            if (response.success) {
+                location.reload();
+            } else {
+                showAlert('danger', response.message || 'Erro ao autorizar orçamento');
+            }
+        },
+        error: function(xhr) {
+            const response = xhr.responseJSON;
+            showAlert('danger', response ? response.message : 'Erro ao autorizar orçamento');
+        }
+    });
+});
+
+// Função para carregar histórico de orçamentos
+function loadBudgetHistory() {
+    try {
+        $.get(GET_BUDGET_HISTORY_URL)
+            .done(function(data) {
+                // Processar os dados recebidos
+                const historyContainer = $('#budgetHistory');
+                historyContainer.empty();
+                
+                if (data && data.length > 0) {
+                    data.forEach(function(budget) {
+                        const date = new Date(budget.date);
+                        const formattedDate = date.toLocaleDateString('pt-BR');
+                        const formattedValue = new Intl.NumberFormat('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL'
+                        }).format(budget.value);
+                        
+                        historyContainer.append(`
+                            <div class="budget-item mb-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>${formattedDate}</span>
+                                    <span>${formattedValue}</span>
+                                    <a href="${budget.pdf_url}" target="_blank" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-file-pdf"></i> Ver PDF
+                                    </a>
+                                </div>
+                            </div>
+                        `);
+                    });
+                } else {
+                    historyContainer.append('<p class="text-muted">Nenhum orçamento encontrado.</p>');
+                }
+            })
+            .fail(function(error) {
+                console.error('Erro ao carregar histórico:', error);
+                showAlert('danger', 'Erro ao carregar histórico de orçamentos');
+            });
+    } catch (error) {
+        console.error('Erro ao carregar histórico:', error);
+    }
+}
+
+// Função para reabrir OS
+function reopenOrder() {
+    const form = document.getElementById('reopenForm');
+    const submitButton = document.querySelector('#reopenModal button[onclick="reopenOrder()"]');
+    
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return;
+    }
+    
+    // Previne múltiplos cliques
+    if (submitButton.disabled) {
+        return;
+    }
+    
+    // Desabilita o botão imediatamente
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+    
+    // Submete o formulário usando AJAX para melhor controle
+    const formData = new FormData(form);
+    
+    fetch(form.action, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = data.redirect_url;
+        } else {
+            showAlert('danger', data.message);
+            // Reabilita o botão em caso de erro
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-sync-alt"></i> Reabrir OS';
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showAlert('danger', 'Erro ao reabrir OS');
+        // Reabilita o botão em caso de erro
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<i class="fas fa-sync-alt"></i> Reabrir OS';
+    });
+}
+
+// Reseta o estado do botão quando o modal é fechado
+$('#reopenModal').on('hidden.bs.modal', function () {
+    const submitButton = document.querySelector('#reopenModal button[onclick="reopenOrder()"]');
+    submitButton.disabled = false;
+    submitButton.innerHTML = '<i class="fas fa-sync-alt"></i> Reabrir OS';
+});
+
+// Validação do formulário de fechamento
+$(document).ready(function() {
+    // Registra o evento do modal de encerramento
+    $(document).on('show.bs.modal', '#closeModal', function() {
+        // Força uma atualização das peças quando o modal for aberto
+        loadParts();
+    });
+
+    // Função para mostrar feedback visual simples
+    function showFieldError(field, message) {
+        $(field)
+            .addClass('is-invalid')
+            .removeClass('is-valid');
+        
+        // Procura ou cria div de feedback
+        let feedback = $(field).next('.invalid-feedback');
+        if (feedback.length === 0) {
+            feedback = $('<div class="invalid-feedback"></div>');
+            $(field).after(feedback);
+        }
+        feedback.text(message);
+    }
+
+    // Função para limpar erro
+    function clearFieldError(field) {
+        $(field)
+            .removeClass('is-invalid')
+            .addClass('is-valid');
+    }
+
+    // Validação ao clicar em Encerrar OS
+    $('#closeOrder').click(function(e) {
+        e.preventDefault();
+        
+        let isValid = true;
+        const form = $('#closeForm');
+        
+        // Reseta validações anteriores
+        form.find('.is-invalid').removeClass('is-invalid');
+        
+        // Valida técnico
+        const technician = $('#technician_id');
+        if (!technician.val()) {
+            showFieldError(technician, 'Por favor, selecione o técnico responsável');
+            isValid = false;
+        }
+        
+        // Valida status final
+        const finalStatus = $('#finalStatus');
+        if (!finalStatus.val()) {
+            showFieldError(finalStatus, 'Por favor, selecione o tipo de encerramento');
+            isValid = false;
+        }
+
+        // Validações específicas por tipo de encerramento
+        const status = finalStatus.val();
+        if (status === 'concluido_sucesso') {
+            // Valida solução
+            const solution = $('[name="solution"]');
+            if (!solution.val()) {
+                showFieldError(solution, 'Por favor, descreva a solução aplicada');
+                isValid = false;
+            }
+
+            // Valida valor
+            const value = $('[name="total_value"]');
+            if (!value.val() || parseFloat(value.val()) <= 0) {
+                showFieldError(value, 'Por favor, informe um valor válido');
+                isValid = false;
+            }
+
+            // Valida forma de pagamento
+            const payment = $('[name="payment_method"]');
+            if (!payment.val()) {
+                showFieldError(payment, 'Por favor, selecione a forma de pagamento');
+                isValid = false;
+            }
+
+            // Valida garantia
+            const warranty = $('[name="warranty_days"]');
+            if (!warranty.val() || parseInt(warranty.val()) < 0) {
+                showFieldError(warranty, 'Por favor, informe os dias de garantia');
+                isValid = false;
+            }
+        } else if (status === 'concluido_falha' || status === 'nao_autorizado') {
+            // Valida observações
+            const obs = $('[name="observations"]');
+            if (!obs.val()) {
+                showFieldError(obs, 'Por favor, informe o motivo');
+                isValid = false;
+            }
+        }
+
+        // Se tudo estiver válido, submete o form
+        if (isValid) {
+            const formData = new FormData(form[0]);
+            
+            $.ajax({
+                url: `/orders/${ORDER_ID}/close`,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        showAlert('danger', response.message || 'Erro ao encerrar OS');
+                    }
+                },
+                error: function(xhr) {
+                    showAlert('danger', 'Erro ao encerrar OS');
+                    console.error('Erro ao encerrar OS:', xhr);
+                }
+            });
+        } else {
+            // Mostra alerta de erro
+            showAlert('danger', 'Por favor, preencha todos os campos obrigatórios');
+        }
+    });
+
+    // Limpa erros quando o usuário começa a digitar/selecionar
+    $('#closeForm').on('input change', 'input, select, textarea', function() {
+        clearFieldError(this);
+    });
+
+    // Atualiza campos visíveis quando muda o status
+    $('#finalStatus').change(function() {
+        const status = $(this).val();
+        $('.close-fields, .status-fields').hide();
+        if (status) {
+            $(`.close-fields[data-status="${status}"], .status-fields[data-status="${status}"]`).show();
+        }
+    });
+});
+
+// Funções para gerenciamento de peças
+function addPart() {
+    // Limpa o formulário
+    document.getElementById('partForm').reset();
+    document.getElementById('part_id').value = '';
+    document.getElementById('partModalTitle').textContent = 'Adicionar Peça';
+    
+    // Abre o modal
+    const modal = new bootstrap.Modal(document.getElementById('partModal'));
+    modal.show();
+}
+
+function editPart(partId) {
+    // Limpa validações anteriores
+    clearValidation();
+    
+    // Busca os dados da peça
+    fetch(`/orders/{{ order.id }}/parts/${partId}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro ao carregar dados da peça');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            const part = data.part;
+            document.getElementById('part_id').value = part.id;
+            document.getElementById('part_select').value = part.inventory_item_id;
+            document.getElementById('quantity').value = part.quantity;
+            document.getElementById('price').value = part.price_per_unit;
+            document.getElementById('observations').value = part.observations || '';
+            
+            document.getElementById('partModalTitle').textContent = 'Editar Peça';
+            
+            // Atualiza a quantidade disponível
+            const option = document.querySelector(`#part_select option[value="${part.inventory_item_id}"]`);
+            if (option) {
+                document.getElementById('available_quantity').textContent = option.dataset.stock;
+            }
+            
+            // Abre o modal
+            const modal = new bootstrap.Modal(document.getElementById('partModal'));
+            modal.show();
+        } else {
+            throw new Error(data.message || 'Erro ao carregar dados da peça');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showAlert('danger', error.message);
+    });
+}
+
+function excluirChecklist(deleteUrl) {
+    if (!confirm('Tem certeza que deseja excluir este checklist? Esta ação não pode ser desfeita e removerá os itens, anexos e o PDF gerado.')) return;
+
+    fetch(deleteUrl, {
+        method: 'DELETE',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json().then(data => ({ status: response.status, data })))
+    .then(({ status, data }) => {
+        if (status === 200 && data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Erro ao excluir o checklist.');
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao excluir checklist:', error);
+        alert('Erro ao excluir o checklist.');
+    });
+}
+
+function removePart(partId) {
+    if (!confirm('Tem certeza que deseja remover esta peça?')) return;
+    
+    fetch(`/orders/{{ order.id }}/parts/${partId}`, {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro ao remover peça');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            loadParts();
+            showAlert('success', 'Peça removida com sucesso');
+        } else {
+            throw new Error(data.message || 'Erro ao remover peça');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showAlert('danger', error.message);
+    });
+}
+
+function savePart() {
+    // Previne múltiplos envios
+    if (savePart.isSubmitting) return;
+    savePart.isSubmitting = true;
+
+    const form = document.getElementById('partForm');
+    
+    // Validação do formulário
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        savePart.isSubmitting = false;
+        return;
+    }
+    
+    const partId = document.getElementById('part_id').value;
+    const inventoryId = document.getElementById('part_select').value;
+    const quantity = parseFloat(document.getElementById('quantity').value);
+    const observations = document.getElementById('observations').value;
+
+    // Validações adicionais
+    if (!inventoryId) {
+        showFieldError('part_select', 'Por favor, selecione uma peça');
+        savePart.isSubmitting = false;
+        return;
+    }
+
+    if (!quantity || quantity <= 0) {
+        showFieldError('quantity', 'Por favor, informe uma quantidade válida');
+        return;
+    }
+
+    // Verifica quantidade disponível
+    const option = document.querySelector(`#part_select option[value="${inventoryId}"]`);
+    if (option) {
+        const available = parseFloat(option.dataset.stock);
+        if (quantity > available) {
+            showFieldError('quantity', `Quantidade máxima disponível: ${available}`);
+            return;
+        }
+    }
+
+    const data = {
+        inventory_id: inventoryId,
+        quantity: quantity,
+        observations: observations
+    };
+
+    const url = partId ? 
+        `/orders/{{ order.id }}/parts/${partId}` : 
+        `/orders/{{ order.id }}/parts`;
+
+    const method = partId ? 'PUT' : 'POST';
+
+    // Desabilita o botão durante o processamento
+    const saveButton = document.querySelector('#partModal button[onclick="savePart()"]');
+    const originalText = saveButton.innerHTML;
+    saveButton.disabled = true;
+    saveButton.innerHTML = '<i class="bi bi-hourglass"></i> Salvando...';
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro ao salvar peça');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message || 'Peça salva com sucesso');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('partModal'));
+            modal.hide();
+            location.reload();
+        } else {
+            throw new Error(data.message || 'Erro ao salvar peça');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showAlert('danger', error.message);
+    })
+    .finally(() => {
+        // Reabilita o botão
+        saveButton.disabled = false;
+        saveButton.innerHTML = originalText;
+    });
+}
+
+// Funções auxiliares
+function clearValidation() {
+    const form = document.getElementById('partForm');
+    form.classList.remove('was-validated');
+    form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+}
+
+function showFieldError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    field.classList.add('is-invalid');
+    
+    // Procura ou cria div de feedback
+    let feedback = field.nextElementSibling;
+    if (!feedback || !feedback.classList.contains('invalid-feedback')) {
+        feedback = document.createElement('div');
+        feedback.className = 'invalid-feedback';
+        field.parentNode.insertBefore(feedback, field.nextSibling);
+    }
+    feedback.textContent = message;
+    
+    // Adiciona classe was-validated ao form
+    field.closest('form').classList.add('was-validated');
+}
+
+function loadParts() {
+    fetch(`/orders/{{ order.id }}/parts`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const tbody = document.getElementById('parts-table-body');
+                if (!tbody) {
+                    console.error('Elemento parts-table-body não encontrado');
+                    return;
+                }
+                
+                // Limpa a tabela existente
+                tbody.innerHTML = '';
+                
+                let total = 0;
+                
+                if (data.parts && data.parts.length > 0) {
+                    data.parts.forEach(part => {
+                        total += part.total_price;
+                        
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${part.name}</td>
+                            <td>${part.quantity}</td>
+                            <td>R$ ${part.unit_price.toFixed(2)}</td>
+                            <td>R$ ${part.total_price.toFixed(2)}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-danger" 
+                                            onclick="removePart(${part.id})">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+
+                } else {
+                    const tr = document.createElement('tr');
+                    tr.id = 'no-parts-row';
+                    tr.innerHTML = `
+                        <td colspan="5" class="text-center text-muted">
+                            Nenhuma peça adicionada
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+
+                }
+                
+                // Atualiza o total
+                const totalSpan = document.getElementById('total-parts');
+                if (totalSpan) {
+                    totalSpan.textContent = total.toFixed(2);
+                }
+
+                // Atualiza o valor total da OS
+                window.partsValue = total;
+                calculateTotal();
+
+                // Atualiza o total no modal de encerramento
+                const closeModalTotal = document.querySelector('#closeModal .table-responsive tfoot strong');
+                if (closeModalTotal) {
+                    closeModalTotal.textContent = `R$ ${total.toFixed(2)}`;
+                }
+            } else {
+                showAlert('danger', data.message || 'Erro ao carregar peças');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            showAlert('danger', 'Erro ao carregar peças');
+        });
+}
+
+// Adiciona listener para o modal de encerramento
+$('#closeModal').on('show.bs.modal', function() {
+    // Força uma atualização das peças quando o modal for aberto
+    loadParts();
+});
+
+// Event listeners para o modal de peças
+document.addEventListener('DOMContentLoaded', function() {
+    // Carrega as peças inicialmente
+    loadParts();
+    
+    // Configura o select de peças
+    const partSelect = document.getElementById('part_select');
+    if (partSelect) {
+        partSelect.addEventListener('change', function() {
+            const option = this.options[this.selectedIndex];
+            if (option) {
+                document.getElementById('price').value = option.dataset.price || '';
+                document.getElementById('available_quantity').textContent = option.dataset.stock || '-';
+                document.getElementById('quantity').max = option.dataset.stock;
+            }
+        });
+    }
+    
+    // Configura a validação de quantidade
+    const quantityInput = document.getElementById('quantity');
+    if (quantityInput) {
+        quantityInput.addEventListener('input', function() {
+            const max = parseFloat(this.max);
+            const value = parseFloat(this.value);
+            
+            if (value > max) {
+                showAlert('warning', `Quantidade máxima disponível: ${max}`);
+                this.value = max;
+            }
+        });
+    }
+});
+
+// Calcula o valor total ao digitar o valor do serviço
+$('input[name="total_value"]').on('input', function() {
+    const serviceValue = parseFloat(this.value) || 0;
+    const partsValue = {{ order.parts_total_value or 0 }};
+    const totalValue = serviceValue + partsValue;
+    
+    // Atualiza o texto de ajuda
+    $(this).next('.form-text').text(
+        `O valor total será a soma do serviço + peças (R$ ${partsValue.toFixed(2)}) = R$ ${totalValue.toFixed(2)}`
+    );
+});
+
+// Função para formatar valor em R$
+function formatCurrency(value) {
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    }).format(value);
+}
+
+// Função para calcular o valor total
+function calculateTotal() {
+    try {
+        const serviceValue = document.getElementById('service_value');
+        const partsValue = document.getElementById('parts_total');
+        const discountValue = document.getElementById('discount');
+        const totalField = document.getElementById('total_value');
+        
+        if (!serviceValue || !partsValue || !discountValue || !totalField) {
+            console.log('Campos necessários não encontrados');
+            return;
+        }
+
+        const service = parseFloat(serviceValue.value || 0);
+        const parts = parseFloat(partsValue.value || 0);
+        const discount = parseFloat(discountValue.value || 0);
+        
+        const total = service + parts - discount;
+        totalField.value = total.toFixed(2);
+        
+    } catch (error) {
+        console.error('Erro ao calcular total:', error);
+    }
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializa os valores
+    calculateTotal();
+    
+    // Listeners para inputs numéricos
+    const numericInputs = document.querySelectorAll('input[type="number"]');
+    numericInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const value = this.value;
+            // Remove caracteres não numéricos, exceto ponto e vírgula
+            const cleanValue = value.replace(/[^\d.,]/g, '').replace(',', '.');
+            this.value = cleanValue;
+            if (this.id === 'service_value' || this.id === 'discount') {
+                calculateTotal();
+            }
+        });
+    });
+    
+    // Carrega peças iniciais
+    loadParts();
+});
+
+// Função para abrir o modal do WhatsApp
+function openWhatsAppModal() {
+    // Limpa os campos
+    document.getElementById('messageType').value = 'custom';
+    document.getElementById('budgetValue').value = '';
+    updateWhatsAppMessage();
+    
+    // Abre o modal
+    const modal = new bootstrap.Modal(document.getElementById('whatsappModal'));
+    modal.show();
+}
+
+// Função para atualizar a mensagem baseada no tipo
+function updateWhatsAppMessage() {
+    const type = document.getElementById('messageType').value;
+    const budgetField = document.getElementById('budgetField');
+    const messageText = document.getElementById('messageText');
+    
+    // Esconde/mostra campo de orçamento
+    budgetField.classList.toggle('d-none', type !== 'budget');
+    
+    // Monta a mensagem base
+    let message = `Olá {{ order.client.name }},\n\n`;
+    
+    switch(type) {
+        case 'budget':
+            const value = document.getElementById('budgetValue').value;
+            message += `O orçamento para seu equipamento {{ order.equipment }} está pronto!\n`;
+            if (value) {
+                message += `Valor: R$ ${parseFloat(value).toFixed(2)}\n`;
+            }
+            message += `\nPodemos prosseguir com o serviço?`;
+            break;
+            
+        case 'status':
+            message += `Atualização sobre seu equipamento {{ order.equipment }}:\n`;
+            message += `Status atual: {{ order.get_status_description() }}\n`;
+            break;
+            
+        case 'conclusion':
+            message += `Seu equipamento {{ order.equipment }} está pronto para retirada!\n`;
+            {% if order.total_value %}
+            message += `Valor total: R$ {{ "%.2f"|format(order.total_value) }}\n`;
+            {% endif %}
+            break;
+            
+        default:
+            message += `Sobre seu equipamento {{ order.equipment }}:\n`;
+            break;
+    }
+    
+    messageText.value = message;
+}
+
+// Função para enviar a mensagem
+function sendWhatsAppMessage() {
+    const message = document.getElementById('messageText').value;
+    if (!message) {
+        showAlert('warning', 'Por favor, digite uma mensagem');
+        return;
+    }
+    
+    // Remove caracteres não numéricos do WhatsApp
+    const whatsapp = '{{ order.client.whatsapp }}'.replace(/\D/g, '');
+    
+    // Se for orçamento, salva no histórico
+    const type = document.getElementById('messageType').value;
+    if (type === 'budget') {
+        const value = document.getElementById('budgetValue').value;
+        if (value) {
+            fetch(`/orders/${ORDER_ID}/budget`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    value: parseFloat(value),
+                    notes: 'Enviado por WhatsApp'
+                })
+            });
+        }
+    }
+    
+    // Fecha o modal
+    bootstrap.Modal.getInstance(document.getElementById('whatsappModal')).hide();
+    
+    // Abre o WhatsApp em nova aba
+    window.open(`https://wa.me/55${whatsapp}?text=${encodeURIComponent(message)}`, '_blank');
+}
+</script>
+{% endblock %}

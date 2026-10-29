@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card border-danger">
+                <div class="card-body">
+                    <h3 class="text-danger mb-4">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        Licença {{ 'Expirada' if license and license.is_expired else 'Inativa' }}
+                    </h3>
+                    
+                    <p class="lead mb-4">
+                        {% if license and license.is_expired %}
+                        Sua licença expirou em {{ license.expiration_date.strftime('%d/%m/%Y') }}.
+                        {% else %}
+                        Sua licença está inativa ou foi revogada.
+                        {% endif %}
+                    </p>
+
+                    <div class="alert alert-info mb-4">
+                        <h5>ID da Máquina</h5>
+                        <code class="fs-6">{{ current_machine_id }}</code>
+                        <p class="small mt-2 mb-0">
+                            Forneça este ID ao entrar em contato com o suporte.
+                        </p>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h5 class="mb-4">Entre em contato conosco para renovar sua licença:</h5>
+                    
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="d-grid gap-3">
+                                <a href="https://www.restorecellsolucoes.com/" target="_blank" 
+                                   class="btn btn-primary btn-lg">
+                                    <i class="bi bi-globe"></i> Visite Nosso Site
+                                </a>
+
+                                <a href="https://wa.me/5585989634058" target="_blank" 
+                                   class="btn btn-success btn-lg">
+                                    <i class="bi bi-whatsapp"></i> WhatsApp Gerência
+                                </a>
+                                
+                                <a href="https://wa.me/5585997507465" target="_blank"
+                                   class="btn btn-success btn-lg">
+                                    <i class="bi bi-whatsapp"></i> WhatsApp Suporte
+                                </a>
+                                
+                                <a href="tel:8532136918" 
+                                   class="btn btn-primary btn-lg">
+                                    <i class="bi bi-telephone"></i> (85) 3213-6918
+                                </a>
+                                
+                                <a href="mailto:contato@restorecellsolucoes.com"
+                                   class="btn btn-info btn-lg text-white">
+                                    <i class="bi bi-envelope"></i> Email Suporte
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="text-muted">
+                        <p class="mb-2">
+                            <i class="bi bi-geo-alt"></i> Av. Godofredo Maciel, 1178, Parangaba - Fortaleza-CE
+                        </p>
+                        <p class="mb-0">
+                            <strong>Horário de Funcionamento:</strong><br>
+                            Seg-Sex: 8:30h às 17:00h | Sábado: 8:30h às 12:00h
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

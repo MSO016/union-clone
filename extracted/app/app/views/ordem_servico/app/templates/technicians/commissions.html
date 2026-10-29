@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ url_for('technicians.show', id=technician.id) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+            <h2 class="mb-0">Comissões - {{ technician.name }}</h2>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if commission_history %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>OS #</th>
+                            <th>Data</th>
+                            <th>Valor do Serviço</th>
+                            <th>Taxa</th>
+                            <th>Comissão</th>
+                            <th>Status</th>
+                            {% if current_user.role in ['admin', 'developer'] %}
+                            <th>Ações</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for commission in commission_history %}
+                        <tr>
+                            <td>{{ commission.order_id }}</td>
+                            <td>{{ commission.created_at.strftime('%d/%m/%Y') }}</td>
+                            <td>R$ {{ "%.2f"|format(commission.service_value) }}</td>
+                            <td>{{ "%.2f"|format(commission.commission_rate) }}%</td>
+                            <td>R$ {{ "%.2f"|format(commission.commission_value) }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if commission.paid else 'warning' }}">
+                                    {{ 'Pago' if commission.paid else 'Pendente' }}
+                                </span>
+                            </td>
+                            {% if current_user.role in ['admin', 'developer'] %}
+                            <td>
+                                {% if not commission.paid %}
+                                <form action="{{ url_for('technicians.pay_commission', commission_id=commission.id) }}" 
+                                      method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-success btn-sm" 
+                                            onclick="return confirm('Confirma o pagamento desta comissão?')">
+                                        <i class="bi bi-check-circle"></i> Marcar como Pago
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="table-info">
+                            <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                            <td>
+                                <strong>
+                                    R$ {{ "%.2f"|format(commission_history|sum(attribute='commission_value')) }}
+                                </strong>
+                            </td>
+                            <td colspan="{% if current_user.role in ['admin', 'developer'] %}2{% else %}1{% endif %}"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted text-center mb-0">
+                Nenhuma comissão registrada.
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

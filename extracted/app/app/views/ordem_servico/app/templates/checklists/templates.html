@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <!-- Card informativo sobre a importância dos checklists -->
+            <div class="card bg-light border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h4 class="card-title text-primary mb-3">
+                                <i class="bi bi-clipboard-check"></i> Templates de Checklist
+                            </h4>
+                            <p class="card-text">
+                                Os checklists são ferramentas essenciais para garantir a qualidade e padronização dos serviços. 
+                                Eles ajudam a:
+                            </p>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Manter um padrão de qualidade consistente</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Reduzir erros e esquecimentos</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Aumentar a eficiência do trabalho</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Facilitar o treinamento de novos técnicos</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <button onclick="setupDefaultTemplates()" class="btn btn-primary btn-lg me-2">
+                                <i class="bi bi-gear"></i> Configurar Templates Padrão
+                            </button>
+                            <a href="{{ url_for('checklists.add_template') }}" class="btn btn-primary btn-lg">
+                                <i class="bi bi-plus-circle"></i> Criar Novo Template
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates Pré-definidos -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h5 class="text-muted mb-3">Templates Pré-definidos</h5>
+        </div>
+        <!-- Template iPhone -->
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 border-0 shadow-sm template-card">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <i class="bi bi-phone text-primary" style="font-size: 2rem;"></i>
+                    </div>
+                    <h5 class="card-title text-center">iPhone</h5>
+                    <p class="card-text small text-muted text-center">
+                        Checklist completo para manutenção de iPhones
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center">
+                    <button onclick="setupDefaultTemplates()" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-plus-lg"></i> Usar Template
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Template Android -->
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 border-0 shadow-sm template-card">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <i class="bi bi-android2 text-success" style="font-size: 2rem;"></i>
+                    </div>
+                    <h5 class="card-title text-center">Android</h5>
+                    <p class="card-text small text-muted text-center">
+                        Checklist especializado para smartphones Android
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center">
+                    <button onclick="setupDefaultTemplates()" class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-plus-lg"></i> Usar Template
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Template PC/Notebook -->
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 border-0 shadow-sm template-card">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <i class="bi bi-laptop text-info" style="font-size: 2rem;"></i>
+                    </div>
+                    <h5 class="card-title text-center">PC/Notebook</h5>
+                    <p class="card-text small text-muted text-center">
+                        Checklist para computadores e notebooks
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center">
+                    <button onclick="setupDefaultTemplates()" class="btn btn-outline-info btn-sm">
+                        <i class="bi bi-plus-lg"></i> Usar Template
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Template Genérico -->
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 border-0 shadow-sm template-card">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <i class="bi bi-tools text-secondary" style="font-size: 2rem;"></i>
+                    </div>
+                    <h5 class="card-title text-center">Genérico</h5>
+                    <p class="card-text small text-muted text-center">
+                        Checklist base para diversos equipamentos
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center">
+                    <button onclick="setupDefaultTemplates()" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-plus-lg"></i> Usar Template
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates Personalizados -->
+    <div class="row">
+        <div class="col-12">
+            <h5 class="text-muted mb-3">Seus Templates Personalizados</h5>
+        </div>
+        {% for template in templates %}
+        <div class="col-md-4 mb-4" data-template-id="{{ template.id }}">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title d-flex justify-content-between align-items-center">
+                        {{ template.name }}
+                        <button class="btn btn-sm btn-outline-danger" 
+                                onclick="deleteTemplate({{ template.id }})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </h5>
+                    <h6 class="card-subtitle mb-3 text-muted">{{ template.equipment_type }}</h6>
+                    
+                    <div class="template-items">
+                        <strong>Itens:</strong>
+                        <ul class="list-unstyled mt-2">
+                            {% for item in template.items[:5] %}
+                            <li class="mb-1">
+                                {% if item.is_critical %}
+                                <i class="bi bi-exclamation-circle-fill text-danger"></i>
+                                {% else %}
+                                <i class="bi bi-circle text-muted"></i>
+                                {% endif %}
+                                {{ item.description }}
+                                {% if item.category %}
+                                <small class="text-muted">({{ item.category }})</small>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                            {% if template.items|length > 5 %}
+                            <li class="text-muted">
+                                <small>+ {{ template.items|length - 5 }} outros itens...</small>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ url_for('checklists.edit_template', id=template.id) }}" 
+                       class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-pencil"></i> Editar Template
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% if not templates %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Você ainda não tem templates personalizados. 
+                Comece criando um novo ou use um dos templates pré-definidos acima!
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.template-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.template-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+.template-items {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.template-items::-webkit-scrollbar {
+    width: 5px;
+}
+
+.template-items::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.template-items::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+.template-items::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+</style>
+
+<script>
+async function setupDefaultTemplates() {
+    try {
+        const response = await fetch('/checklists/templates/setup-defaults', {
+            method: 'POST'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Templates padrão configurados com sucesso!');
+            location.reload();
+        } else {
+            alert('Erro ao configurar templates: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao configurar templates. Por favor, tente novamente.');
+    }
+}
+
+function duplicateTemplate(templateId) {
+    if (confirm('Deseja duplicar este template?')) {
+        fetch(`/checklists/templates/duplicate/${templateId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erro ao duplicar template');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao duplicar template');
+        });
+    }
+}
+
+function deleteTemplate(templateId) {
+    if (confirm('Tem certeza que deseja excluir este template?')) {
+        fetch(`/checklists/templates/${templateId}/delete`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erro ao excluir template');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao excluir template');
+        });
+    }
+}
+</script>
+{% endblock %}

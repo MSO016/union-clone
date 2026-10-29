@@ -1,0 +1,256 @@
+{% extends "finance/base.html" %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Força a visibilidade do item ativo no menu */
+    .nav-link.active[href*="accounts"] {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Garante que o item pai também fique visível */
+    .nav-item:has(.nav-link.active[href*="accounts"]) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Mantém o estilo do item ativo */
+    .sidebar .nav-link.active[href*="accounts"] {
+        background-color: var(--bs-primary);
+        color: white !important;
+        border-radius: 0.25rem;
+        margin: 0.25rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block page_title %}Contas a Pagar e Receber{% endblock %}
+
+{% block extra_js %}
+<!-- IMask para outras máscaras -->
+<script src="https://unpkg.com/imask"></script>
+<!-- Adiciona o JS do módulo financeiro -->
+<script src="{{ url_for('static', filename='js/finance.js') }}"></script>
+{% endblock %}
+
+{% block page_actions %}
+    <a href="{{ url_for('finance.add_account') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nova Conta
+    </a>
+{% endblock %}
+
+{% block finance_content %}
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="form-inline">
+                <div class="form-group mx-2">
+                    <label class="mr-2">Vencimento de:</label>
+                    <input type="text" name="due_start" class="form-control datepicker" 
+                           value="{{ request.args.get('due_start', '') }}">
+                </div>
+                <div class="form-group mx-2">
+                    <label class="mr-2">até:</label>
+                    <input type="text" name="due_end" class="form-control datepicker"
+                           value="{{ request.args.get('due_end', '') }}">
+                </div>
+                <div class="form-group mx-2">
+                    <label class="mr-2">Tipo:</label>
+                    <select name="type" class="form-control">
+                        <option value="">Todos</option>
+                        <option value="pagar" {% if request.args.get('type') == 'pagar' %}selected{% endif %}>A Pagar</option>
+                        <option value="receber" {% if request.args.get('type') == 'receber' %}selected{% endif %}>A Receber</option>
+                    </select>
+                </div>
+                <div class="form-group mx-2">
+                    <label class="mr-2">Status:</label>
+                    <select name="status" class="form-control">
+                        <option value="">Todos</option>
+                        <option value="pendente" {% if request.args.get('status') == 'pendente' %}selected{% endif %}>Pendente</option>
+                        <option value="pago" {% if request.args.get('status') == 'pago' %}selected{% endif %}>Pago</option>
+                        <option value="cancelado" {% if request.args.get('status') == 'cancelado' %}selected{% endif %}>Cancelado</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Resumo -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total a Pagar (Pendente)</h5>
+                    <h3 class="card-text">{{ "R$ %.2f"|format(total_pagar) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total a Receber (Pendente)</h5>
+                    <h3 class="card-text">{{ "R$ %.2f"|format(total_receber) }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de Contas -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Vencimento</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                    <th>OS</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in accounts %}
+                    <tr class="{% if account.is_overdue() %}table-danger{% endif %}">
+                        <td>{{ account.due_date.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            <span class="badge badge-{{ 'success' if account.type == 'receber' else 'danger' }}">
+                                {{ account.get_type_display() }}
+                            </span>
+                        </td>
+                        <td>{{ account.description }}</td>
+                        <td class="text-{{ 'success' if account.type == 'receber' else 'danger' }}">
+                            {{ "R$ %.2f"|format(account.amount) }}
+                        </td>
+                        <td>
+                            <span class="badge badge-{{ account.get_status_class() }}">
+                                {{ account.get_status_display() }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if account.service_order %}
+                                <a href="{{ url_for('orders.view', id=account.service_order.id) }}" target="_blank">
+                                    OS #{{ account.service_order.id }}
+                                </a>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if account.status == 'pendente' %}
+                                <button type="button" class="btn btn-sm btn-success" 
+                                        data-bs-toggle="modal" data-bs-target="#payModal{{ account.id }}">
+                                    <i class="fas fa-check"></i> Marcar como Pago
+                                </button>
+
+                                <!-- Modal de Pagamento -->
+                                <div class="modal fade" id="payModal{{ account.id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form action="{{ url_for('finance.pay_account', id=account.id) }}" method="POST">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Marcar como Pago</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="form-group mb-3">
+                                                        <label>Data do Pagamento</label>
+                                                        <input type="text" name="payment_date" class="form-control datepicker"
+                                                               value="{{ datetime.now().strftime('%d/%m/%Y') }}" required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Forma de Pagamento</label>
+                                                        <select name="payment_method" class="form-control" required>
+                                                            <option value="dinheiro">Dinheiro</option>
+                                                            <option value="pix">PIX</option>
+                                                            <option value="cartao_credito">Cartão de Crédito</option>
+                                                            <option value="cartao_debito">Cartão de Débito</option>
+                                                            <option value="transferencia">Transferência</option>
+                                                            <option value="boleto">Boleto</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <button type="submit" class="btn btn-success">Confirmar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">Nenhuma conta encontrada.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // Aguarda o jQuery e plugins carregarem completamente
+    $(document).ready(function() {
+        console.log('[accounts.html] Iniciando configuração dos componentes');
+
+        try {
+            // Inicializa máscaras
+            $('.money').mask('#.##0,00', {reverse: true});
+
+            // Inicializa tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+
+            // Intercepta o submit do formulário para garantir formato correto das datas
+            $('form:has(.datepicker)').on('submit', function(e) {
+                e.preventDefault();
+                
+                const dueStart = $('input[name="due_start"]').val();
+                const dueEnd = $('input[name="due_end"]').val();
+                const paymentDate = $('input[name="payment_date"]').val();
+                
+                console.log('Datas do formulário:', { dueStart, dueEnd, paymentDate });
+                
+                // Valida o formato das datas (DD/MM/YYYY)
+                const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+                let hasError = false;
+                
+                if (dueStart && !dateRegex.test(dueStart)) {
+                    alert('Data inicial inválida. Use o formato DD/MM/AAAA');
+                    hasError = true;
+                }
+                
+                if (dueEnd && !dateRegex.test(dueEnd)) {
+                    alert('Data final inválida. Use o formato DD/MM/AAAA');
+                    hasError = true;
+                }
+                
+                if (paymentDate && !dateRegex.test(paymentDate)) {
+                    alert('Data de pagamento inválida. Use o formato DD/MM/AAAA');
+                    hasError = true;
+                }
+                
+                if (!hasError) {
+                    console.log('Datas validadas, submetendo formulário...');
+                    this.submit();
+                }
+            });
+
+            console.log('[accounts.html] Componentes inicializados com sucesso');
+        } catch (error) {
+            console.error('Erro ao inicializar componentes:', error);
+        }
+    });
+</script>
+{% endblock %} 

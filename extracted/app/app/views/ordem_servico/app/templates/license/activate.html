@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Ativar Nova Licença</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">ID da Máquina</label>
+                            <input type="text" name="machine_id" class="form-control" required>
+                            <small class="text-muted">ID único da máquina que será ativada</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de Licença</label>
+                            <select name="license_type" class="form-select" required>
+                                <option value="basic">Básica</option>
+                                <option value="professional">Profissional</option>
+                                <option value="enterprise">Empresarial</option>
+                            </select>
+                            <div class="form-text">
+                                Básica: Para pequenos negócios<br>
+                                Profissional: Para médias empresas<br>
+                                Empresarial: Para grandes empresas
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Duração</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="number" name="duration" class="form-control" value="30">
+                                </div>
+                                <div class="col-md-6">
+                                    <select name="duration_unit" class="form-select">
+                                        <option value="days">Dias</option>
+                                        <option value="months">Meses</option>
+                                        <option value="years">Anos</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Observações</label>
+                            <textarea name="notes" class="form-control" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-key"></i> Ativar Licença
+                            </button>
+                            <a href="{{ url_for('license.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Voltar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelector('select[name="license_type"]').addEventListener('change', function(e) {
+    const durationInputs = document.querySelectorAll('input[name="duration"], select[name="duration_unit"]');
+    if (e.target.value === 'lifetime') {
+        durationInputs.forEach(input => {
+            input.disabled = true;
+            input.required = false;
+        });
+    } else {
+        durationInputs.forEach(input => {
+            input.disabled = false;
+            input.required = true;
+        });
+    }
+});
+</script>
+{% endblock %} 

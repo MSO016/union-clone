@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+{# Fase 11 - Modernizacao cosmetica VIEW (escopado em .view-modern).
+   Nao mexe em tooltips Bootstrap, statusFilter, confirmDelete, modal de exclusao. #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/view-modern.css') }}?v=20260529-tema">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 view-modern">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Detalhes do Cliente</h2>
+        <div class="btn-group">
+            <a href="{{ url_for('orders.from_client', client_id=client.id) }}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Nova OS
+            </a>
+            <a href="{{ url_for('clients.edit', id=client.id) }}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a href="{{ url_for('clients.list') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- Dados do Cliente -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0"><i class="fas fa-user me-2"></i>Informações do Cliente</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Nome:</strong> {{ client.name }}</p>
+                    <p><strong>Tipo:</strong> {{ 'Pessoa Física' if client.type == 'PF' else 'Pessoa Jurídica' }}</p>
+                    <p><strong>{% if locale and locale.code == 'PT' %}NIF{% elif locale and locale.code == 'US' %}{{ 'SSN' if client.type == 'PF' else 'EIN' }}{% else %}{{ 'CPF' if client.type == 'PF' else 'CNPJ' }}{% endif %}:</strong> {{ client.document or 'Não informado' }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Email:</strong> {{ client.email or 'Não informado' }}</p>
+                    <p><strong>Telefone:</strong> {{ client.phone or 'Não informado' }}</p>
+                    <p><strong>Endereço:</strong> {{ client.address or 'Não informado' }}</p>
+                    <p><strong>CEP:</strong> {{ client.cep or 'Não informado' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ordens de Serviço -->
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0"><i class="fas fa-tools me-2"></i>Ordens de Serviço</h5>
+            <div class="btn-group">
+                <select class="form-select form-select-sm" id="statusFilter">
+                    <option value="">Todos os Status</option>
+                    <option value="aguardando_diagnostico">Aguardando Diagnóstico</option>
+                    <option value="em_diagnostico">Em Diagnóstico</option>
+                    <option value="aguardando_autorizacao">Aguardando Autorização</option>
+                    <option value="autorizado">Autorizado</option>
+                    <option value="em_manutencao">Em Manutenção</option>
+                    <option value="concluido_sucesso">Concluído com Sucesso</option>
+                    <option value="concluido_falha">Concluído com Falha</option>
+                    <option value="finalizada">Finalizada</option>
+                    <option value="em_garantia">Em Garantia</option>
+                    <option value="aguardando_peca">Aguardando Peça</option>
+                </select>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if orders %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>OS #</th>
+                            <th>Data</th>
+                            <th>Equipamento</th>
+                            <th>Status</th>
+                            <th>Valor</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr class="order-row" data-status="{{ order.status }}">
+                            <td><strong class="text-primary">#{{ order.id }}</strong></td>
+                            <td>{{ order.created_at.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ order.equipment }}</td>
+                            <td>
+                                <span class="badge bg-{{ {
+                                    'aguardando_diagnostico': 'warning',
+                                    'em_diagnostico': 'info',
+                                    'aguardando_autorizacao': 'secondary',
+                                    'autorizado': 'primary',
+                                    'em_manutencao': 'info',
+                                    'concluido_sucesso': 'success',
+                                    'concluido_falha': 'danger',
+                                    'nao_autorizado': 'danger',
+                                    'finalizada': 'dark',
+                                    'em_garantia': 'success'
+                                }[order.status] }}">
+                                    {{ order.get_status_description() }}
+                                </span>
+                            </td>
+                            <td>R$ {{ "%.2f"|format(order.total_value or 0) }}</td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <a href="{{ url_for('orders.view', id=order.id) }}" 
+                                       class="btn btn-sm btn-primary"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="Visualizar OS">
+                                        <i class="fas fa-eye"></i>
+                                        <span class="d-none d-md-inline ms-1">Visualizar</span>
+                                    </a>
+                                    <a href="{{ url_for('orders.edit', id=order.id) }}" 
+                                       class="btn btn-sm btn-warning"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="Editar OS">
+                                        <i class="fas fa-edit"></i>
+                                        <span class="d-none d-md-inline ms-1">Editar</span>
+                                    </a>
+                                    {% if not order.is_finalized() and current_user.role in ['admin', 'developer'] %}
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger"
+                                            onclick="confirmDelete('{{ order.id }}')"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Excluir OS">
+                                        <i class="fas fa-trash"></i>
+                                        <span class="d-none d-md-inline ms-1">Excluir</span>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Nenhuma ordem de serviço encontrada para este cliente.</p>
+                <a href="{{ url_for('orders.from_client', client_id=client.id) }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Criar Nova OS
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                    Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir esta ordem de serviço?</p>
+                <p class="text-danger">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Esta ação não pode ser desfeita!
+                </p>
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" method="POST">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializa tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Filtro de Status
+    const statusFilter = document.getElementById('statusFilter');
+    statusFilter.addEventListener('change', function() {
+        const selectedStatus = this.value;
+        const rows = document.querySelectorAll('.order-row');
+        
+        rows.forEach(row => {
+            const rowStatus = row.getAttribute('data-status');
+            if (!selectedStatus || rowStatus === selectedStatus) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+
+function confirmDelete(orderId) {
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const form = document.getElementById('deleteForm');
+    form.action = `/orders/${orderId}/delete`;
+    
+    // Adiciona listener para o formulário
+    form.onsubmit = function(event) {
+        event.preventDefault();
+        
+        fetch(form.action, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Força atualização do dashboard se estiver aberto
+                if (window.refreshDashboard) {
+                    refreshDashboard();
+                }
+                // Recarrega a página
+                window.location.reload();
+            } else {
+                alert('Erro ao excluir ordem de serviço');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao excluir ordem de serviço');
+        })
+        .finally(() => {
+            modal.hide();
+        });
+    };
+    
+    modal.show();
+}
+</script>
+
+<style>
+.btn-group .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+@media (max-width: 768px) {
+    .btn-group {
+        flex-wrap: nowrap;
+    }
+    
+    .btn-group .btn {
+        padding: .25rem .5rem;
+    }
+}
+</style>
+{% endblock %} 

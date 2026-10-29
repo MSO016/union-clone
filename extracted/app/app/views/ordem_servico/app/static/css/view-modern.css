@@ -1,0 +1,748 @@
+/* =============================================================================
+   view-modern.css — Modernizacao cosmetica das paginas VIEW (somente leitura)
+   =============================================================================
+   FASE 11 — 17/05/2026
+   ESCOPO: TODOS os seletores comecam com .view-modern para nao afetar
+   nenhum outro template do sistema.
+
+   FILOSOFIA (mesma das Fases 7-10):
+   - Apenas substitui visualmente cards/tabela/badges/botoes/dropdowns.
+   - Mantem 100% do JS (handlePDF, WhatsApp modal, status update, modais,
+     dropdowns, statusFilter, confirmDelete) intacto.
+   - Convive com .navbar.ui-modern (Fase 5) e theme-toggle (Fase 6).
+   - Paleta sincronizada com Union (#0D47A1 + #2196F3) + acentos Material.
+   - Suporte a prefers-color-scheme: dark e theme-light/dark forcados.
+
+   Usado em:
+   - orders/view.html        (Detalhes da OS — template critico ~1950 linhas)
+   - clients/view.html       (Detalhes do Cliente + lista OS)
+   - inventory/view.html     (Detalhes do Produto + QR Code + movimentacoes)
+   ============================================================================= */
+
+/* ---------- Tokens locais ---------------------------------------------- */
+.view-modern {
+    --vw-accent:        #0D47A1;
+    --vw-accent-2:      #2196F3;
+    --vw-accent-soft:   rgba(13, 71, 161, 0.10);
+
+    --vw-success:       #2E7D32;
+    --vw-success-soft:  rgba(46, 125, 50, 0.12);
+    --vw-warn:          #F57C00;
+    --vw-warn-soft:     rgba(245, 124, 0, 0.14);
+    --vw-error:         #DC2626;
+    --vw-error-soft:    rgba(220, 38, 38, 0.12);
+    --vw-info:          #0288D1;
+    --vw-info-soft:     rgba(2, 136, 209, 0.12);
+
+    --vw-text:          #0f172a;
+    --vw-text-muted:    #64748b;
+    --vw-bg-card:       #ffffff;
+    --vw-bg-card-soft:  #f8fafc;
+    --vw-border:        #e2e8f0;
+    --vw-border-strong: #cbd5e1;
+
+    --vw-radius:        14px;
+    --vw-radius-sm:     10px;
+    --vw-radius-pill:   9999px;
+    --vw-shadow-sm:     0 1px 3px rgba(15, 23, 42, 0.06);
+    --vw-shadow-md:     0 4px 14px rgba(15, 23, 42, 0.08);
+}
+
+/* Dark 100% OPT-IN (29-05-2026): so com .theme-dark (era @media dark, que
+   ligava sozinho no Windows escuro e deixava texto claro em fundo claro). */
+:root.theme-dark .view-modern {
+    --vw-text:          #e2e8f0;
+    --vw-text-muted:    #94a3b8;
+    --vw-bg-card:       #1e293b;
+    --vw-bg-card-soft:  #0f172a;
+    --vw-border:        #334155;
+    --vw-border-strong: #475569;
+}
+
+/* ============================================================================
+   HEADER — titulo + btn-group (Voltar/Editar/PDF/etc.)
+   ============================================================================ */
+.view-modern > .d-flex.justify-content-between {
+    background: linear-gradient(135deg, var(--vw-accent) 0%, var(--vw-accent-2) 100%);
+    color: #ffffff;
+    padding: 1.1rem 1.4rem !important;
+    border-radius: var(--vw-radius);
+    box-shadow: var(--vw-shadow-md);
+    margin-bottom: 1.5rem !important;
+}
+
+.view-modern > .d-flex.justify-content-between h1,
+.view-modern > .d-flex.justify-content-between h2,
+.view-modern > .d-flex.justify-content-between h4 {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 1.4rem !important;
+    margin: 0;
+    letter-spacing: 0.01em;
+}
+.view-modern > .d-flex.justify-content-between h1 i,
+.view-modern > .d-flex.justify-content-between h2 i,
+.view-modern > .d-flex.justify-content-between h4 i {
+    color: rgba(255, 255, 255, 0.92) !important;
+    margin-right: 0.5rem;
+}
+
+/* Botoes do header — pilula translucida */
+.view-modern > .d-flex.justify-content-between .btn,
+.view-modern > .d-flex.justify-content-between .btn-group .btn {
+    background: rgba(255, 255, 255, 0.18) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    color: #ffffff !important;
+    border-radius: var(--vw-radius-pill) !important;
+    padding: 0.45rem 1.05rem !important;
+    font-weight: 500;
+    font-size: 0.88rem;
+    transition: background 0.18s ease, transform 0.15s ease;
+    backdrop-filter: blur(6px);
+    margin-left: 0.4rem;
+}
+.view-modern > .d-flex.justify-content-between .btn:hover,
+.view-modern > .d-flex.justify-content-between .btn-group .btn:hover {
+    background: rgba(255, 255, 255, 0.30) !important;
+    transform: translateY(-1px);
+}
+.view-modern > .d-flex.justify-content-between .btn[disabled],
+.view-modern > .d-flex.justify-content-between .btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Dropdown-toggle no header — separa visualmente do menu */
+.view-modern > .d-flex.justify-content-between .btn.dropdown-toggle::after {
+    margin-left: 0.4rem;
+}
+
+/* ============================================================================
+   HEADER ALTERNATIVO — card-header em vez de d-flex (inventory/view)
+   ============================================================================ */
+.view-modern > .card > .card-header.d-flex {
+    background: linear-gradient(135deg, var(--vw-accent) 0%, var(--vw-accent-2) 100%) !important;
+    color: #ffffff !important;
+    padding: 1.05rem 1.3rem !important;
+    border-bottom: none !important;
+}
+.view-modern > .card > .card-header.d-flex h4 {
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin: 0;
+}
+.view-modern > .card > .card-header.d-flex .btn {
+    background: rgba(255, 255, 255, 0.18) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    color: #ffffff !important;
+    border-radius: var(--vw-radius-pill) !important;
+    padding: 0.4rem 0.95rem !important;
+    font-weight: 500;
+    margin-left: 0.4rem;
+    backdrop-filter: blur(6px);
+}
+.view-modern > .card > .card-header.d-flex .btn:hover {
+    background: rgba(255, 255, 255, 0.30) !important;
+    transform: translateY(-1px);
+}
+
+/* ============================================================================
+   CARDS GENERICOS
+   ============================================================================ */
+.view-modern .card {
+    background: var(--vw-bg-card) !important;
+    border: 1px solid var(--vw-border) !important;
+    border-radius: var(--vw-radius) !important;
+    box-shadow: var(--vw-shadow-sm) !important;
+    overflow: hidden;
+}
+
+/* card-header padrao — Bootstrap default vira soft */
+.view-modern .card-header,
+.view-modern .card .card-header {
+    background: var(--vw-bg-card-soft) !important;
+    border-bottom: 1px solid var(--vw-border) !important;
+    padding: 0.85rem 1.1rem !important;
+}
+.view-modern .card-header h5,
+.view-modern .card-header h6 {
+    color: var(--vw-text) !important;
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0;
+}
+.view-modern .card-header i.text-primary { color: var(--vw-accent) !important; }
+.view-modern .card-header i.text-success { color: var(--vw-success) !important; }
+.view-modern .card-header i.text-info    { color: var(--vw-info) !important; }
+.view-modern .card-header i.text-warning { color: var(--vw-warn) !important; }
+.view-modern .card-header i.text-danger  { color: var(--vw-error) !important; }
+
+/* card-header.bg-primary — usado em clients/view e inventory/view (QR Code)
+   e orders/view (Checklists) */
+.view-modern .card-header.bg-primary {
+    background: linear-gradient(135deg, var(--vw-accent) 0%, var(--vw-accent-2) 100%) !important;
+    color: #ffffff !important;
+    border-bottom: none !important;
+    padding: 0.95rem 1.2rem !important;
+}
+.view-modern .card-header.bg-primary h5,
+.view-modern .card-header.bg-primary h5.card-title,
+.view-modern .card-header.bg-primary h5.card-title.mb-0 {
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0;
+}
+.view-modern .card-header.bg-primary i {
+    color: rgba(255, 255, 255, 0.92) !important;
+}
+
+/* card-header.bg-primary com dropdown-filter (clients/view) */
+.view-modern .card-header.bg-primary.d-flex .form-select,
+.view-modern .card-header.bg-primary.d-flex .form-select-sm {
+    background: rgba(255, 255, 255, 0.92) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    color: var(--vw-text) !important;
+    border-radius: var(--vw-radius-sm) !important;
+    font-size: 0.85rem;
+    max-width: 220px;
+}
+
+/* Subcards aninhados (orders/view: cards dentro de "Documentos da OS") */
+.view-modern .card .card.h-100 {
+    border: 1px solid var(--vw-border) !important;
+    border-radius: var(--vw-radius-sm) !important;
+    box-shadow: none !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease,
+                transform 0.15s ease;
+}
+.view-modern .card .card.h-100:hover {
+    border-color: var(--vw-accent-2) !important;
+    box-shadow: 0 4px 12px rgba(13, 71, 161, 0.10) !important;
+    transform: translateY(-1px);
+}
+.view-modern .card .card.h-100 .card-body {
+    padding: 1rem;
+}
+.view-modern .card .card.h-100 .card-title {
+    color: var(--vw-text) !important;
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    margin-bottom: 0.85rem !important;
+}
+
+/* ============================================================================
+   PARAGRAFOS LABEL/VALUE (clients/view: <p><strong>Nome:</strong> valor</p>)
+   ============================================================================ */
+.view-modern .card-body p {
+    margin-bottom: 0.55rem;
+    font-size: 0.92rem;
+    color: var(--vw-text);
+    line-height: 1.55;
+}
+.view-modern .card-body p strong {
+    color: var(--vw-text-muted);
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: inline-block;
+    min-width: 110px;
+}
+
+/* ============================================================================
+   TABELAS
+   ============================================================================ */
+.view-modern .table {
+    margin-bottom: 0;
+    color: var(--vw-text);
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--vw-text);
+    --bs-table-hover-bg: var(--vw-accent-soft);
+    --bs-table-striped-bg: var(--vw-bg-card-soft);
+    --bs-table-striped-color: var(--vw-text);
+}
+
+.view-modern .table thead.table-light,
+.view-modern .table thead {
+    background: var(--vw-bg-card-soft) !important;
+}
+.view-modern .table thead th {
+    font-size: 0.74rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    color: var(--vw-text-muted) !important;
+    font-weight: 700 !important;
+    background: var(--vw-bg-card-soft) !important;
+    border-bottom: 1px solid var(--vw-border) !important;
+    padding: 0.7rem 0.85rem !important;
+    white-space: nowrap;
+}
+
+.view-modern .table tbody tr {
+    transition: background 0.15s ease;
+}
+.view-modern .table tbody tr:hover {
+    background: var(--vw-accent-soft) !important;
+}
+.view-modern .table tbody td {
+    padding: 0.6rem 0.85rem !important;
+    border-color: var(--vw-border) !important;
+    color: var(--vw-text);
+    vertical-align: middle;
+    font-size: 0.92rem;
+}
+
+/* Tabela "info" (table-bordered) — inventory/view (label/value) */
+.view-modern .table-bordered {
+    border: 1px solid var(--vw-border) !important;
+    border-radius: var(--vw-radius-sm);
+    overflow: hidden;
+}
+.view-modern .table-bordered th,
+.view-modern .table-bordered td {
+    border: 1px solid var(--vw-border) !important;
+    background: var(--vw-bg-card) !important;
+}
+.view-modern .table-bordered tbody tr:first-child th {
+    border-top: none !important;
+}
+.view-modern .table-bordered tbody tr th {
+    background: var(--vw-bg-card-soft) !important;
+    color: var(--vw-text-muted) !important;
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    width: 200px;
+    vertical-align: middle;
+}
+.view-modern .table-bordered tbody tr td {
+    color: var(--vw-text) !important;
+    font-size: 0.92rem;
+}
+
+/* Tabela striped — inventory/view (movimentacoes) */
+.view-modern .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--vw-bg-card-soft) !important;
+}
+.view-modern .table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: var(--vw-bg-card-soft) !important;
+}
+
+/* Header inline "Historico de Movimentacoes" (inventory/view) */
+.view-modern h5.bg-primary.text-white.p-2.rounded {
+    background: linear-gradient(135deg, var(--vw-accent) 0%, var(--vw-accent-2) 100%) !important;
+    color: #ffffff !important;
+    border-radius: var(--vw-radius-sm) !important;
+    padding: 0.7rem 1rem !important;
+    margin-top: 1.5rem !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* ============================================================================
+   STATUS BADGES — Material Light
+   ============================================================================ */
+.view-modern .badge {
+    border-radius: var(--vw-radius-pill) !important;
+    padding: 0.32rem 0.72rem !important;
+    font-size: 0.74rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    line-height: 1.2;
+}
+
+.view-modern .badge.bg-warning,
+.view-modern .badge.bg-warning.text-dark {
+    background: var(--vw-warn-soft) !important;
+    color: #b45309 !important;
+    border-color: rgba(245, 124, 0, 0.30);
+}
+.view-modern .badge.bg-info {
+    background: var(--vw-info-soft) !important;
+    color: #01579b !important;
+    border-color: rgba(2, 136, 209, 0.30);
+}
+.view-modern .badge.bg-secondary {
+    background: rgba(100, 116, 139, 0.16) !important;
+    color: #475569 !important;
+    border-color: rgba(100, 116, 139, 0.30);
+}
+.view-modern .badge.bg-primary {
+    background: rgba(13, 71, 161, 0.14) !important;
+    color: #0c3a8a !important;
+    border-color: rgba(13, 71, 161, 0.30);
+}
+.view-modern .badge.bg-danger {
+    background: var(--vw-error-soft) !important;
+    color: var(--vw-error) !important;
+    border-color: rgba(220, 38, 38, 0.30);
+}
+.view-modern .badge.bg-success {
+    background: var(--vw-success-soft) !important;
+    color: var(--vw-success) !important;
+    border-color: rgba(46, 125, 50, 0.30);
+}
+.view-modern .badge.bg-dark {
+    background: rgba(15, 23, 42, 0.14) !important;
+    color: #1e293b !important;
+    border-color: rgba(15, 23, 42, 0.30);
+}
+
+/* "text-primary" usado em <strong> (numero da OS em listas internas) */
+.view-modern .table strong.text-primary {
+    color: var(--vw-accent) !important;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+/* ============================================================================
+   BOTOES NA TABELA / SUBCARDS — pillshape colorida por papel
+   ============================================================================ */
+.view-modern .table .btn-group .btn,
+.view-modern .card-body .btn-group .btn {
+    border-radius: 8px !important;
+    margin: 0 1px;
+    padding: 0.32rem 0.6rem !important;
+    border: 1px solid transparent !important;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+.view-modern .table .btn-group .btn:hover,
+.view-modern .card-body .btn-group .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(15, 23, 42, 0.15);
+}
+
+/* Cores Material Light */
+.view-modern .btn-primary,
+.view-modern .table .btn-group .btn.btn-primary,
+.view-modern .card-body .btn-group .btn.btn-primary {
+    background: var(--vw-accent) !important;
+    border-color: var(--vw-accent) !important;
+    color: #ffffff !important;
+}
+.view-modern .btn-primary:hover,
+.view-modern .table .btn-group .btn.btn-primary:hover {
+    background: var(--vw-accent-2) !important;
+    border-color: var(--vw-accent-2) !important;
+}
+.view-modern .btn-success,
+.view-modern .table .btn-group .btn.btn-success,
+.view-modern .card-body .btn-group .btn.btn-success {
+    background: var(--vw-success) !important;
+    border-color: var(--vw-success) !important;
+    color: #ffffff !important;
+}
+.view-modern .btn-success:hover,
+.view-modern .table .btn-group .btn.btn-success:hover {
+    background: #1b5e20 !important;
+    border-color: #1b5e20 !important;
+}
+.view-modern .btn-warning,
+.view-modern .table .btn-group .btn.btn-warning,
+.view-modern .card-body .btn-group .btn.btn-warning {
+    background: var(--vw-warn) !important;
+    border-color: var(--vw-warn) !important;
+    color: #ffffff !important;
+}
+.view-modern .btn-warning:hover,
+.view-modern .table .btn-group .btn.btn-warning:hover {
+    background: #e65100 !important;
+    border-color: #e65100 !important;
+}
+.view-modern .btn-danger,
+.view-modern .table .btn-group .btn.btn-danger,
+.view-modern .card-body .btn-group .btn.btn-danger {
+    background: var(--vw-error) !important;
+    border-color: var(--vw-error) !important;
+    color: #ffffff !important;
+}
+.view-modern .btn-danger:hover,
+.view-modern .table .btn-group .btn.btn-danger:hover {
+    background: #b91c1c !important;
+    border-color: #b91c1c !important;
+}
+.view-modern .btn-info,
+.view-modern .table .btn-group .btn.btn-info,
+.view-modern .card-body .btn-group .btn.btn-info {
+    background: var(--vw-info) !important;
+    border-color: var(--vw-info) !important;
+    color: #ffffff !important;
+}
+.view-modern .btn-info:hover,
+.view-modern .table .btn-group .btn.btn-info:hover {
+    background: #01579b !important;
+    border-color: #01579b !important;
+}
+.view-modern .btn-secondary,
+.view-modern .table .btn-group .btn.btn-secondary,
+.view-modern .card-body .btn-group .btn.btn-secondary {
+    background: #475569 !important;
+    border-color: #475569 !important;
+    color: #ffffff !important;
+}
+
+/* btn-outline-* */
+.view-modern .btn-outline-primary {
+    background: transparent !important;
+    border: 1px solid var(--vw-accent) !important;
+    color: var(--vw-accent) !important;
+}
+.view-modern .btn-outline-primary:hover {
+    background: var(--vw-accent) !important;
+    color: #ffffff !important;
+}
+.view-modern .btn-outline-success {
+    background: transparent !important;
+    border: 1px solid var(--vw-success) !important;
+    color: var(--vw-success) !important;
+}
+.view-modern .btn-outline-success:hover {
+    background: var(--vw-success) !important;
+    color: #ffffff !important;
+}
+.view-modern .btn-outline-warning {
+    background: transparent !important;
+    border: 1px solid var(--vw-warn) !important;
+    color: var(--vw-warn) !important;
+}
+.view-modern .btn-outline-warning:hover {
+    background: var(--vw-warn) !important;
+    color: #ffffff !important;
+}
+.view-modern .btn-outline-info {
+    background: transparent !important;
+    border: 1px solid var(--vw-info) !important;
+    color: var(--vw-info) !important;
+}
+.view-modern .btn-outline-info:hover {
+    background: var(--vw-info) !important;
+    color: #ffffff !important;
+}
+/* Fix contraste: btn-outline-dark nao tinha estilo no tema view-modern e ficava
+   com fundo branco/texto branco em alguns navegadores. Agora explicito. */
+.view-modern .btn-outline-dark {
+    background: transparent !important;
+    border: 1px solid #212529 !important;
+    color: #212529 !important;
+}
+.view-modern .btn-outline-dark:hover {
+    background: #212529 !important;
+    color: #ffffff !important;
+    border-color: #212529 !important;
+}
+/* Fix contraste: btn-outline-secondary tambem faltava e alguns botoes
+   'Voltar' usam essa classe. */
+.view-modern .btn-outline-secondary {
+    background: transparent !important;
+    border: 1px solid #6c757d !important;
+    color: #6c757d !important;
+}
+.view-modern .btn-outline-secondary:hover {
+    background: #6c757d !important;
+    color: #ffffff !important;
+    border-color: #6c757d !important;
+}
+
+/* Botao desabilitado — nao remove borda/cor, so aplica opacity + cursor.
+   Para outlines, garante que a borda permaneca visivel (senao fica branco
+   em branco quando OS nao esta finalizada, ex: PDF de Encerramento). */
+.view-modern .btn.disabled,
+.view-modern .btn:disabled {
+    opacity: 0.55 !important;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
+.view-modern .btn-outline-primary.disabled,
+.view-modern .btn-outline-primary:disabled,
+.view-modern .btn-outline-success.disabled,
+.view-modern .btn-outline-success:disabled,
+.view-modern .btn-outline-warning.disabled,
+.view-modern .btn-outline-warning:disabled,
+.view-modern .btn-outline-info.disabled,
+.view-modern .btn-outline-info:disabled,
+.view-modern .btn-outline-dark.disabled,
+.view-modern .btn-outline-dark:disabled,
+.view-modern .btn-outline-secondary.disabled,
+.view-modern .btn-outline-secondary:disabled {
+    background: #f8f9fa !important;
+    /* Mantem borda e cor do texto herdadas das regras acima; apenas garante
+       um leve fundo cinza claro para dar volume visual quando disabled. */
+}
+
+/* ============================================================================
+   DROPDOWN MENU (orders/view: Checklists, status, WhatsApp)
+   ============================================================================ */
+.view-modern .dropdown-menu {
+    border-radius: var(--vw-radius-sm) !important;
+    border: 1px solid var(--vw-border) !important;
+    box-shadow: var(--vw-shadow-md) !important;
+    padding: 0.4rem 0.3rem;
+    background: var(--vw-bg-card) !important;
+}
+.view-modern .dropdown-menu .dropdown-item {
+    border-radius: 6px;
+    padding: 0.5rem 0.85rem;
+    color: var(--vw-text);
+    font-size: 0.9rem;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.view-modern .dropdown-menu .dropdown-item:hover {
+    background: var(--vw-accent-soft);
+    color: var(--vw-accent);
+}
+.view-modern .dropdown-menu .dropdown-divider {
+    border-top-color: var(--vw-border);
+    margin: 0.3rem 0;
+}
+
+/* ============================================================================
+   QR CODE PREVIEW (inventory/view)
+   ============================================================================ */
+.view-modern .qr-code-container {
+    background: var(--vw-bg-card) !important;
+    padding: 1rem !important;
+    border-radius: var(--vw-radius-sm) !important;
+    border: 1px solid var(--vw-border);
+    box-shadow: var(--vw-shadow-sm) !important;
+    display: inline-block;
+}
+.view-modern .qr-code-container img {
+    display: block;
+    margin: 0 auto;
+}
+
+/* ============================================================================
+   EMPTY STATE (clients/view: "Nenhuma OS encontrada" + icone)
+   ============================================================================ */
+.view-modern .text-center.py-4 .fa-3x {
+    color: var(--vw-accent-2) !important;
+    opacity: 0.55;
+    margin-bottom: 0.75rem;
+}
+.view-modern .text-center.py-4 p.text-muted {
+    color: var(--vw-text-muted) !important;
+    font-size: 0.95rem;
+    margin-bottom: 0.85rem;
+}
+
+/* ============================================================================
+   MODAIS (preserva estilo Bootstrap mas alinha cores Union)
+   ============================================================================ */
+.view-modern + .modal .modal-content,
+body.view-modern-active .modal .modal-content {
+    /* nao mexer estrutural — apenas garantir font legivel */
+}
+
+/* ============================================================================
+   FORM-LABEL / FORM-CONTROL (modais auxiliares no orders/view)
+   ============================================================================ */
+.view-modern .form-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--vw-text-muted);
+    margin-bottom: 0.35rem;
+}
+.view-modern .form-control,
+.view-modern .form-select {
+    border-radius: var(--vw-radius-sm) !important;
+    border-color: var(--vw-border) !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    font-size: 0.92rem;
+    background: var(--vw-bg-card);
+    color: var(--vw-text);
+}
+.view-modern .form-control:focus,
+.view-modern .form-select:focus {
+    border-color: var(--vw-accent-2) !important;
+    box-shadow: 0 0 0 3px var(--vw-accent-soft) !important;
+}
+
+/* ============================================================================
+   DARK MODE — preferencia automatica do SO
+   ============================================================================ */
+/* Dark 100% OPT-IN (29-05-2026): so com .theme-dark (era @media dark). */
+:root.theme-dark .view-modern .card,
+:root.theme-dark .view-modern .card .card.h-100 {
+    background: var(--vw-bg-card) !important;
+    border-color: var(--vw-border) !important;
+}
+:root.theme-dark .view-modern .card-header {
+    background: var(--vw-bg-card-soft) !important;
+    border-color: var(--vw-border) !important;
+}
+:root.theme-dark .view-modern .form-control,
+:root.theme-dark .view-modern .form-select {
+    background: var(--vw-bg-card-soft) !important;
+    color: var(--vw-text) !important;
+    border-color: var(--vw-border) !important;
+}
+:root.theme-dark .view-modern .table {
+    --bs-table-color: var(--vw-text);
+    color: var(--vw-text) !important;
+}
+:root.theme-dark .view-modern .table thead th,
+:root.theme-dark .view-modern .table thead.table-light {
+    background: var(--vw-bg-card-soft) !important;
+    color: var(--vw-text-muted) !important;
+    border-color: var(--vw-border) !important;
+}
+:root.theme-dark .view-modern .table tbody td {
+    border-color: var(--vw-border) !important;
+    color: var(--vw-text);
+}
+:root.theme-dark .view-modern .table-bordered tbody tr th {
+    background: var(--vw-bg-card-soft) !important;
+    color: var(--vw-text-muted) !important;
+}
+:root.theme-dark .view-modern .table-bordered tbody tr td {
+    background: var(--vw-bg-card) !important;
+}
+:root.theme-dark .view-modern .qr-code-container {
+    background: var(--vw-bg-card-soft) !important;
+    border-color: var(--vw-border);
+}
+
+/* ============================================================================
+   RESPONSIVO
+   ============================================================================ */
+@media (max-width: 767.98px) {
+    .view-modern > .d-flex.justify-content-between {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.75rem;
+        padding: 1rem !important;
+    }
+    .view-modern > .d-flex.justify-content-between h1,
+    .view-modern > .d-flex.justify-content-between h2 {
+        font-size: 1.15rem !important;
+    }
+    .view-modern > .d-flex.justify-content-between .btn-group {
+        flex-wrap: wrap;
+        gap: 0.4rem;
+    }
+    .view-modern > .d-flex.justify-content-between .btn-group .btn {
+        margin-left: 0;
+        flex: 1 1 auto;
+    }
+    .view-modern .table thead th { font-size: 0.68rem !important; }
+    .view-modern .table tbody td { font-size: 0.85rem; }
+}

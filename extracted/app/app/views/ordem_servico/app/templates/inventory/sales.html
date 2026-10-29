@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+{# Fase 10 - Modernizacao cosmetica da listagem de vendas (escopado em .sales-modern).
+   Nao mexe em downloadPDF, enviarOrcamentoWhatsApp, paginacao ou submit GET. #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sales-modern.css') }}?v=20260529-tema">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 sales-modern">
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+        <h1 class="mb-0">
+            <i class="bi bi-receipt me-2"></i>
+            Vendas e Orçamentos
+        </h1>
+        <div class="btn-group">
+            <a href="{{ url_for('inventory.new_sale') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-2"></i>Nova Venda
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-white">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-funnel me-2 text-primary"></i>
+                <h5 class="mb-0">Filtros</h5>
+            </div>
+        </div>
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-2">
+                    <label for="status" class="form-label">Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="draft" {% if request.args.get('status') == 'draft' %}selected{% endif %}>Orçamento</option>
+                        <option value="confirmed" {% if request.args.get('status') == 'confirmed' %}selected{% endif %}>Confirmada</option>
+                        <option value="cancelled" {% if request.args.get('status') == 'cancelled' %}selected{% endif %}>Cancelada</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="client" class="form-label">Cliente</label>
+                    <input type="text" name="client" id="client" class="form-control" 
+                           value="{{ request.args.get('client', '') }}" placeholder="Nome ou documento">
+                </div>
+                <div class="col-md-2">
+                    <label for="start_date" class="form-label">Data Inicial</label>
+                    <input type="date" name="start_date" id="start_date" class="form-control"
+                           value="{{ request.args.get('start_date', '') }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="end_date" class="form-label">Data Final</label>
+                    <input type="date" name="end_date" id="end_date" class="form-control"
+                           value="{{ request.args.get('end_date', '') }}">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="bi bi-search me-2"></i>Filtrar
+                    </button>
+                    <a href="{{ url_for('inventory.list_sales') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-lg me-2"></i>Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Vendas -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="100">#</th>
+                            <th width="150">Data</th>
+                            <th width="150">Status</th>
+                            <th>Cliente</th>
+                            <th width="140">Pagamento</th>
+                            <th width="150" class="text-end">Total</th>
+                            <th width="120">Vendedor</th>
+                            <th width="120">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in sales.items %}
+                        <tr>
+                            <td>{{ sale.id }}</td>
+                            <td>{{ sale.date.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>
+                                {% if sale.status == 'draft' %}
+                                    <span class="badge bg-warning text-dark">Orçamento</span>
+                                {% elif sale.status == 'confirmed' %}
+                                    <span class="badge bg-success">Confirmada</span>
+                                {% elif sale.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelada</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if sale.client %}
+                                    <strong>{{ sale.client.name }}</strong>
+                                    {% if sale.client.document %}
+                                        <br><small class="text-muted">{{ sale.client.document }}</small>
+                                    {% endif %}
+                                {% else %}
+                                    {{ sale.client_name or 'Cliente não informado' }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if sale.payment_method %}
+                                    {{ sale.get_payment_method_display() }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <strong>R$ {{ "%.2f"|format(sale.final_amount) }}</strong>
+                                {% if sale.discount > 0 %}
+                                    <br><small class="text-success">Desconto: R$ {{ "%.2f"|format(sale.discount) }}</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ sale.created_by.username }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('inventory.view_sale', id=sale.id) }}" 
+                                       class="btn btn-sm btn-outline-primary" title="Ver detalhes">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if sale.status == 'draft' %}
+                                    <button type="button" class="btn btn-sm btn-outline-success" 
+                                            onclick="enviarOrcamentoWhatsApp({{ sale.id }})"
+                                            title="Enviar por WhatsApp">
+                                        <i class="bi bi-whatsapp"></i>
+                                    </button>
+                                    {% endif %}
+                                    <button type="button" onclick="downloadPDF({{ sale.id }})"
+                                       class="btn btn-sm btn-outline-dark" title="Baixar PDF">
+                                        <i class="bi bi-file-pdf"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="bi bi-inbox display-4 d-block mb-3"></i>
+                                    <p class="mb-0">Nenhuma venda encontrada</p>
+                                    <small>Use os filtros acima para refinar sua busca</small>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginação -->
+            {% if sales.pages > 1 %}
+            <nav aria-label="Navegação de páginas" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if not sales.has_prev %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('inventory.list_sales', page=sales.prev_num, **request.args) if sales.has_prev else '#' }}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% for page in sales.iter_pages() %}
+                        {% if page %}
+                            <li class="page-item {% if page == sales.page %}active{% endif %}">
+                                <a class="page-link" href="{{ url_for('inventory.list_sales', page=page, **request.args) }}">
+                                    {{ page }}
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    <li class="page-item {% if not sales.has_next %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('inventory.list_sales', page=sales.next_num, **request.args) if sales.has_next else '#' }}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+async function enviarOrcamentoWhatsApp(saleId) {
+    try {
+        const response = await fetch(`{{ url_for('inventory.quick_quote') }}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                sale_id: saleId
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            window.open(`https://wa.me/55${result.whatsapp}?text=${encodeURIComponent(result.message)}`, '_blank');
+        } else {
+            alert(result.message || 'Erro ao gerar orçamento');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao gerar orçamento');
+    }
+}
+
+async function downloadPDF(saleId) {
+    try {
+        const response = await fetch(`/reports/sales/${saleId}/pdf`);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `venda_${saleId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+    } catch (error) {
+        console.error('Erro ao baixar PDF:', error);
+        alert('Erro ao baixar o PDF. Por favor, tente novamente.');
+    }
+}
+</script>
+{% endblock %} 

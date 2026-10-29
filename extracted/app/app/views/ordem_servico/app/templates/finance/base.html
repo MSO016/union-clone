@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% if current_user.role not in ['admin', 'developer', 'manager', 'seller'] %}
+    <script>
+        window.location.href = "{{ url_for('main.dashboard') }}";
+    </script>
+{% else %}
+
+{% block styles %}
+{{ super() }}
+<!-- Bootstrap Datepicker CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
+<style>
+    /* Sidebar */
+    .sidebar {
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        z-index: 100;
+    }
+    
+    .sidebar .nav-link {
+        padding: 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .sidebar .nav-link:hover {
+        background-color: rgba(0,0,0,0.05);
+        transform: translateX(5px);
+    }
+    
+    .sidebar .nav-link.active {
+        background-color: var(--primary);
+        color: white !important;
+        border-radius: 0.25rem;
+    }
+    
+    .sidebar .nav-link i {
+        margin-right: 0.5rem;
+        width: 20px;
+        text-align: center;
+    }
+    
+    /* Cards */
+    .card {
+        transition: transform 0.3s ease;
+        margin-bottom: 1rem;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .card-header {
+        background-color: rgba(0,0,0,0.03);
+    }
+    
+    /* Tabelas */
+    .table th {
+        background-color: rgba(0,0,0,0.03);
+        border-top: none;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(0,0,0,0.02);
+    }
+    
+    /* Badges */
+    .badge {
+        padding: 0.5em 0.8em;
+        font-size: 85%;
+    }
+    
+    /* Botões */
+    .btn i {
+        margin-right: 0.3rem;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: -100%;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.show {
+            left: 0;
+        }
+        
+        main {
+            margin-left: 0 !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <div class="sidebar-sticky pt-3">
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mb-1 text-muted">
+                    <span>Financeiro</span>
+                </h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'finance.transactions' %}active{% endif %}" 
+                           href="{{ url_for('finance.transactions') }}">
+                            <i class="fas fa-exchange-alt"></i> Livro Caixa
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint in ['finance.cash_register', 'finance.cash_history'] %}active{% endif %}"
+                           href="{{ url_for('finance.cash_register') }}">
+                            <i class="fas fa-cash-register"></i> Caixa
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'finance.accounts' %}active{% endif %}"
+                           href="{{ url_for('finance.accounts') }}">
+                            <i class="fas fa-file-invoice-dollar"></i> Contas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'finance.cash_flow' %}active{% endif %}"
+                           href="{{ url_for('finance.cash_flow') }}">
+                            <i class="fas fa-chart-line"></i> Fluxo de Caixa
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'finance.categories' %}active{% endif %}"
+                           href="{{ url_for('finance.categories') }}">
+                            <i class="fas fa-tags"></i> Categorias
+                        </a>
+                    </li>
+                </ul>
+                
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Relatórios</span>
+                </h6>
+                <ul class="nav flex-column mb-2">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'finance.cash_flow' %}active{% endif %}"
+                           href="{{ url_for('finance.cash_flow') }}">
+                            <i class="fas fa-chart-bar"></i> Relatório Fluxo de Caixa
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'finance.reports' %}active{% endif %}"
+                           href="{{ url_for('finance.reports') }}">
+                            <i class="fas fa-file-alt"></i> Relatórios Gerenciais
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Conteúdo Principal -->
+        <main role="main" class="col-md-10 ml-sm-auto px-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">{% block page_title %}{% endblock %}</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    {% block page_actions %}{% endblock %}
+                </div>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block finance_content %}{% endblock %}
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- Bootstrap Datepicker JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.pt-BR.min.js"></script>
+<!-- jQuery Mask Plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<!-- Finance JS -->
+<script src="{{ url_for('static', filename='js/finance.js') }}"></script>
+<script>
+    // Formatação de valores monetários
+    function formatMoney(value) {
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+            minimumFractionDigits: 2
+        }).format(value);
+    }
+
+    // Formatação de datas
+    function formatDate(date) {
+        return new Intl.DateTimeFormat('pt-BR').format(new Date(date));
+    }
+
+    // Inicializa componentes
+    $(document).ready(function() {
+        // Tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+        
+        // Máscaras de entrada
+        $('.money').mask('#.##0,00', {reverse: true});
+        
+        // Toggle sidebar em mobile
+        $('.sidebar-toggle').on('click', function() {
+            $('.sidebar').toggleClass('show');
+        });
+    });
+    
+    // Confirmações
+    function confirmDelete(message) {
+        return confirm(message || 'Tem certeza que deseja excluir este item?');
+    }
+    
+    // Atualiza totais
+    function updateTotals() {
+        let totalEntrada = 0;
+        let totalSaida = 0;
+        
+        $('.transaction-value').each(function() {
+            const value = parseFloat($(this).data('value'));
+            const type = $(this).data('type');
+            
+            if (type === 'entrada') {
+                totalEntrada += value;
+            } else {
+                totalSaida += value;
+            }
+        });
+        
+        $('#totalEntrada').text(formatMoney(totalEntrada));
+        $('#totalSaida').text(formatMoney(totalSaida));
+        $('#saldo').text(formatMoney(totalEntrada - totalSaida));
+    }
+</script>
+{% endblock %}
+{% endif %}

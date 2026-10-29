@@ -1,0 +1,411 @@
+/* =============================================================================
+   dashboard-shell.css — Modernizacao cosmetica do Dashboard principal
+   =============================================================================
+   ESCOPO: TODOS os seletores comecam com .dash-shell para nao afetar
+   nenhum outro template do sistema.
+
+   FILOSOFIA:
+   - Apenas substitui visualmente os cards/tabelas/graficos do dashboard.
+   - Mantem 100% do JS (refreshDashboard, Chart.js, setInterval) intacto.
+   - Convive com .dash-ranking (Fase 3) — escopos independentes.
+   - Paleta sincronizada com o app principal Union (sidebar.py + main_window.py).
+   - Mantem o <style> inline legado do dashboard.html como fallback total.
+   - Dark mode automatico via prefers-color-scheme.
+   ============================================================================= */
+
+/* ---------- Tokens locais (mesma paleta do login Fase 2) ----------------- */
+.dash-shell {
+    --ds-accent:        #0D47A1;
+    --ds-accent-2:      #2196F3;
+    --ds-accent-soft:   rgba(13, 71, 161, 0.10);
+    --ds-text:          #0f172a;
+    --ds-text-muted:    #64748b;
+    --ds-bg-page:       transparent;        /* respeita o body legado */
+    --ds-bg-card:       #ffffff;
+    --ds-bg-card-soft:  #f8fafc;
+    --ds-border:        #e2e8f0;
+    --ds-border-strong: #cbd5e1;
+    --ds-radius:        14px;
+    --ds-radius-sm:     10px;
+    --ds-shadow-sm:     0 1px 3px rgba(15, 23, 42, 0.06);
+    --ds-shadow-md:     0 4px 14px rgba(15, 23, 42, 0.10);
+    --ds-shadow-lg:     0 10px 28px rgba(15, 23, 42, 0.15);
+
+    /* Cores dos KPIs primarios (linha 1) */
+    --ds-kpi-1-from:    #0D47A1;
+    --ds-kpi-1-to:      #2196F3;
+    --ds-kpi-2-from:    #F57C00;
+    --ds-kpi-2-to:      #FFB300;
+    --ds-kpi-3-from:    #00838F;
+    --ds-kpi-3-to:      #26C6DA;
+    --ds-kpi-4-from:    #2E7D32;
+    --ds-kpi-4-to:      #66BB6A;
+
+    /* Indicadores secundarios (linha 2) */
+    --ds-warning:       #F57C00;
+    --ds-danger:        #DC2626;
+    --ds-success:       #2E7D32;
+}
+
+/* Dark 100% OPT-IN (29-05-2026): so com .theme-dark (era @media dark, que
+   ligava sozinho no Windows escuro e deixava texto claro em fundo claro). */
+:root.theme-dark .dash-shell {
+    --ds-text:          #e2e8f0;
+    --ds-text-muted:    #94a3b8;
+    --ds-bg-card:       #1e293b;
+    --ds-bg-card-soft:  #0f172a;
+    --ds-border:        #334155;
+    --ds-border-strong: #475569;
+}
+
+/* ============================================================================
+   LINHA 1 — Cards de KPI principais com gradient moderno
+   ============================================================================ */
+/* Todos os 4 cards .dashboard-card que tem variantes *-gradient sao
+   sobrescritos com a paleta Union. Os IDs originais permanecem para o
+   refreshDashboard manter compatibilidade. */
+.dash-shell .dashboard-card {
+    border: none !important;
+    border-radius: var(--ds-radius) !important;
+    box-shadow: var(--ds-shadow-md) !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.2s ease !important;
+    overflow: hidden;
+    position: relative;
+}
+.dash-shell .dashboard-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--ds-shadow-lg) !important;
+}
+
+/* OS Total (azul Union — primary-gradient) */
+.dash-shell .dashboard-card.primary-gradient {
+    background: linear-gradient(135deg, var(--ds-kpi-1-from) 0%, var(--ds-kpi-1-to) 100%) !important;
+    color: #ffffff !important;
+}
+/* OS Aguardando (ambar — warning-gradient) */
+.dash-shell .dashboard-card.warning-gradient {
+    background: linear-gradient(135deg, var(--ds-kpi-2-from) 0%, var(--ds-kpi-2-to) 100%) !important;
+    color: #ffffff !important;
+}
+/* OS Manutencao (teal — info-gradient) */
+.dash-shell .dashboard-card.info-gradient {
+    background: linear-gradient(135deg, var(--ds-kpi-3-from) 0%, var(--ds-kpi-3-to) 100%) !important;
+    color: #ffffff !important;
+}
+/* OS Concluidas (verde — success-gradient) */
+.dash-shell .dashboard-card.success-gradient {
+    background: linear-gradient(135deg, var(--ds-kpi-4-from) 0%, var(--ds-kpi-4-to) 100%) !important;
+    color: #ffffff !important;
+}
+
+/* Brilho sutil decorativo no canto dos cards de KPI */
+.dash-shell .dashboard-card.primary-gradient::before,
+.dash-shell .dashboard-card.warning-gradient::before,
+.dash-shell .dashboard-card.info-gradient::before,
+.dash-shell .dashboard-card.success-gradient::before {
+    content: "";
+    position: absolute;
+    top: -40%;
+    right: -20%;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    pointer-events: none;
+}
+
+.dash-shell .dashboard-card.primary-gradient .card-subtitle,
+.dash-shell .dashboard-card.warning-gradient .card-subtitle,
+.dash-shell .dashboard-card.info-gradient .card-subtitle,
+.dash-shell .dashboard-card.success-gradient .card-subtitle {
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    margin-bottom: 0.4rem !important;
+}
+
+.dash-shell .dashboard-card.primary-gradient .card-value,
+.dash-shell .dashboard-card.warning-gradient .card-value,
+.dash-shell .dashboard-card.info-gradient .card-value,
+.dash-shell .dashboard-card.success-gradient .card-value {
+    color: #ffffff !important;
+    font-size: 2.4rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+
+.dash-shell .dashboard-card.primary-gradient .card-icon i,
+.dash-shell .dashboard-card.warning-gradient .card-icon i,
+.dash-shell .dashboard-card.info-gradient .card-icon i,
+.dash-shell .dashboard-card.success-gradient .card-icon i {
+    color: rgba(255, 255, 255, 0.45) !important;
+    font-size: 2.2rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+}
+
+/* ============================================================================
+   LINHA 2 — Cards secundarios brancos com borda lateral colorida
+   ============================================================================ */
+/* Cards #delayed-orders, #critical-orders, #accounts-payable, #accounts-receivable */
+.dash-shell #delayed-orders.dashboard-card,
+.dash-shell #critical-orders.dashboard-card,
+.dash-shell #accounts-payable.dashboard-card,
+.dash-shell #accounts-receivable.dashboard-card {
+    background: var(--ds-bg-card) !important;
+    border: 1px solid var(--ds-border) !important;
+    border-left-width: 4px !important;
+}
+.dash-shell #delayed-orders.dashboard-card     { border-left-color: var(--ds-warning) !important; }
+.dash-shell #critical-orders.dashboard-card    { border-left-color: var(--ds-danger) !important; }
+.dash-shell #accounts-payable.dashboard-card   { border-left-color: var(--ds-danger) !important; }
+.dash-shell #accounts-receivable.dashboard-card { border-left-color: var(--ds-success) !important; }
+
+.dash-shell #delayed-orders .card-value,
+.dash-shell #critical-orders .card-value,
+.dash-shell #accounts-payable .card-value,
+.dash-shell #accounts-receivable .card-value {
+    font-size: 2.1rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+}
+
+.dash-shell #delayed-orders .card-subtitle,
+.dash-shell #critical-orders .card-subtitle,
+.dash-shell #accounts-payable .card-subtitle,
+.dash-shell #accounts-receivable .card-subtitle {
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+/* Indicators verticais legados (.status-indicator) ficam mais discretos */
+.dash-shell .status-indicator {
+    width: 6px !important;
+    border-radius: 0 var(--ds-radius) var(--ds-radius) 0 !important;
+    opacity: 0.85;
+}
+
+/* Botoes "Ver Todas" dos cards financeiros */
+.dash-shell #accounts-payable .btn-outline-danger,
+.dash-shell #accounts-receivable .btn-outline-success {
+    border-radius: 9999px !important;
+    font-size: 0.78rem !important;
+    padding: 0.25rem 0.7rem !important;
+    border-width: 1.5px !important;
+    font-weight: 500 !important;
+}
+
+/* ============================================================================
+   LINHA 3 — Card de Peliculas (gradient inline) — sobrescreve com paleta Union
+   ============================================================================ */
+.dash-shell a[href*="peliculas"] .dashboard-card {
+    /* Override do style="background: linear-gradient(135deg, #667eea, #764ba2)" */
+    background: linear-gradient(135deg, var(--ds-accent) 0%, var(--ds-accent-2) 100%) !important;
+}
+
+/* ============================================================================
+   LINHA 4 — Cards de graficos (statusChart + weekdayChart)
+   ============================================================================ */
+.dash-shell .row .col-md-6 > .dashboard-card {
+    background: var(--ds-bg-card) !important;
+    border: 1px solid var(--ds-border) !important;
+}
+
+.dash-shell .card-title {
+    color: var(--ds-text) !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    margin-bottom: 1rem !important;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid var(--ds-accent-soft);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.dash-shell .card-title::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 18px;
+    background: var(--ds-accent);
+    border-radius: 2px;
+}
+
+/* Re-habilita interacao em canvas dentro do escopo (style.css global tem
+   pointer-events:none em todo canvas — mesma tecnica da Fase 3). */
+.dash-shell .chart-container canvas {
+    pointer-events: auto !important;
+}
+
+.dash-shell .chart-container {
+    padding: 0.5rem 0;
+    min-height: 240px;
+}
+
+/* ============================================================================
+   LINHA 5 — Tabelas (Tecnicos Mais Produtivos + Clientes Mais Frequentes)
+   ============================================================================ */
+.dash-shell .card-header.bg-transparent {
+    border-bottom: 1px solid var(--ds-border) !important;
+    padding: 1rem 1.25rem !important;
+}
+
+.dash-shell .card-header .card-title {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0.15rem !important;
+    font-size: 1rem !important;
+}
+.dash-shell .card-header .card-title::before {
+    display: none;
+}
+
+.dash-shell .card-header .text-warning {
+    color: #F57C00 !important;
+    font-size: 1.4rem;
+}
+.dash-shell .card-header .text-primary {
+    color: var(--ds-accent) !important;
+    font-size: 1.4rem;
+}
+
+.dash-shell .table-hover {
+    margin-bottom: 0;
+}
+
+.dash-shell .table-hover thead th {
+    font-size: 0.78rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    color: var(--ds-text-muted) !important;
+    font-weight: 600 !important;
+    background: var(--ds-bg-card-soft);
+    border-bottom: 1px solid var(--ds-border);
+    padding: 0.6rem 0.85rem !important;
+}
+
+.dash-shell .table-hover tbody tr {
+    transition: background 0.15s ease;
+}
+.dash-shell .table-hover tbody tr:hover {
+    background: var(--ds-accent-soft) !important;
+}
+
+.dash-shell .table-hover tbody td {
+    padding: 0.6rem 0.85rem !important;
+    border-color: var(--ds-border) !important;
+    color: var(--ds-text) !important;
+    vertical-align: middle;
+}
+
+/* Indica posicao 1, 2, 3 nas tabelas com icone Bootstrap Icons (trophy-fill)
+   Substituido de emojis Unicode para garantir renderizacao consistente em
+   WebView2 e navegadores sem fonte emoji. Codepoint \f5e6 confirmado em
+   bootstrap-icons.css:1276 (versao 1.8.1 local). */
+.dash-shell .table-hover tbody tr:nth-child(1) td:first-child::before {
+    content: "\f5e6";
+    font-family: "bootstrap-icons" !important;
+    margin-right: 0.4rem;
+    color: #f59e0b;
+    font-size: 0.9rem;
+}
+.dash-shell .table-hover tbody tr:nth-child(2) td:first-child::before {
+    content: "\f5e6";
+    font-family: "bootstrap-icons" !important;
+    margin-right: 0.4rem;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+.dash-shell .table-hover tbody tr:nth-child(3) td:first-child::before {
+    content: "\f5e6";
+    font-family: "bootstrap-icons" !important;
+    margin-right: 0.4rem;
+    color: #b45309;
+    font-size: 0.9rem;
+}
+
+/* ============================================================================
+   LINHA 7 — Network access flutuante (canto inferior direito)
+   ============================================================================ */
+/* Mesmo padrao chip dark glass do login (Fase 2) — consistencia total. */
+.dash-shell ~ .position-fixed.bottom-0.end-0 .network-access,
+.dash-shell + .position-fixed .network-access,
+body:has(.dash-shell) .position-fixed .network-access {
+    background: rgba(15, 23, 42, 0.85) !important;
+    border: 1px solid rgba(33, 150, 243, 0.45) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 9999px !important;
+    padding: 0.5rem 1rem !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+body:has(.dash-shell) .position-fixed .network-access small {
+    color: #ffffff !important;
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+body:has(.dash-shell) .position-fixed .network-access strong {
+    color: #2196F3 !important;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+body:has(.dash-shell) .position-fixed .network-access .btn-outline-secondary {
+    background: rgba(33, 150, 243, 0.22) !important;
+    border: 1px solid rgba(33, 150, 243, 0.55) !important;
+    color: #ffffff !important;
+    border-radius: 9999px !important;
+    padding: 0.2rem 0.55rem !important;
+}
+body:has(.dash-shell) .position-fixed .network-access .btn-outline-secondary:hover {
+    background: #2196F3 !important;
+    border-color: #2196F3 !important;
+    color: #ffffff !important;
+}
+
+/* ============================================================================
+   ESPACAMENTO E FUNDO DA PAGINA
+   ============================================================================ */
+.dash-shell {
+    padding-top: 0.5rem !important;
+}
+
+/* Separacao visual entre secao de KPIs e secao de graficos/tabelas
+   (a partir da 3a row, exclui .dash-ranking que tem escopo proprio) */
+.dash-shell > .row.mb-4:nth-child(n+3):not(.dash-ranking) {
+    padding-top: 0.35rem;
+}
+
+/* ============================================================================
+   ACESSIBILIDADE — reduz movimento se solicitado
+   ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+    .dash-shell .dashboard-card,
+    .dash-shell .table-hover tbody tr {
+        transition: none !important;
+    }
+    .dash-shell .dashboard-card:hover {
+        transform: none !important;
+    }
+}
+
+/* ============================================================================
+   RESPONSIVO — mobile/tablet
+   ============================================================================ */
+@media (max-width: 767.98px) {
+    .dash-shell .dashboard-card.primary-gradient .card-value,
+    .dash-shell .dashboard-card.warning-gradient .card-value,
+    .dash-shell .dashboard-card.info-gradient .card-value,
+    .dash-shell .dashboard-card.success-gradient .card-value {
+        font-size: 1.85rem !important;
+    }
+    .dash-shell .card-body { padding: 1rem !important; }
+    .dash-shell .table-hover tbody tr td:first-child::before { display: none; }
+}

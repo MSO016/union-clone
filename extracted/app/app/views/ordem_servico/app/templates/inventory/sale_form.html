@@ -1,0 +1,945 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid form-modern">
+    <div class="d-flex justify-content-between align-items-center mt-3 mb-4">
+        <h2>
+            <i class="bi bi-cart-check me-2"></i>
+            {% if sale %}
+            Editar Orçamento #{{ sale.id }}
+            {% else %}
+            PDV - Ponto de Venda
+            {% endif %}
+        </h2>
+        <a href="{{ url_for('inventory.list_sales') }}" class="btn btn-outline-secondary btn-lg">
+            <i class="bi bi-arrow-left me-2"></i>Voltar
+        </a>
+    </div>
+
+    <form method="POST" id="saleForm" class="pdv-form">
+        <div class="row">
+            <!-- Coluna da Esquerda - Itens -->
+            <div class="col-md-8">
+                <!-- Busca de Produtos -->
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-search me-2"></i>
+                            Buscar Produtos
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Buscar por Nome</label>
+                                <input type="text" class="form-control" id="searchByName" placeholder="Digite o nome do produto...">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Buscar por QR Code</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="searchByQRCode" placeholder="Digite ou escaneie o QR code...">
+                                    <button class="btn btn-outline-primary" type="button" id="cameraButton" title="Usar câmera" style="-webkit-appearance: none;">
+                                        <i class="bi bi-camera"></i>
+                                    </button>
+                                </div>
+                                <!-- Container para o preview da câmera -->
+                                <div id="cameraContainer" class="d-none mt-2 position-relative">
+                                    <div id="qrReader"></div>
+                                    <div class="camera-overlay">
+                                        <div class="scan-region-highlight"></div>
+                                        <div class="scan-region-highlight-svg"></div>
+                                    </div>
+                                    <button class="btn btn-sm btn-danger position-absolute" id="stopCamera" style="bottom: 10px; right: 10px;">
+                                        <i class="bi bi-x-lg me-2"></i>Fechar Câmera
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Categoria</label>
+                                <select class="form-select" id="searchByCategory">
+                                    <option value="">Todas as Categorias</option>
+                                    {% set choices = {'peca': 'Peça', 'insumo': 'Insumo', 'ferramenta': 'Ferramenta'} %}
+                                    {% for value, label in choices.items() %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Itens -->
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-cart me-2"></i>
+                            Itens da Venda
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table" id="itemsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Produto</th>
+                                        <th>Quantidade</th>
+                                        <th>Preço Unit.</th>
+                                        <th>Total</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="itemsContainer">
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" class="btn btn-success" onclick="addNewRow()">
+                            <i class="bi bi-plus-circle"></i> Adicionar Item
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna da Direita - Informações e Totais -->
+            <div class="col-md-4">
+                <!-- Card de Cliente -->
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-person me-2"></i>
+                            Cliente
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="clientSelect" class="form-label">Cliente Cadastrado</label>
+                            <select class="form-select form-select-lg" id="clientSelect" name="client_id">
+                                <option value="">Cliente não identificado</option>
+                                {% for client in clients %}
+                                <option value="{{ client.id }}">
+                                    {{ client.name }}
+                                    {% if client.document %}({{ client.document }}){% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="clientName" class="form-label">Nome do Cliente</label>
+                            <input type="text" class="form-control form-control-lg" id="clientName" 
+                                   name="client_name" placeholder="Cliente não cadastrado">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card de Totais e Finalização -->
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-success text-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-cash me-2"></i>
+                            Totais
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <label class="col-sm-4 col-form-label">Subtotal:</label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    <span class="input-group-text">{{ locale.currency_symbol if locale else 'R$' }}</span>
+                                    <input type="number" class="form-control form-control-lg" 
+                                           id="totalAmount" name="total_amount" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label class="col-sm-4 col-form-label">Desconto:</label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    <span class="input-group-text">{{ locale.currency_symbol if locale else 'R$' }}</span>
+                                    <input type="number" class="form-control form-control-lg" 
+                                           id="discount" name="discount" value="0" min="0" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <label class="col-sm-4 col-form-label fw-bold">Total Final:</label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    <span class="input-group-text">{{ locale.currency_symbol if locale else 'R$' }}</span>
+                                    <input type="number" class="form-control form-control-lg fw-bold" 
+                                           id="finalAmount" name="final_amount" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="warranty" class="form-label">Garantia</label>
+                            <input type="text" class="form-control form-control-lg" id="warranty" 
+                                   name="warranty" placeholder="Ex: 90 dias">
+                            <div class="form-text">Opcional. Informe o período de garantia.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="payment_method" class="form-label">Forma de Pagamento</label>
+                            <select class="form-select form-select-lg" id="payment_method" name="payment_method">
+                                <option value="">Selecione...</option>
+                                <option value="dinheiro">💵 Dinheiro</option>
+                                <option value="pix">🔄 PIX</option>
+                                <option value="cartao_credito">💳 Cartão de Crédito</option>
+                                <option value="cartao_debito">💳 Cartão de Débito</option>
+                                <option value="transferencia">🏦 Transferência Bancária</option>
+                                <option value="boleto">📄 Boleto</option>
+                                <option value="outros">❓ Outros</option>
+                            </select>
+                            <div class="form-text">Obrigatório para vendas confirmadas.</div>
+
+                            {# ----------------------------------------------------- #}
+                            {# Botao QR Code PIX - 100% aditivo, defensivo.          #}
+                            {# Aparece apenas se ha imagem cadastrada em Settings.   #}
+                            {# Se pix_qrcode_url=None (default), nada e renderizado. #}
+                            {# ----------------------------------------------------- #}
+                            {% if pix_qrcode_url %}
+                            <button type="button" id="btnMostrarPix"
+                                    class="btn btn-outline-success btn-sm mt-2 w-100"
+                                    data-bs-toggle="modal" data-bs-target="#modalPixQrCode">
+                                <i class="bi bi-qr-code me-1"></i> Mostrar QR Code PIX
+                            </button>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Observações</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Tipo de Operação</label>
+                            <select class="form-select form-select-lg" id="status" name="status" required>
+                                <option value="draft">Gerar Orçamento</option>
+                                <option value="confirmed">Confirmar Venda</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="bi bi-check-lg me-2"></i>Finalizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+{# --------------------------------------------------------------------- #}
+{# Modal QR Code PIX - aditivo, so renderiza se a imagem existe.         #}
+{# --------------------------------------------------------------------- #}
+{% if pix_qrcode_url %}
+<div class="modal fade" id="modalPixQrCode" tabindex="-1" aria-labelledby="modalPixQrCodeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalPixQrCodeLabel">
+                    <i class="bi bi-qr-code me-2"></i>QR Code PIX
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <img src="{{ pix_qrcode_url }}" alt="QR Code PIX"
+                     style="max-width: 100%; max-height: 480px; border: 1px solid #dee2e6; padding: 10px; background: #fff;">
+                <p class="text-muted mt-3 mb-0">
+                    <i class="bi bi-camera me-1"></i>
+                    Aponte a camera do celular do cliente para escanear
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-1"></i> Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+.pdv-form .form-control,
+.pdv-form .form-select,
+.pdv-form .input-group-text {
+    border-radius: 8px;
+}
+
+.pdv-form .card {
+    border-radius: 12px;
+    border: none;
+}
+
+.pdv-form .card-header {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.pdv-form .btn {
+    border-radius: 8px;
+}
+
+.pdv-form .table > :not(caption) > * > * {
+    padding: 1rem 0.75rem;
+}
+
+.pdv-form .form-control:focus,
+.pdv-form .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.pdv-form .btn-success {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.pdv-form .btn-success:hover {
+    background-color: #157347;
+    border-color: #146c43;
+}
+
+/* Estilo para indicador de carregamento */
+.loading {
+    background-image: url('data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+
+/* Estilo para alertas */
+.alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+    min-width: 300px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para o leitor de QR code */
+#qrReader {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #000;
+}
+
+#qrReader video {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    transform: scaleX(-1); /* Espelha o vídeo para câmera frontal */
+}
+
+#qrReader.__className_e66fe9 {
+    border: none !important;
+    padding: 0 !important;
+}
+
+#qrReader button {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 8px 16px !important;
+    margin: 4px !important;
+}
+
+.camera-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.scan-region-highlight {
+    border: 2px solid #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.5);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 250px;
+    height: 250px;
+}
+
+.scan-region-highlight-svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 260px;
+    height: 260px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 260 260'%3E%3Cpath d='M10 10h50v-2h-52v52h2v-50zm240 0v50h2v-52h-52v2h50zm-240 240v-50h-2v52h52v-2h-50zm240 0h-50v2h52v-52h-2v50z' fill='%23ffffff'/%3E%3C/svg%3E") no-repeat center center;
+}
+
+/* Ajustes para dispositivos móveis */
+@media (max-width: 768px) {
+    #qrReader {
+        max-width: 100%;
+    }
+    
+    .scan-region-highlight,
+    .scan-region-highlight-svg {
+        width: 200px;
+        height: 200px;
+    }
+}
+
+/* Ajustes para iOS */
+@supports (-webkit-touch-callout: none) {
+    #qrReader video {
+        transform: none; /* Remove o espelhamento em dispositivos iOS */
+    }
+}
+
+/* Ajustes específicos para iOS */
+@supports (-webkit-touch-callout: none) {
+    #cameraButton {
+        -webkit-appearance: none;
+        -webkit-tap-highlight-color: transparent;
+        cursor: pointer;
+    }
+    
+    #qrReader {
+        width: 100vw;
+        max-width: 100vw;
+        height: 100vw;
+        max-height: 100vw;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    #qrReader video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: none;
+    }
+    
+    .scan-region-highlight {
+        width: 70vw;
+        height: 70vw;
+        max-width: 250px;
+        max-height: 250px;
+    }
+    
+    .scan-region-highlight-svg {
+        width: calc(70vw + 10px);
+        height: calc(70vw + 10px);
+        max-width: 260px;
+        max-height: 260px;
+    }
+}
+</style>
+{# Fase 10 - Modernizacao cosmetica do PDV (escopado em .form-modern).
+   Linkado APOS o <style> inline acima para ganhar precedencia natural por
+   ordem de carregamento. Nao mexe em html5-qrcode/camera, busca de produtos AJAX,
+   tabela dinamica addNewRow/updateGrandTotal, validacao payment_method ao confirmar. #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/forms-modern.css') }}?v=20260530-bold">
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+let itemCount = 0;
+let qrCodeTimeout = null;
+let hidQrTimeout = null;
+
+function extrairCodigoQr(decodedText) {
+    if (decodedText === null || decodedText === undefined) {
+        return '';
+    }
+    var t = String(decodedText).trim();
+    if (!t) {
+        return '';
+    }
+    if (t.indexOf('INV-') === 0) {
+        return t;
+    }
+    try {
+        var jsonData = JSON.parse(t);
+        if (jsonData && jsonData.code) {
+            return String(jsonData.code);
+        }
+        if (jsonData && jsonData.id !== undefined && jsonData.id !== null) {
+            return String(jsonData.id);
+        }
+    } catch (e) {
+        // nao e JSON — tenta etiqueta antiga (str(dict) Python)
+    }
+    try {
+        var m = t.match(/INV-\d+-\d+-[0-9a-fA-Z]+/i);
+        if (m && m[0]) {
+            return m[0];
+        }
+    } catch (e2) {
+        // ignora
+    }
+    return t;
+}
+
+// Função para processar o QR code lido
+function processQrCode(decodedText) {
+    try {
+        var codigo = extrairCodigoQr(decodedText);
+        if (!codigo) {
+            return;
+        }
+        searchProducts('qr_code', codigo);
+    } catch (e) {
+        searchProducts('qr_code', decodedText);
+    }
+}
+
+// Função para inicializar a câmera com tratamento de erros
+async function initializeCamera() {
+    const cameraContainer = document.getElementById('cameraContainer');
+    const qrReader = document.getElementById('qrReader');
+    
+    try {
+        // Primeiro, verifica se o navegador suporta a API de mídia
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error('Seu navegador não suporta acesso à câmera');
+        }
+
+        // Mostra o container da câmera
+        cameraContainer.classList.remove('d-none');
+
+        // Cria uma nova instância do scanner
+        const html5QrcodeScanner = new Html5Qrcode("qrReader");
+
+        // Configurações base do scanner
+        const config = {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0,
+            experimentalFeatures: {
+                useBarCodeDetectorIfSupported: true
+            }
+        };
+
+        // Tenta diferentes configurações de câmera em ordem de preferência
+        const cameraConfigs = [
+            { facingMode: "environment" }, // Primeiro tenta câmera traseira sem 'exact'
+            { facingMode: "user" },        // Depois tenta câmera frontal
+            {}                             // Por último, deixa o navegador escolher
+        ];
+
+        let success = false;
+        for (const cameraConfig of cameraConfigs) {
+            try {
+                await html5QrcodeScanner.start(
+                    cameraConfig,
+                    config,
+                    (decodedText) => {
+                        // Para o scanner após ler um código
+                        html5QrcodeScanner.stop().then(() => {
+                            cameraContainer.classList.add('d-none');
+                            processQrCode(decodedText);
+                        });
+                    },
+                    (errorMessage) => {
+                        // Ignora erros de leitura contínua
+                        if (errorMessage.includes("QR code parse error")) return;
+                        console.error(errorMessage);
+                    }
+                );
+                success = true;
+                break; // Se conseguiu iniciar a câmera, sai do loop
+            } catch (err) {
+                console.log('Tentando próxima configuração de câmera:', err);
+                continue;
+            }
+        }
+
+        if (!success) {
+            throw new Error('Não foi possível inicializar nenhuma câmera');
+        }
+
+        // Armazena a instância do scanner
+        qrReader.scanner = html5QrcodeScanner;
+
+    } catch (error) {
+        console.error('Erro ao inicializar câmera:', error);
+        if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+            showAlert('No iOS, você precisa permitir o acesso à câmera nas configurações do Safari.', 'warning');
+        } else {
+            showAlert('Erro ao acessar a câmera. Verifique as permissões e tente novamente.', 'danger');
+        }
+        cameraContainer.classList.add('d-none');
+    }
+}
+
+// Event listeners para busca
+document.addEventListener('DOMContentLoaded', function() {
+    // Adiciona eventos de toque para iOS
+    const cameraButton = document.getElementById('cameraButton');
+    
+    // Adiciona eventos tanto de click quanto de touchstart
+    ['click', 'touchstart'].forEach(eventType => {
+        cameraButton.addEventListener(eventType, function(e) {
+            e.preventDefault(); // Previne comportamento padrão
+            if (document.getElementById('qrReader').scanner) {
+                document.getElementById('qrReader').scanner.stop().then(() => {
+                    document.getElementById('cameraContainer').classList.add('d-none');
+                    document.getElementById('qrReader').scanner = null;
+                });
+            } else {
+                initializeCamera();
+            }
+        }, false);
+    });
+
+    // Event listener para busca por nome
+    document.getElementById('searchByName').addEventListener('input', (e) => {
+        clearTimeout(qrCodeTimeout);
+        const value = e.target.value;
+        const category = document.getElementById('searchByCategory').value;
+        qrCodeTimeout = setTimeout(() => {
+            searchProducts('text', value, category);
+        }, 300);
+    });
+
+    // Event listener para busca por categoria
+    document.getElementById('searchByCategory').addEventListener('change', (e) => {
+        const category = e.target.value;
+        const searchText = document.getElementById('searchByName').value;
+        searchProducts('text', searchText, category);
+    });
+
+    // Pistola HID (emula teclado) no campo QR. Sem este bloco o campo
+    // existia mas nao disparava busca. Fallback: se o input nao existir, noop.
+    var qrHidInput = document.getElementById('searchByQRCode');
+    if (qrHidInput) {
+        function dispararBuscaQrHid() {
+            try {
+                var v = (qrHidInput.value || '').trim();
+                if (!v) {
+                    return;
+                }
+                processQrCode(v);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        qrHidInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                clearTimeout(hidQrTimeout);
+                dispararBuscaQrHid();
+            }
+        });
+        qrHidInput.addEventListener('input', function() {
+            clearTimeout(hidQrTimeout);
+            hidQrTimeout = setTimeout(function() {
+                var v = (qrHidInput.value || '').trim();
+                if (v.indexOf('INV-') === 0 || v.length >= 8) {
+                    dispararBuscaQrHid();
+                }
+            }, 400);
+        });
+    }
+});
+
+// Função para buscar produtos
+function searchProducts(searchType, value, category = '') {
+    const baseUrl = window.location.origin;
+    const url = new URL('/api/inventory/items', baseUrl);
+    
+    url.searchParams.append('search', value);
+    url.searchParams.append('type', searchType);
+    url.searchParams.append('in_stock', 'true');
+    
+    if (category) {
+        url.searchParams.append('category', category);
+    }
+    
+    // Adiciona indicador de carregamento
+    const searchInput = document.getElementById(searchType === 'qr_code' ? 'searchByQRCode' : 'searchByName');
+    searchInput.classList.add('loading');
+    
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro na requisição');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Produtos encontrados:', data); // Debug
+            if (searchType === 'qr_code' && data.length === 1) {
+                // Se encontrou exatamente um produto por QR code, seleciona automaticamente
+                const product = data[0];
+                addProductToSale(product);
+                // Limpa o campo de busca
+                searchInput.value = '';
+            } else {
+                updateProductList(data);
+            }
+        })
+        .catch(error => {
+            console.error('Erro na busca:', error);
+            showAlert('Erro ao buscar produtos. Tente novamente.', 'danger');
+        })
+        .finally(() => {
+            searchInput.classList.remove('loading');
+        });
+}
+
+// Função para adicionar produto à venda
+function addProductToSale(product) {
+    addNewRow();
+    const lastRow = document.querySelector('#itemsContainer tr:last-child');
+    const select = lastRow.querySelector('.product-select');
+    const quantityInput = lastRow.querySelector('.quantity-input');
+    const priceInput = lastRow.querySelector('.price-input');
+    
+    // Atualiza o select com o produto
+    const option = document.createElement('option');
+    option.value = product.id;
+    option.textContent = `${product.name} (${product.category}) - Estoque: ${product.quantity}`;
+    option.dataset.price = product.sale_price;
+    option.dataset.stock = product.quantity;
+    select.innerHTML = '<option value="">Selecione um produto...</option>';
+    select.appendChild(option);
+    select.value = product.id;
+    
+    // Define o preço e foca na quantidade
+    priceInput.value = product.sale_price;
+    quantityInput.value = '1';
+    quantityInput.max = product.quantity;
+    quantityInput.focus();
+    
+    updateTotal(priceInput);
+}
+
+// Função para mostrar alertas
+function showAlert(message, type = 'info') {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.querySelector('.container-fluid').insertBefore(alertDiv, document.querySelector('.row'));
+    setTimeout(() => alertDiv.remove(), 5000);
+}
+
+// Função para adicionar nova linha
+function addNewRow() {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td>
+            <select class="form-select product-select" name="items[${itemCount}][inventory_id]" required onchange="updatePrice(this)">
+                <option value="">Selecione um produto...</option>
+            </select>
+        </td>
+        <td>
+            <input type="number" class="form-control quantity-input" name="items[${itemCount}][quantity]" 
+                   step="0.01" min="0.01" required onchange="updateTotal(this)">
+        </td>
+        <td>
+            <input type="number" class="form-control price-input" name="items[${itemCount}][unit_price]" 
+                   step="0.01" min="0.01" required onchange="updateTotal(this)" readonly>
+        </td>
+        <td class="text-end">
+            <span class="item-total" data-value="0">{{ locale.currency_symbol if locale else 'R$' }} 0,00</span>
+        </td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">
+                <i class="bi bi-trash"></i>
+            </button>
+        </td>
+    `;
+    
+    document.getElementById('itemsContainer').appendChild(row);
+    itemCount++;
+    
+    // Atualiza a lista de produtos na nova linha
+    searchProducts('text', document.getElementById('searchByName').value);
+}
+
+// Funções auxiliares
+function updatePrice(select) {
+    const option = select.selectedOptions[0];
+    if (option && option.dataset.price) {
+        const row = select.closest('tr');
+        const priceInput = row.querySelector('.price-input');
+        const quantityInput = row.querySelector('.quantity-input');
+        
+        priceInput.value = option.dataset.price;
+        
+        // Limita a quantidade ao estoque disponível
+        const maxStock = parseFloat(option.dataset.stock) || 0;
+        quantityInput.max = maxStock;
+        quantityInput.title = `Estoque disponível: ${maxStock}`;
+        
+        updateTotal(priceInput);
+    }
+}
+
+// Helper de moeda baseado no locale (defensivo: fallback BR).
+// Usa data-value para parsing seguro (independe do simbolo da moeda).
+const PDV_CURRENCY_SYMBOL = "{{ locale.currency_symbol if locale else 'R$' }}";
+const PDV_CURRENCY_POSITION = "{{ locale.currency_position if locale else 'before' }}";
+
+function pdvFormatMoney(value) {
+    const num = (parseFloat(value) || 0).toFixed(2);
+    if (PDV_CURRENCY_POSITION === 'after') {
+        return `${num} ${PDV_CURRENCY_SYMBOL}`;
+    }
+    return `${PDV_CURRENCY_SYMBOL} ${num}`;
+}
+
+function updateTotal(input) {
+    const row = input.closest('tr');
+    const quantity = parseFloat(row.querySelector('.quantity-input').value) || 0;
+    const price = parseFloat(row.querySelector('.price-input').value) || 0;
+    const total = quantity * price;
+    const itemTotal = row.querySelector('.item-total');
+    itemTotal.textContent = pdvFormatMoney(total);
+    itemTotal.dataset.value = total;
+    updateGrandTotal();
+}
+
+function updateGrandTotal() {
+    let subtotal = 0;
+    document.querySelectorAll('.item-total').forEach(span => {
+        // Prefere data-value (preciso); fallback para texto sem simbolo.
+        const raw = span.dataset.value;
+        if (raw !== undefined && raw !== '') {
+            subtotal += parseFloat(raw) || 0;
+        } else {
+            // Compat retro: parse "R$ 10,00" ou "10,00 EUR"
+            const stripped = (span.textContent || '')
+                .replace(PDV_CURRENCY_SYMBOL, '')
+                .replace(',', '.')
+                .trim();
+            subtotal += parseFloat(stripped) || 0;
+        }
+    });
+
+    document.getElementById('totalAmount').value = subtotal.toFixed(2);
+
+    const discount = parseFloat(document.getElementById('discount').value) || 0;
+    const finalAmount = Math.max(0, subtotal - discount);
+
+    document.getElementById('finalAmount').value = finalAmount.toFixed(2);
+}
+
+function removeRow(button) {
+    const row = button.closest('tr');
+    row.remove();
+    updateGrandTotal();
+}
+
+function updateProductList(products) {
+    const select = document.querySelector('#itemsContainer tr:last-child .product-select');
+    if (!select) return;
+
+    // Mantém a opção padrão
+    select.innerHTML = '<option value="">Selecione um produto...</option>';
+
+    // Adiciona os produtos encontrados
+    products.forEach(product => {
+        const option = document.createElement('option');
+        option.value = product.id;
+        option.textContent = `${product.name} (${product.category}) - Estoque: ${product.quantity}`;
+        option.dataset.price = product.sale_price;
+        option.dataset.stock = product.quantity;
+        select.appendChild(option);
+    });
+}
+
+// Inicialização do formulário
+document.addEventListener('DOMContentLoaded', () => {
+    {% if sale %}
+        // Preenche os dados do cliente
+        if ('{{ sale.client_id }}') {
+            document.getElementById('clientSelect').value = '{{ sale.client_id }}';
+        }
+        if ('{{ sale.client_name }}') {
+            document.getElementById('clientName').value = '{{ sale.client_name }}';
+        }
+        
+        // Preenche outros campos
+        if ('{{ sale.discount }}') {
+            document.getElementById('discount').value = '{{ sale.discount }}';
+        }
+        if ('{{ sale.notes }}') {
+            document.getElementById('notes').value = '{{ sale.notes }}';
+        }
+        if ('{{ sale.status }}') {
+            document.getElementById('status').value = '{{ sale.status }}';
+        }
+        if ('{{ sale.payment_method }}') {
+            document.getElementById('payment_method').value = '{{ sale.payment_method }}';
+        }
+        if ('{{ sale.warranty }}') {
+            document.getElementById('warranty').value = '{{ sale.warranty }}';
+        }
+        
+        // Carrega os itens existentes
+        {% for item in sale.items %}
+            addNewRow();
+            const lastRow = document.querySelector('#itemsContainer tr:last-child');
+            const select = lastRow.querySelector('.product-select');
+            const quantity = lastRow.querySelector('.quantity-input');
+            const price = lastRow.querySelector('.price-input');
+            
+            // Busca o produto e atualiza o select
+            fetch(`/api/inventory/items?search={{ item.inventory.name }}`)
+                .then(response => response.json())
+                .then(data => {
+                    updateProductList([data[0]]);
+                    select.value = '{{ item.inventory_id }}';
+                    quantity.value = '{{ item.quantity }}';
+                    price.value = '{{ item.unit_price }}';
+                    updateTotal(price);
+                });
+        {% endfor %}
+    {% else %}
+        addNewRow();
+    {% endif %}
+});
+
+// Atualizar totais quando o desconto mudar
+document.getElementById('discount').addEventListener('input', updateGrandTotal);
+
+// Validação do formulário
+document.getElementById('saleForm').addEventListener('submit', function(e) {
+    const status = document.getElementById('status').value;
+    const paymentMethod = document.getElementById('payment_method').value;
+    
+    // Se for uma venda confirmada, o método de pagamento é obrigatório
+    if (status === 'confirmed' && !paymentMethod) {
+        e.preventDefault();
+        showAlert('Para confirmar uma venda, é necessário informar a forma de pagamento.', 'warning');
+        document.getElementById('payment_method').focus();
+        return false;
+    }
+});
+
+// Atualizar estado do campo payment_method baseado no status
+document.getElementById('status').addEventListener('change', function() {
+    const paymentMethodSelect = document.getElementById('payment_method');
+    const paymentMethodLabel = document.querySelector('label[for="payment_method"]');
+    
+    if (this.value === 'confirmed') {
+        paymentMethodSelect.required = true;
+        paymentMethodLabel.innerHTML = 'Forma de Pagamento <span class="text-danger">*</span>';
+    } else {
+        paymentMethodSelect.required = false;
+        paymentMethodLabel.innerHTML = 'Forma de Pagamento';
+    }
+});
+</script>
+{% endblock %} 

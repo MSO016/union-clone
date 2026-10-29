@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Movimentação de Estoque</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="bi bi-arrow-left-right me-1"></i>
+            {{ item.name }}
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">Quantidade Atual</label>
+                    <input type="text" class="form-control" readonly value="{{ "%.2f"|format(item.quantity) }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Preço Unitário</label>
+                    <input type="text" class="form-control" readonly 
+                           value="R$ {{ "%.2f"|format(item.price_per_unit) if item.price_per_unit else '0.00' }}">
+                </div>
+            </div>
+            
+            <form method="POST">
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Tipo de Movimento</label>
+                        <select name="type" class="form-select" required>
+                            <option value="">Selecione...</option>
+                            <option value="{{ InventoryMovement.TYPE_IN }}">Entrada</option>
+                            <option value="{{ InventoryMovement.TYPE_OUT }}">Saída</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Quantidade</label>
+                        <input type="number" name="quantity" class="form-control" required step="0.01" min="0.01">
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Observações</label>
+                    <textarea name="notes" class="form-control" rows="3"></textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <a href="{{ url_for('inventory.index') }}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Registrar</button>
+                </div>
+            </form>
+            
+            <hr>
+            
+            <h5>Histórico de Movimentações</h5>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Quantidade</th>
+                        <th>Valor Total</th>
+                        <th>Observações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for movement in item.movements %}
+                    <tr>
+                        <td>{{ movement.date.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>{{ movement.get_type_display() }}</td>
+                        <td>{{ "%.2f"|format(movement.quantity) }}</td>
+                        <td>R$ {{ "%.2f"|format(movement.total_price) if movement.total_price else '0.00' }}</td>
+                        <td>{{ movement.notes or '-' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">Nenhuma movimentação registrada</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

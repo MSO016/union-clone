@@ -1,0 +1,1113 @@
+/* =============================================================================
+   forms-modern.css — Modernizacao cosmetica de formularios (Orders + Clients)
+   =============================================================================
+   FASE 8 — escopado em .form-modern para nao afetar outros templates.
+
+   ESTRATEGIA:
+   - Em orders/form.html (que tem ~830 linhas de <style> inline legado),
+     este CSS e linkado DENTRO de {% block styles %} APOS o <style> inline
+     para ganhar precedencia natural por ordem de carregamento.
+   - Em clients/form.html (sem style inline), e linkado em {% block extra_css %}.
+
+   FILOSOFIA (mesma das Fases 1, 4 e 7):
+   - Apenas substitui visualmente cards/labels/inputs/botoes.
+   - NAO mexe em IMask, jQuery UI autocomplete, SweetAlert2, viacep.com.br,
+     validacao CPF/CNPJ, modais, AJAX submit.
+   - Convive com .navbar.ui-modern (Fase 5), theme-toggle (Fase 6).
+   - Paleta sincronizada com Union (#0D47A1 + #2196F3).
+   - Suporte automatico a :root.theme-light/dark e prefers-color-scheme.
+   ============================================================================= */
+
+/* ---------- Tokens locais ---------------------------------------------- */
+.form-modern {
+    --fm-accent:        #0D47A1;
+    --fm-accent-2:      #2196F3;
+    --fm-accent-soft:   rgba(13, 71, 161, 0.10);
+    --fm-text:          #0f172a;
+    --fm-text-muted:    #64748b;
+    --fm-bg-card:       #ffffff;
+    --fm-bg-card-soft:  #f8fafc;
+    --fm-border:        #e2e8f0;
+    --fm-border-strong: #cbd5e1;
+    --fm-radius:        14px;
+    --fm-radius-sm:     10px;
+    --fm-radius-pill:   9999px;
+    --fm-shadow-sm:     0 1px 3px rgba(15, 23, 42, 0.06);
+    --fm-shadow-md:     0 4px 14px rgba(15, 23, 42, 0.08);
+
+    --fm-error:         #DC2626;
+    --fm-error-bg:      rgba(220, 38, 38, 0.08);
+    --fm-success:       #2E7D32;
+    --fm-warn:          #F57C00;
+
+    /* Legibilidade do texto digitado vs placeholder (etapa 27/05/2026 v2;
+       reforco 29/05/2026: peso 600 + fonte maior; reforco 30/05/2026:
+       peso 700 (negrito) + 1.06rem para combater "letra fina/apagada"
+       relatada pelos tecnicos ao digitar) */
+    --fm-input-color:       #0f172a;   /* texto digitado pelo usuario (slate-900) */
+    --fm-input-weight:      700;       /* negrito firme (legibilidade ao digitar) */
+    --fm-input-size:        1.06rem;   /* um pouco maior que o padrao */
+    --fm-placeholder-color: #475569;   /* placeholder slate-600 (claramente mais escuro) */
+    --fm-placeholder-weight: 400;
+}
+
+/* Dark 100% OPT-IN (29-05-2026): aplica SOMENTE quando o usuario escolhe o
+   tema escuro (.theme-dark no <html>). Antes era @media (prefers-color-scheme:
+   dark), que ligava sozinho em maquinas com Windows escuro e deixava texto
+   claro sobre fundo claro ("letra branca apagada") em TODOS os forms. */
+:root.theme-dark .form-modern {
+    --fm-text:          #e2e8f0;
+    --fm-text-muted:    #94a3b8;
+    --fm-bg-card:       #1e293b;
+    --fm-bg-card-soft:  #0f172a;
+    --fm-border:        #334155;
+    --fm-border-strong: #475569;
+
+    /* Em dark, texto digitado claro + placeholder com contraste medio */
+    --fm-input-color:       #f1f5f9;
+    --fm-placeholder-color: #cbd5e1;
+}
+
+/* ============================================================================
+   TITULO H2 do formulario (orders/form.html: "Editar / Nova Ordem de Servico")
+   ============================================================================ */
+.form-modern > h2 {
+    background: linear-gradient(135deg, var(--fm-accent) 0%, var(--fm-accent-2) 100%);
+    color: #ffffff !important;
+    padding: 1rem 1.4rem !important;
+    border-radius: var(--fm-radius);
+    box-shadow: var(--fm-shadow-md);
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: 0.01em;
+    margin-bottom: 1.5rem !important;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.form-modern > h2::before {
+    content: "📝";
+    font-size: 1.1rem;
+}
+
+/* ============================================================================
+   CARDS (clients/form.html usa <div class="card">; orders nao usa card,
+   apenas .form-container)
+   ============================================================================ */
+.form-modern .card {
+    background: var(--fm-bg-card);
+    border: 1px solid var(--fm-border) !important;
+    border-radius: var(--fm-radius) !important;
+    box-shadow: var(--fm-shadow-sm) !important;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.form-modern .card-header {
+    background: linear-gradient(135deg, var(--fm-accent) 0%, var(--fm-accent-2) 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 1rem 1.4rem !important;
+    font-weight: 600;
+}
+.form-modern .card-header h4,
+.form-modern .card-header h5,
+.form-modern .card-header h6 {
+    color: #ffffff !important;
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: 0.01em;
+}
+
+.form-modern .card-body {
+    background: var(--fm-bg-card);
+    padding: 1.4rem !important;
+}
+
+/* ============================================================================
+   LABELS — kicker discreto uppercase
+   ============================================================================ */
+.form-modern .form-label,
+.form-modern label:not(.form-check-label):not(.btn-close) {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--fm-text-muted);
+    margin-bottom: 0.35rem;
+}
+
+/* Asterisco de obrigatoriedade discretamente realcado */
+.form-modern .form-label:has-text("*"),
+.form-modern label {
+    /* fallback se :has-text nao for suportado */
+}
+
+/* small de "(opcional)" em destaque sutil */
+.form-modern label small {
+    text-transform: none;
+    font-weight: 500;
+    color: var(--fm-text-muted);
+    font-size: 0.72rem;
+    margin-left: 0.3rem;
+    opacity: 0.85;
+}
+
+/* ============================================================================
+   INPUTS / SELECTS / TEXTAREAS
+   ============================================================================ */
+.form-modern .form-control,
+.form-modern .form-select {
+    background-color: var(--fm-bg-card);
+    color: var(--fm-text);
+    border-radius: var(--fm-radius-sm) !important;
+    border: 1px solid var(--fm-border) !important;
+    padding: 0.55rem 0.8rem !important;
+    font-size: 0.92rem !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    line-height: 1.5;
+}
+
+.form-modern .form-control:hover:not(:disabled):not(:focus),
+.form-modern .form-select:hover:not(:disabled):not(:focus) {
+    border-color: var(--fm-border-strong) !important;
+}
+
+.form-modern .form-control:focus,
+.form-modern .form-select:focus {
+    border-color: var(--fm-accent-2) !important;
+    box-shadow: 0 0 0 3px var(--fm-accent-soft) !important;
+    outline: none;
+    background-color: var(--fm-bg-card);
+}
+
+.form-modern .form-control:disabled,
+.form-modern .form-select:disabled {
+    background-color: var(--fm-bg-card-soft);
+    color: var(--fm-text-muted);
+    opacity: 0.7;
+}
+
+.form-modern textarea.form-control {
+    min-height: 90px;
+    resize: vertical;
+}
+
+/* ----------------------------------------------------------------------------
+   Legibilidade do texto digitado pelo usuario (Etapa 27/05/2026)
+   - Texto digitado fica em semi-bold (600) para destacar do placeholder
+   - Placeholder fica em peso normal (400), com cor mais escura que o padrao
+     do Bootstrap, mantendo contraste em light e dark mode.
+   - Funciona em input, select, textarea. Inputs disabled mantem o estilo
+     atual (cor mais clara/opacity). NAO afeta nada fora de .form-modern.
+   ---------------------------------------------------------------------------- */
+.form-modern .form-control:not(:disabled),
+.form-modern .form-select:not(:disabled),
+.form-modern textarea.form-control:not(:disabled) {
+    color: var(--fm-input-color) !important;
+    font-weight: var(--fm-input-weight) !important;
+    font-size: var(--fm-input-size) !important;
+}
+
+/* Placeholder em peso normal (volta a 400) mas cor mais escura */
+.form-modern .form-control::placeholder,
+.form-modern textarea.form-control::placeholder,
+.form-modern .form-select::placeholder {
+    color: var(--fm-placeholder-color) !important;
+    font-weight: var(--fm-placeholder-weight) !important;
+    opacity: 1 !important; /* Firefox aplica 0.54 por padrao */
+}
+/* Prefixes legados (cobertura total entre navegadores) */
+.form-modern .form-control::-webkit-input-placeholder,
+.form-modern textarea.form-control::-webkit-input-placeholder {
+    color: var(--fm-placeholder-color) !important;
+    font-weight: var(--fm-placeholder-weight) !important;
+    opacity: 1 !important;
+}
+.form-modern .form-control::-moz-placeholder,
+.form-modern textarea.form-control::-moz-placeholder {
+    color: var(--fm-placeholder-color) !important;
+    font-weight: var(--fm-placeholder-weight) !important;
+    opacity: 1 !important;
+}
+.form-modern .form-control:-ms-input-placeholder,
+.form-modern textarea.form-control:-ms-input-placeholder {
+    color: var(--fm-placeholder-color) !important;
+    font-weight: var(--fm-placeholder-weight) !important;
+}
+
+/* form-text (texto de ajuda abaixo do input) */
+.form-modern .form-text {
+    color: var(--fm-text-muted);
+    font-size: 0.78rem;
+    margin-top: 0.3rem;
+}
+
+/* ============================================================================
+   INPUT-GROUP (CEP + botao Buscar; client_search + Novo Cliente)
+   ============================================================================ */
+.form-modern .input-group .form-control {
+    border-right: 0 !important;
+}
+.form-modern .input-group .form-control:focus {
+    border-right: 1px solid var(--fm-accent-2) !important;
+    z-index: 3;
+}
+.form-modern .input-group .input-group-text {
+    background: var(--fm-bg-card-soft);
+    border: 1px solid var(--fm-border);
+    border-left: 0 !important;
+    color: var(--fm-text-muted);
+    border-top-right-radius: var(--fm-radius-sm) !important;
+    border-bottom-right-radius: var(--fm-radius-sm) !important;
+}
+
+/* ============================================================================
+   FORM-CHECK (radio PF/PJ)
+   ============================================================================ */
+.form-modern .form-check-inline {
+    margin-right: 1.5rem;
+}
+.form-modern .form-check-input {
+    border: 2px solid var(--fm-border-strong);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.form-modern .form-check-input:checked {
+    background-color: var(--fm-accent) !important;
+    border-color: var(--fm-accent) !important;
+}
+.form-modern .form-check-input:focus {
+    border-color: var(--fm-accent-2) !important;
+    box-shadow: 0 0 0 3px var(--fm-accent-soft) !important;
+}
+.form-modern .form-check-label {
+    font-weight: 500;
+    color: var(--fm-text);
+    cursor: pointer;
+    margin-left: 0.35rem;
+}
+
+/* ============================================================================
+   ESTADO DE VALIDACAO (.is-invalid / .is-valid)
+   ============================================================================ */
+.form-modern .form-control.is-invalid,
+.form-modern .form-select.is-invalid {
+    border-color: var(--fm-error) !important;
+    background-color: var(--fm-error-bg);
+}
+.form-modern .form-control.is-invalid:focus,
+.form-modern .form-select.is-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
+}
+
+.form-modern .form-control.is-valid,
+.form-modern .form-select.is-valid {
+    border-color: var(--fm-success) !important;
+}
+.form-modern .form-control.is-valid:focus,
+.form-modern .form-select.is-valid:focus {
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15) !important;
+}
+
+.form-modern .invalid-feedback {
+    color: var(--fm-error);
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+    font-weight: 500;
+}
+
+/* ============================================================================
+   BOTOES DENTRO DO FORM
+   ============================================================================ */
+/* Botao Primary (Salvar) */
+.form-modern .btn-primary,
+.form-modern .btn.btn-primary {
+    background: var(--fm-accent) !important;
+    border-color: var(--fm-accent) !important;
+    color: #ffffff !important;
+    border-radius: var(--fm-radius-pill) !important;
+    padding: 0.55rem 1.4rem !important;
+    font-weight: 600;
+    font-size: 0.92rem !important;
+    letter-spacing: 0.01em;
+    transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 2px 6px rgba(13, 71, 161, 0.20);
+}
+.form-modern .btn-primary:hover:not(:disabled),
+.form-modern .btn.btn-primary:hover:not(:disabled) {
+    background: var(--fm-accent-2) !important;
+    border-color: var(--fm-accent-2) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 71, 161, 0.30);
+}
+.form-modern .btn-primary:disabled,
+.form-modern .btn.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Botao Secondary (Cancelar) */
+.form-modern .btn-secondary,
+.form-modern .btn.btn-secondary {
+    background: var(--fm-bg-card-soft) !important;
+    border: 1px solid var(--fm-border-strong) !important;
+    color: var(--fm-text) !important;
+    border-radius: var(--fm-radius-pill) !important;
+    padding: 0.55rem 1.3rem !important;
+    font-weight: 500;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+.form-modern .btn-secondary:hover:not(:disabled) {
+    background: var(--fm-border) !important;
+    transform: translateY(-1px);
+}
+
+/* Botao Outline-Primary (ex: "Novo Cliente") */
+.form-modern .btn-outline-primary {
+    background: transparent !important;
+    border: 1px solid var(--fm-accent) !important;
+    color: var(--fm-accent) !important;
+    border-radius: var(--fm-radius-pill) !important;
+    font-weight: 500;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.form-modern .btn-outline-primary:hover {
+    background: var(--fm-accent) !important;
+    color: #ffffff !important;
+}
+
+/* Botao Outline-Secondary (ex: "Gerenciar tipos") */
+.form-modern .btn-outline-secondary {
+    background: transparent !important;
+    border: 1px solid var(--fm-border-strong) !important;
+    color: var(--fm-text-muted) !important;
+    border-radius: var(--fm-radius-pill) !important;
+    font-weight: 500;
+}
+.form-modern .btn-outline-secondary:hover {
+    background: var(--fm-text-muted) !important;
+    color: #ffffff !important;
+    border-color: var(--fm-text-muted) !important;
+}
+
+/* Botao "Buscar CEP" (`#searchCep` em clients/form.html) */
+.form-modern #searchCep {
+    background: var(--fm-accent) !important;
+    border-color: var(--fm-accent) !important;
+    color: #ffffff !important;
+    border-radius: 0 var(--fm-radius-sm) var(--fm-radius-sm) 0 !important;
+    padding: 0.55rem 1rem !important;
+    font-weight: 500;
+    font-size: 0.88rem !important;
+}
+.form-modern #searchCep:hover {
+    background: var(--fm-accent-2) !important;
+    border-color: var(--fm-accent-2) !important;
+}
+
+/* ============================================================================
+   BOTAO FLUTUANTE "Salvar OS" (.fixed-save-button — orders/form.html)
+   ============================================================================ */
+/* Mantem a posicao fixed e o JS legado, apenas refina o visual */
+.form-modern .fixed-save-button,
+.fixed-save-button {
+    /* Aplica fora do escopo .form-modern porque o elemento pode estar fora
+       do wrapper em alguns casos. Mas garantido por especificidade. */
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(13, 71, 161, 0.12) !important;
+    box-shadow: 0 -4px 16px rgba(13, 71, 161, 0.08) !important;
+    padding: 0.85rem !important;
+}
+
+.form-modern .fixed-save-button .btn-primary,
+.form-modern .fixed-save-button .btn.btn-primary {
+    background: linear-gradient(135deg, var(--fm-accent) 0%, var(--fm-accent-2) 100%) !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(13, 71, 161, 0.30) !important;
+    min-width: 200px;
+    padding: 0.65rem 1.5rem !important;
+    font-weight: 600;
+    border-radius: var(--fm-radius-pill) !important;
+}
+.form-modern .fixed-save-button .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(13, 71, 161, 0.40) !important;
+}
+
+/* ============================================================================
+   ALERTAS (flash messages) DENTRO DO FORM
+   ============================================================================ */
+.form-modern .alert {
+    border-radius: var(--fm-radius-sm) !important;
+    border: 1px solid transparent !important;
+    padding: 0.7rem 1rem !important;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+.form-modern .alert-success {
+    background: rgba(46, 125, 50, 0.10) !important;
+    color: var(--fm-success) !important;
+    border-color: rgba(46, 125, 50, 0.25) !important;
+}
+.form-modern .alert-danger {
+    background: var(--fm-error-bg) !important;
+    color: var(--fm-error) !important;
+    border-color: rgba(220, 38, 38, 0.25) !important;
+}
+.form-modern .alert-warning {
+    background: rgba(245, 124, 0, 0.10) !important;
+    color: var(--fm-warn) !important;
+    border-color: rgba(245, 124, 0, 0.25) !important;
+}
+.form-modern .alert-info {
+    background: rgba(33, 150, 243, 0.10) !important;
+    color: #0c5fb6 !important;
+    border-color: rgba(33, 150, 243, 0.25) !important;
+}
+
+/* ============================================================================
+   MODAIS DENTRO DO FORM (refino de cabecalho — sem mexer em comportamento)
+   ============================================================================ */
+.form-modern + .modal .modal-content,
+body:has(.form-modern) .modal .modal-content {
+    border-radius: var(--fm-radius) !important;
+    border: 1px solid var(--fm-border) !important;
+    box-shadow: 0 12px 40px rgba(15, 23, 42, 0.18) !important;
+    overflow: hidden;
+}
+
+body:has(.form-modern) .modal .modal-header {
+    background: linear-gradient(135deg, var(--fm-accent) 0%, var(--fm-accent-2) 100%) !important;
+    color: #ffffff !important;
+    border-bottom: none !important;
+    padding: 1rem 1.4rem !important;
+}
+body:has(.form-modern) .modal .modal-header .modal-title {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+}
+body:has(.form-modern) .modal .modal-header .btn-close {
+    filter: invert(1) brightness(2);
+}
+
+body:has(.form-modern) .modal .modal-body {
+    padding: 1.4rem !important;
+}
+
+body:has(.form-modern) .modal .modal-footer {
+    border-top: 1px solid var(--fm-border) !important;
+    padding: 0.85rem 1.4rem !important;
+    background: var(--fm-bg-card-soft);
+}
+
+/* ============================================================================
+   AJUSTES ESPECIFICOS — orders/form.html .form-container
+   (dentro do wrapper .form-modern, inputs ficam mais limpos)
+   ============================================================================ */
+.form-modern.form-container {
+    /* form-container ja tem padding-bottom: 80px do CSS legado, manter */
+    background: transparent;
+}
+
+/* invalid-feedback ja existe dentro do escopo .client-field — refinamos */
+.form-modern .client-field .form-control.is-valid {
+    border-color: var(--fm-success) !important;
+}
+.form-modern .client-field .form-control.is-invalid {
+    border-color: var(--fm-error) !important;
+}
+
+/* ============================================================================
+   FASE 9 — Overrides para inventory/form, inventory/supplier_form,
+   settings/index, settings/service_type_form
+   ============================================================================ */
+
+/* ---- File input ----------------------------------------------------- */
+.form-modern input[type="file"].form-control {
+    padding: 0.4rem 0.8rem !important;
+    cursor: pointer;
+}
+.form-modern input[type="file"].form-control::-webkit-file-upload-button,
+.form-modern input[type="file"].form-control::file-selector-button {
+    background: var(--fm-accent);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.3rem 0.7rem;
+    margin-right: 0.7rem;
+    margin-left: -0.4rem;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: background 0.15s ease;
+}
+.form-modern input[type="file"].form-control:hover::-webkit-file-upload-button,
+.form-modern input[type="file"].form-control:hover::file-selector-button {
+    background: var(--fm-accent-2);
+}
+
+/* "input-group-text" usado como label de file (ex: "Escolher arquivo") */
+.form-modern label.input-group-text[for] {
+    background: var(--fm-bg-card-soft);
+    border: 1px solid var(--fm-border);
+    color: var(--fm-text-muted);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* ---- Botao "olho" de toggle password (settings/index.html) --------- */
+.form-modern .input-group .btn-outline-secondary {
+    border: 1px solid var(--fm-border) !important;
+    border-left: 0 !important;
+    background: var(--fm-bg-card) !important;
+    color: var(--fm-text-muted) !important;
+    border-radius: 0 var(--fm-radius-sm) var(--fm-radius-sm) 0 !important;
+}
+.form-modern .input-group .btn-outline-secondary:hover {
+    background: var(--fm-bg-card-soft) !important;
+    color: var(--fm-accent) !important;
+    border-color: var(--fm-accent-soft) !important;
+}
+
+/* ---- Progress bar (forca de senha em settings/index.html) ---------- */
+.form-modern .progress {
+    background-color: var(--fm-bg-card-soft);
+    border-radius: var(--fm-radius-pill);
+    overflow: hidden;
+    height: 6px !important;
+    margin-top: 0.4rem !important;
+}
+.form-modern .progress-bar {
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+/* Cores Material Light para os 4 estados */
+.form-modern .progress-bar.bg-danger {
+    background-color: var(--fm-error) !important;
+}
+.form-modern .progress-bar.bg-warning {
+    background-color: var(--fm-warn) !important;
+}
+.form-modern .progress-bar.bg-info {
+    background-color: var(--fm-accent-2) !important;
+}
+.form-modern .progress-bar.bg-success {
+    background-color: var(--fm-success) !important;
+}
+
+/* ---- Botao Voltar (outline-secondary com seta) -------------------- */
+.form-modern .container > .mb-3 > .btn-outline-secondary,
+.form-modern .d-flex > .btn-outline-secondary {
+    background: transparent !important;
+    border: 1px solid var(--fm-border-strong) !important;
+    color: var(--fm-text-muted) !important;
+    border-radius: var(--fm-radius-pill) !important;
+    padding: 0.4rem 1rem !important;
+    font-weight: 500;
+    font-size: 0.88rem !important;
+}
+.form-modern .container > .mb-3 > .btn-outline-secondary:hover,
+.form-modern .d-flex > .btn-outline-secondary:hover {
+    background: var(--fm-accent-soft) !important;
+    color: var(--fm-accent) !important;
+    border-color: var(--fm-accent) !important;
+}
+
+/* ---- Card-header com botao Voltar embutido (inventory/supplier_form) */
+.form-modern .card-header.bg-white,
+.form-modern .card-header.d-flex {
+    background: linear-gradient(135deg, var(--fm-accent) 0%, var(--fm-accent-2) 100%) !important;
+}
+.form-modern .card-header.d-flex .btn-outline-secondary {
+    background: rgba(255, 255, 255, 0.18) !important;
+    border-color: rgba(255, 255, 255, 0.35) !important;
+    color: #ffffff !important;
+}
+.form-modern .card-header.d-flex .btn-outline-secondary:hover {
+    background: rgba(255, 255, 255, 0.30) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* ---- Botao Copiar (settings: telefone/email) ---------------------- */
+.form-modern .input-group #copiarTelefone,
+.form-modern .input-group #copiarEmail {
+    background: var(--fm-bg-card-soft) !important;
+    border: 1px solid var(--fm-border) !important;
+    border-left: 0 !important;
+    color: var(--fm-text-muted) !important;
+    border-radius: 0 var(--fm-radius-sm) var(--fm-radius-sm) 0 !important;
+}
+.form-modern .input-group #copiarTelefone:hover,
+.form-modern .input-group #copiarEmail:hover {
+    background: var(--fm-accent-soft) !important;
+    color: var(--fm-accent) !important;
+}
+
+/* ---- Backup (botao success "Baixar Ultimo Backup") ---------------- */
+.form-modern .btn-success {
+    background: var(--fm-success) !important;
+    border-color: var(--fm-success) !important;
+    color: #ffffff !important;
+    border-radius: var(--fm-radius-pill) !important;
+    font-weight: 500;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+.form-modern .btn-success:hover {
+    background: #1b5e20 !important;
+    border-color: #1b5e20 !important;
+    transform: translateY(-1px);
+}
+
+/* ---- Backup (botao warning "Restaurar") --------------------------- */
+.form-modern .btn-warning {
+    background: var(--fm-warn) !important;
+    border-color: var(--fm-warn) !important;
+    color: #ffffff !important;
+    border-radius: var(--fm-radius-pill) !important;
+    font-weight: 500;
+}
+.form-modern .btn-warning:hover {
+    background: #e65100 !important;
+    border-color: #e65100 !important;
+    color: #ffffff !important;
+}
+
+/* ---- Tabela de backups (settings/index.html) ----------------------- */
+.form-modern .table {
+    color: var(--fm-text);
+    font-size: 0.88rem;
+    margin-bottom: 0;
+}
+.form-modern .table thead th {
+    background: var(--fm-bg-card-soft) !important;
+    color: var(--fm-text-muted) !important;
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--fm-border) !important;
+    padding: 0.6rem 0.85rem !important;
+}
+.form-modern .table tbody td {
+    padding: 0.55rem 0.85rem !important;
+    border-color: var(--fm-border) !important;
+    vertical-align: middle;
+}
+.form-modern .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--fm-bg-card-soft) !important;
+}
+.form-modern .table-bordered {
+    border: 1px solid var(--fm-border) !important;
+    border-radius: var(--fm-radius-sm);
+    overflow: hidden;
+}
+.form-modern .table-bordered th,
+.form-modern .table-bordered td {
+    border: 1px solid var(--fm-border) !important;
+}
+
+/* ---- Badge generico no settings (Atualizado / sucesso) ------------ */
+.form-modern .badge.bg-success {
+    background: rgba(46, 125, 50, 0.14) !important;
+    color: var(--fm-success) !important;
+    border: 1px solid rgba(46, 125, 50, 0.30);
+    border-radius: var(--fm-radius-pill);
+    padding: 0.25rem 0.65rem !important;
+    font-weight: 600;
+    font-size: 0.74rem;
+}
+.form-modern .badge.bg-warning {
+    background: rgba(245, 124, 0, 0.14) !important;
+    color: var(--fm-warn) !important;
+    border: 1px solid rgba(245, 124, 0, 0.30);
+    border-radius: var(--fm-radius-pill);
+    padding: 0.25rem 0.65rem !important;
+    font-weight: 600;
+    font-size: 0.74rem;
+}
+
+/* ---- Card 'bg-light' interno (Ultimo Backup) --------------------- */
+.form-modern .card.bg-light {
+    background: var(--fm-bg-card-soft) !important;
+    border: 1px solid var(--fm-border) !important;
+}
+
+/* ---- Input com classe bg-light (markup_percentage readonly) ------- */
+.form-modern .form-control.bg-light {
+    background: var(--fm-bg-card-soft) !important;
+    color: var(--fm-text-muted) !important;
+}
+
+/* ---- input-group-text "%" (markup) -------------------------------- */
+.form-modern .input-group .input-group-text {
+    background: var(--fm-bg-card-soft) !important;
+    border: 1px solid var(--fm-border) !important;
+    color: var(--fm-text-muted) !important;
+    font-weight: 600;
+}
+
+/* ---- QR Code preview (inventory/form.html) ----------------------- */
+.form-modern .border.p-3.text-center {
+    border: 1px solid var(--fm-border) !important;
+    border-radius: var(--fm-radius-sm) !important;
+    background: var(--fm-bg-card-soft);
+}
+
+/* ---- Title H1 (settings/service_type_form.html) ----------------- */
+.form-modern > .d-flex > h1 {
+    color: var(--fm-text);
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin: 0;
+    letter-spacing: 0.01em;
+}
+
+/* ---- Title H2 solto (inventory/form.html) ---------------------- */
+.form-modern > h2 {
+    color: var(--fm-text);
+    font-weight: 700;
+    font-size: 1.45rem;
+    margin: 0 0 1.25rem 0;
+    letter-spacing: 0.01em;
+    padding: 0.65rem 1rem;
+    background: linear-gradient(135deg, var(--fm-accent-soft) 0%, transparent 100%);
+    border-left: 4px solid var(--fm-accent);
+    border-radius: 0 var(--fm-radius-sm) var(--fm-radius-sm) 0;
+}
+
+/* ---- Title H2 da settings/index.html ---------------------------- */
+.form-modern > h2.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+/* ---- Form solto (sem card) — inventory/form.html --------------- */
+.form-modern > form.needs-validation {
+    background: var(--fm-bg-card);
+    border: 1px solid var(--fm-border);
+    border-radius: var(--fm-radius-md);
+    padding: 1.5rem;
+    box-shadow: var(--fm-shadow-card);
+}
+
+/* ---- Botoes finais do form (Salvar/Cancelar agrupados) -------- */
+.form-modern .form-group.mt-4 {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--fm-border);
+    margin-top: 1.5rem !important;
+}
+.form-modern .form-group.mt-4 .btn-secondary {
+    background: transparent !important;
+    border: 1px solid var(--fm-border-strong) !important;
+    color: var(--fm-text-muted) !important;
+}
+.form-modern .form-group.mt-4 .btn-secondary:hover {
+    background: var(--fm-bg-card-soft) !important;
+    color: var(--fm-text) !important;
+}
+
+/* ---- form-text (texto auxiliar) -------------------------------- */
+.form-modern .form-text,
+.form-modern small.text-muted {
+    color: var(--fm-text-muted) !important;
+    font-size: 0.78rem;
+    margin-top: 0.25rem;
+}
+
+/* ---- d-grid + botao salvar (service_type_form) ----------------- */
+.form-modern .d-grid.gap-2.d-md-flex {
+    border-top: 1px solid var(--fm-border);
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+}
+
+/* ============================================================================
+   FASE 10 — Overrides especificos para PDV (sale_form.html) e
+              detalhes de venda (sale_details.html)
+   ============================================================================ */
+
+/* ---- Card "Buscar Produtos" / "Itens da Venda" / "Cliente" -------- */
+/* O sale_form.html usa .card.shadow + .card-header.bg-primary.text-white.
+   O .form-modern .card-header ja aplica gradient azul Union — ok. */
+.form-modern .card.shadow {
+    background: var(--fm-bg-card) !important;
+    border: 1px solid var(--fm-border) !important;
+    border-radius: var(--fm-radius-md) !important;
+    box-shadow: var(--fm-shadow-card) !important;
+    overflow: hidden;
+}
+
+/* ---- Card-header com bg-primary (PDV — Buscar/Itens/Cliente) -------- */
+.form-modern .card-header.bg-primary {
+    background: linear-gradient(135deg, var(--fm-accent) 0%, var(--fm-accent-2) 100%) !important;
+    color: #ffffff !important;
+    border-bottom: none !important;
+    padding: 0.95rem 1.2rem !important;
+}
+.form-modern .card-header.bg-primary h5 {
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0;
+}
+.form-modern .card-header.bg-primary i {
+    color: rgba(255, 255, 255, 0.92) !important;
+}
+
+/* ---- Card "Totais" — header verde Material (success) -------------- */
+.form-modern .card-header.bg-success {
+    background: linear-gradient(135deg, var(--fm-success) 0%, #43a047 100%) !important;
+    color: #ffffff !important;
+    border-bottom: none !important;
+    padding: 0.95rem 1.2rem !important;
+}
+.form-modern .card-header.bg-success h5 {
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0;
+}
+.form-modern .card-header.bg-success i {
+    color: rgba(255, 255, 255, 0.92) !important;
+}
+
+/* ---- Tabela editavel #itemsTable (PDV) --------------------------- */
+.form-modern #itemsTable {
+    margin-bottom: 1rem;
+}
+.form-modern #itemsTable thead th {
+    font-size: 0.74rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--fm-text-muted) !important;
+    background: var(--fm-bg-card-soft) !important;
+    border-bottom: 1px solid var(--fm-border) !important;
+    padding: 0.6rem 0.75rem !important;
+    font-weight: 700;
+}
+.form-modern #itemsTable tbody td {
+    padding: 0.5rem 0.75rem !important;
+    border-color: var(--fm-border) !important;
+    vertical-align: middle;
+}
+.form-modern #itemsTable tbody td .form-control,
+.form-modern #itemsTable tbody td .form-select {
+    margin: 0;
+    padding: 0.4rem 0.6rem !important;
+    font-size: 0.88rem;
+}
+.form-modern #itemsTable tbody td .item-total {
+    color: var(--fm-success) !important;
+    font-weight: 600;
+}
+.form-modern #itemsTable tbody td .btn-danger.btn-sm {
+    background: var(--fm-error) !important;
+    border-color: var(--fm-error) !important;
+    color: #ffffff !important;
+    border-radius: 6px !important;
+    padding: 0.3rem 0.55rem !important;
+}
+.form-modern #itemsTable tbody td .btn-danger.btn-sm:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(220, 38, 38, 0.30);
+}
+
+/* ---- Botao "Adicionar Item" (verde) ------------------------------ */
+.form-modern .pdv-form .btn-success,
+.form-modern button.btn-success[onclick*="addNewRow"] {
+    background: var(--fm-success) !important;
+    border-color: var(--fm-success) !important;
+    color: #ffffff !important;
+    border-radius: var(--fm-radius-pill) !important;
+    font-weight: 500;
+    padding: 0.45rem 1.1rem !important;
+}
+.form-modern .pdv-form .btn-success:hover,
+.form-modern button.btn-success[onclick*="addNewRow"]:hover {
+    background: #1b5e20 !important;
+    border-color: #1b5e20 !important;
+    transform: translateY(-1px);
+}
+
+/* ---- Botao Finalizar (btn-success btn-lg w-100) ------------------- */
+.form-modern .btn-success.btn-lg.w-100 {
+    background: linear-gradient(135deg, var(--fm-success) 0%, #43a047 100%) !important;
+    border: none !important;
+    color: #ffffff !important;
+    border-radius: var(--fm-radius-pill) !important;
+    padding: 0.85rem 1.5rem !important;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+    box-shadow: 0 6px 18px rgba(46, 125, 50, 0.30);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.form-modern .btn-success.btn-lg.w-100:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(46, 125, 50, 0.40);
+    background: linear-gradient(135deg, #1b5e20 0%, var(--fm-success) 100%) !important;
+}
+
+/* ---- Inputs grandes (form-control-lg / form-select-lg) ------------ */
+.form-modern .form-control-lg,
+.form-modern .form-select-lg {
+    font-size: 1rem !important;
+    padding: 0.6rem 0.85rem !important;
+    border-radius: var(--fm-radius-sm) !important;
+}
+
+/* ---- Camera QR overlay (preserva escuro proprio) ----------------- */
+/* NAO sobrescrever — tem estilo proprio em sale_form.html */
+.form-modern #cameraContainer,
+.form-modern #qrReader,
+.form-modern .camera-overlay,
+.form-modern .scan-region-highlight,
+.form-modern .scan-region-highlight-svg {
+    /* mantem estilos inline originais */
+}
+
+/* ---- Botao camera (input-group append) ---------------------------- */
+.form-modern #cameraButton {
+    border: 1px solid var(--fm-border) !important;
+    border-left: 0 !important;
+    background: var(--fm-bg-card-soft) !important;
+    color: var(--fm-accent) !important;
+    border-radius: 0 var(--fm-radius-sm) var(--fm-radius-sm) 0 !important;
+}
+.form-modern #cameraButton:hover {
+    background: var(--fm-accent-soft) !important;
+    color: var(--fm-accent) !important;
+}
+
+/* ---- sale_details.html — listas <dl class="row"> --------------- */
+.form-modern dl.row dt {
+    color: var(--fm-text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+.form-modern dl.row dd {
+    color: var(--fm-text);
+    font-size: 0.95rem;
+    margin-bottom: 0.4rem;
+}
+
+/* ---- Tabela com tfoot (totais em sale_details) ------------------- */
+.form-modern .table tfoot tr td {
+    background: var(--fm-bg-card-soft);
+    border-top: 1px solid var(--fm-border);
+    padding: 0.55rem 0.85rem !important;
+    font-size: 0.92rem;
+}
+.form-modern .table tfoot tr:last-child td {
+    background: var(--fm-accent-soft);
+    color: var(--fm-text);
+    font-size: 1.05rem;
+    border-top: 2px solid var(--fm-accent);
+}
+.form-modern .table tfoot tr:last-child td.fw-bold {
+    color: var(--fm-success) !important;
+}
+
+/* ---- Dropdown PDF (sale_details) — Bootstrap 5 ------------------ */
+.form-modern .btn-group > .btn-primary.dropdown-toggle {
+    background: var(--fm-accent) !important;
+    border-color: var(--fm-accent) !important;
+    color: #ffffff !important;
+    border-radius: var(--fm-radius-pill) !important;
+}
+.form-modern .btn-group > .btn-primary.dropdown-toggle:hover {
+    background: var(--fm-accent-2) !important;
+}
+.form-modern .dropdown-menu {
+    border-radius: var(--fm-radius-sm) !important;
+    border: 1px solid var(--fm-border) !important;
+    box-shadow: var(--fm-shadow-card) !important;
+    padding: 0.4rem 0.3rem;
+}
+.form-modern .dropdown-menu .dropdown-item {
+    border-radius: 6px;
+    padding: 0.5rem 0.85rem;
+    color: var(--fm-text);
+    font-size: 0.9rem;
+}
+.form-modern .dropdown-menu .dropdown-item:hover {
+    background: var(--fm-accent-soft);
+    color: var(--fm-accent);
+}
+
+/* ---- Botoes de acao do header em sale_details -------------------- */
+.form-modern .d-flex.justify-content-between > .btn-group .btn {
+    border-radius: var(--fm-radius-pill) !important;
+    padding: 0.45rem 1rem !important;
+    font-weight: 500;
+    margin-left: 0.4rem;
+}
+.form-modern .d-flex.justify-content-between > .btn-group .btn-success {
+    background: var(--fm-success) !important;
+    border-color: var(--fm-success) !important;
+    color: #ffffff !important;
+}
+.form-modern .d-flex.justify-content-between > .btn-group .btn-danger {
+    background: var(--fm-error) !important;
+    border-color: var(--fm-error) !important;
+    color: #ffffff !important;
+}
+.form-modern .d-flex.justify-content-between > .btn-group .btn-outline-danger {
+    background: transparent !important;
+    border: 1px solid var(--fm-error) !important;
+    color: var(--fm-error) !important;
+}
+.form-modern .d-flex.justify-content-between > .btn-group .btn-outline-danger:hover {
+    background: var(--fm-error) !important;
+    color: #ffffff !important;
+}
+
+/* ============================================================================
+   RESPONSIVO
+   ============================================================================ */
+@media (max-width: 767.98px) {
+    .form-modern .card-header {
+        padding: 0.85rem 1.1rem !important;
+    }
+    .form-modern .card-body {
+        padding: 1.1rem !important;
+    }
+    .form-modern .form-control,
+    .form-modern .form-select {
+        font-size: 16px !important; /* evita zoom no iOS */
+    }
+    .form-modern .btn-primary,
+    .form-modern .btn-secondary,
+    .form-modern .btn-outline-primary {
+        padding: 0.55rem 1.2rem !important;
+        width: 100%;
+        margin-bottom: 0.4rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .form-modern .form-control,
+    .form-modern .form-select,
+    .form-modern .btn-primary,
+    .form-modern .btn-secondary,
+    .form-modern .btn-outline-primary,
+    .form-modern .fixed-save-button .btn-primary {
+        transition: none !important;
+        transform: none !important;
+    }
+}

@@ -1,0 +1,107 @@
+<!-- Botões de ação -->
+<div class="d-flex justify-content-end mb-4">
+    {% if not order.is_final_status() %}
+    <a href="{{ url_for('orders.close_order', id=order.id) }}" class="btn btn-success me-2">
+        <i class="bi bi-check-circle"></i> Encerrar OS
+    </a>
+    <a href="{{ url_for('orders.edit', id=order.id) }}" class="btn btn-primary me-2">
+        <i class="bi bi-pencil"></i> Editar
+    </a>
+    {% endif %}
+    {% if order.is_final_status() %}
+    <a href="{{ url_for('reports.service_order_pdf', id=order.id, type='encerramento', download=true) }}" 
+       class="btn btn-primary me-2">
+        <i class="bi bi-file-pdf"></i> Baixar PDF
+    </a>
+    {% endif %}
+    <a href="{{ url_for('orders.list') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+</div>
+
+<!-- Informações do Técnico -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Técnico Responsável</h5>
+        {% if not order.is_final_status() %}
+        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#changeTechnicianModal">
+            <i class="bi bi-person-gear"></i> Alterar Técnico
+        </button>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if order.assigned_technician %}
+        <div class="row">
+            <div class="col-md-2 text-center">
+                {% if order.assigned_technician.photo %}
+                    <img src="{{ order.assigned_technician.photo }}" 
+                         alt="{{ order.assigned_technician.name }}"
+                         class="rounded-circle" width="80" height="80">
+                {% else %}
+                    <i class="bi bi-person-circle" style="font-size: 4rem;"></i>
+                {% endif %}
+            </div>
+            <div class="col-md-10">
+                <h5>{{ order.assigned_technician.name }}</h5>
+                <p class="mb-1">
+                    <i class="bi bi-telephone me-2"></i>
+                    {{ order.assigned_technician.contact or 'Contato não informado' }}
+                </p>
+                {% if order.is_final_status() %}
+                <p class="mb-1">
+                    <i class="bi bi-percent me-2"></i>
+                    Comissão: {{ order.assigned_technician.commission_rate }}%
+                    (R$ {{ "%.2f"|format(order.commission_value or 0) }})
+                </p>
+                <p class="mb-0">
+                    <i class="bi bi-clock me-2"></i>
+                    Tempo de Execução: {{ (order.completion_time or 0)|round|int }} minutos
+                </p>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">
+            Nenhum técnico vinculado
+            {% if order.is_final_status() %}
+            <br>
+            <small class="text-danger">
+                É necessário vincular um técnico antes de finalizar a OS
+            </small>
+            {% endif %}
+        </p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal para alterar técnico -->
+<div class="modal fade" id="changeTechnicianModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('orders.edit', id=order.id) }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Alterar Técnico</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="technician_id" class="form-label">Selecione o Técnico</label>
+                        <select class="form-select" id="technician_id" name="technician_id" required>
+                            <option value="">Selecione...</option>
+                            {% for technician in technicians %}
+                            <option value="{{ technician.id }}"
+                                    {% if order.technician_id == technician.id %}selected{% endif %}>
+                                {{ technician.name }} ({{ technician.commission_rate }}%)
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> 

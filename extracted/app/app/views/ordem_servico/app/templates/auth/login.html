@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block content %}
+{# A classe extra "login-modern" ativa o redesign cosmetico (Fase 2).        #}
+{# Todo CSS novo esta escopado em .login-modern (login-modern.css).          #}
+{# Form, IDs, names e JS existentes permanecem 100% inalterados.             #}
+<div class="login-container login-modern">
+    <div class="login-box">
+        <!-- Logo da Empresa -->
+        <div class="text-center mb-4">
+            <h1 class="display-5 mb-3 text-primary">UNION OS MANAGER</h1>
+            <p class="text-muted mb-4">Sistema Profissional de Gestão de Ordens de Serviço</p>
+            {% if company and company.logo_path %}
+                <img src="{{ url_for('static', filename=company.logo_path) }}" 
+                     alt="Logo da Empresa"
+                     class="login-logo img-fluid"
+                     onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/logo.png') }}'"
+                     style="max-width: 250px; max-height: 120px; object-fit: contain;">
+            {% else %}
+                <img src="{{ url_for('static', filename='img/logo.png') }}" 
+                     alt="Logo Padrão"
+                     class="login-logo img-fluid"
+                     style="max-width: 250px; max-height: 120px; object-fit: contain;">
+            {% endif %}
+        </div>
+
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="text-center mb-0">Login</h4>
+            </div>
+            <div class="card-body">
+                {% if error_message %}
+                    <div class="error-message mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+                            <div class="text-danger">{{ error_message }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <form method="POST" action="{{ url_for('auth.login') }}" class="login-form">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Usuário</label>
+                        <div class="input-group dropdown">
+                            <span class="input-group-text">
+                                <i class="bi bi-person"></i>
+                            </span>
+                            <input type="text" class="form-control custom-input" id="username" 
+                                   name="username" required autofocus
+                                   autocomplete="off"
+                                   placeholder="Digite seu usuário">
+                            {% if saved_credentials and saved_credentials.users %}
+                            <div class="dropdown-menu w-100 saved-users">
+                                {% for username in saved_credentials.users %}
+                                <button type="button" class="dropdown-item saved-user" data-username="{{ username }}">
+                                    <i class="bi bi-person-check me-2"></i>{{ username }}
+                                </button>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Senha</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-lock"></i>
+                            </span>
+                            <input type="password" class="form-control custom-input" id="password" 
+                                   name="password" required
+                                   placeholder="Digite sua senha">
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="remember" 
+                               name="remember">
+                        <label class="form-check-label" for="remember">Lembrar de mim</label>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-box-arrow-in-right"></i> Entrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Nome da Empresa -->
+        <div class="company-name text-center mt-4">
+            <h5 class="text-primary">Tech Union Solutions</h5>
+            {% if network_url %}
+            <div class="network-access mt-2">
+                <small class="text-muted">
+                    Acesso em rede: <strong>{{ network_url }}</strong>
+                    <button class="btn btn-sm btn-outline-secondary" 
+                            onclick="copyNetworkUrl('{{ network_url }}')">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </small>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+{# CSS escopado em .login-modern adicionado pela Fase 2 (redesign do login).  #}
+{# Carregado ANTES do <style> legado abaixo: a maior especificidade do escopo #}
+{# garante que o visual moderno prevalece, e o legado fica como fallback.     #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login-modern.css') }}?v=20260529-login">
+<style>
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 1rem;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 400px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.login-form {
+    padding: 1rem 0;
+}
+
+.custom-input {
+    height: 45px;
+    font-size: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.custom-input:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    min-width: 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    background: white;
+    overflow: hidden;
+}
+
+.card-header {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    padding: 1.5rem;
+    border-bottom: none;
+}
+
+.card-header h4 {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    border: none;
+    padding: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.form-check-input:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.login-logo {
+    margin: 1rem auto;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.login-logo:hover {
+    transform: scale(1.05);
+}
+
+.error-message {
+    background-color: #fff5f5;
+    border-left: 4px solid #dc3545;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+}
+
+.network-access {
+    background: rgba(255,255,255,0.9);
+    padding: 0.5rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Estilo para o dropdown de usuários */
+.saved-users {
+    margin-top: 0;
+    width: 100%;
+    border: 1px solid #ced4da;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 0.5rem 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.saved-users .dropdown-item {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.saved-users .dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.saved-users .dropdown-item i {
+    color: #007bff;
+}
+
+/* Mostra o dropdown quando o input está focado */
+.input-group.dropdown:focus-within .dropdown-menu {
+    display: block;
+}
+
+/* Responsividade */
+@media (max-width: 576px) {
+    .login-box {
+        padding: 0 1rem;
+    }
+    
+    .card {
+        margin: 0;
+    }
+}
+
+/* Animação para feedback de cópia */
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    20% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyNetworkUrl(url) {
+    // Tenta usar a API moderna (requer HTTPS ou localhost)
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url).then(() => {
+            showCopyFeedback(true);
+        }).catch(() => {
+            fallbackCopy(url);
+        });
+    } else {
+        // Fallback para navegadores sem suporte ou HTTP
+        fallbackCopy(url);
+    }
+}
+
+function fallbackCopy(text) {
+    // Cria elemento temporário
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-9999px';
+    textArea.style.top = '-9999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        showCopyFeedback(true);
+    } catch (err) {
+        showCopyFeedback(false);
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+function showCopyFeedback(success) {
+    const msg = success 
+        ? '✅ URL copiada para a área de transferência!' 
+        : '⚠️ Copie manualmente a URL acima';
+    
+    // Cria tooltip temporário
+    const tooltip = document.createElement('div');
+    tooltip.textContent = msg;
+    tooltip.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: ${success ? '#28a745' : '#ffc107'};
+        color: ${success ? 'white' : 'black'};
+        padding: 10px 20px;
+        border-radius: 5px;
+        z-index: 9999;
+        animation: fadeInOut 2s ease-in-out;
+    `;
+    document.body.appendChild(tooltip);
+    setTimeout(() => tooltip.remove(), 2000);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const usernameInput = document.getElementById('username');
+    const rememberCheckbox = document.getElementById('remember');
+    const passwordInput = document.getElementById('password');
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    
+    {% if saved_credentials and saved_credentials.users %}
+        // Se houver usuários salvos, preenche o último usado
+        usernameInput.value = '{{ saved_credentials.users[0] }}';
+        rememberCheckbox.checked = true;
+    {% endif %}
+    
+    // Adiciona evento para os itens salvos
+    document.querySelectorAll('.saved-user').forEach(item => {
+        item.addEventListener('click', function() {
+            const username = this.dataset.username;
+            usernameInput.value = username;
+            rememberCheckbox.checked = true;
+            passwordInput.focus();
+        });
+    });
+
+    // Fecha o dropdown quando clicar fora
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.input-group.dropdown')) {
+            document.querySelector('.saved-users')?.classList.remove('show');
+        }
+    });
+
+    // Toggle password visibility
+    if (togglePasswordBtn) {
+        togglePasswordBtn.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            const icon = this.querySelector('i');
+            icon.classList.toggle('bi-eye');
+            icon.classList.toggle('bi-eye-slash');
+        });
+    }
+});
+</script>
+{% endblock %}

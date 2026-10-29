@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+{# Fase 9 - Modernizacao cosmetica do cadastro de fornecedor (escopado em .form-modern).
+   Nao mexe em jquery.mask, clipboard, tooltips Bootstrap, validacao. #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/forms-modern.css') }}?v=20260530-bold">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 form-modern">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center bg-white">
+            <div class="d-flex align-items-center">
+                <a href="{{ url_for('inventory.listar_fornecedores') }}" class="btn btn-secondary btn-sm me-3">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+                <h5 class="mb-0">
+                    <i class="bi bi-truck me-2"></i>
+                    {{ 'Novo Fornecedor' if not fornecedor else 'Editar Fornecedor' }}
+                </h5>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if errors %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-1"></i>
+                {% if errors.get('_general') %}
+                    {{ errors['_general'] }}
+                {% else %}
+                    Por favor, corrija os erros destacados abaixo.
+                {% endif %}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+
+            <form method="POST" class="needs-validation" novalidate>
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label for="nome" class="form-label">Nome do Fornecedor *</label>
+                        <input type="text" class="form-control {% if errors and errors.get('nome') %}is-invalid{% endif %}" id="nome" name="nome" 
+                               placeholder="Digite o nome completo do fornecedor"
+                               value="{{ form_data.get('nome', '') if form_data else (fornecedor.supplier if fornecedor else '') }}" required>
+                        <div class="invalid-feedback">
+                            {{ errors.get('nome', 'Por favor, informe o nome do fornecedor.') if errors else 'Por favor, informe o nome do fornecedor.' }}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="categoria" class="form-label">Categoria Principal *</label>
+                        {% set current_cat = form_data.get('categoria', '') if form_data else (fornecedor.category if fornecedor else '') %}
+                        <select class="form-select" id="categoria" name="categoria" required>
+                            <option value="">Selecione a categoria</option>
+                            {% for value, label in Inventory.CATEGORY_CHOICES.items() %}
+                            <option value="{{ value }}" 
+                                    {% if current_cat == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor, selecione a categoria principal.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="telefone" class="form-label">
+                            <i class="bi bi-telephone me-1"></i>Telefone
+                        </label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="telefone" name="telefone"
+                                   placeholder="(00) 00000-0000"
+                                   value="{{ form_data.get('telefone', '') if form_data else '' }}">
+                            <button class="btn btn-outline-secondary" type="button" id="copiarTelefone" title="Copiar telefone">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">Telefone principal para contato</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="email" class="form-label">
+                            <i class="bi bi-envelope me-1"></i>E-mail
+                        </label>
+                        <div class="input-group">
+                            <input type="email" class="form-control" id="email" name="email"
+                                   placeholder="email@fornecedor.com.br"
+                                   value="{{ form_data.get('email', '') if form_data else '' }}">
+                            <button class="btn btn-outline-secondary" type="button" id="copiarEmail" title="Copiar e-mail">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">E-mail para contato e orçamentos</div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="observacoes" class="form-label">
+                        <i class="bi bi-card-text me-1"></i>Observações
+                    </label>
+                    <textarea class="form-control" id="observacoes" name="observacoes" rows="4"
+                              placeholder="Informações adicionais sobre o fornecedor">{{ form_data.get('observacoes', '') if form_data else '' }}</textarea>
+                    <div class="form-text">
+                        Informações como: horário de atendimento, condições de pagamento, prazos de entrega, etc.
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">* Campos obrigatórios</small>
+                    <div>
+                        <a href="{{ url_for('inventory.listar_fornecedores') }}" class="btn btn-outline-secondary me-2">
+                            <i class="bi bi-x-lg"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i> Salvar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- Adiciona jQuery Mask Plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Máscara para o telefone usando o plugin
+    $('#telefone').mask('(00) 00000-0000', {
+        placeholder: "(00) 00000-0000"
+    });
+    
+    // Validação do formulário
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+    
+    // Função para copiar texto
+    function copiarTexto(elemento, mensagem) {
+        const texto = $(elemento).val();
+        if (texto) {
+            navigator.clipboard.writeText(texto).then(function() {
+                const tooltip = bootstrap.Tooltip.getInstance(elemento.next('button')[0]);
+                elemento.next('button').attr('title', 'Copiado!').tooltip('dispose').tooltip('show');
+                setTimeout(function() {
+                    elemento.next('button').attr('title', mensagem).tooltip('dispose').tooltip('show');
+                }, 1500);
+            });
+        }
+    }
+    
+    // Inicializa tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+    
+    // Botões de copiar
+    $('#copiarTelefone').click(function() {
+        copiarTexto($('#telefone'), 'Copiar telefone');
+    });
+    
+    $('#copiarEmail').click(function() {
+        copiarTexto($('#email'), 'Copiar e-mail');
+    });
+});
+</script>
+{% endblock %} 

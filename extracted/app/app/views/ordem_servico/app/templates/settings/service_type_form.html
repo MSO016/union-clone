@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+{# Fase 9 - Modernizacao cosmetica do cadastro de tipo de servico (escopado em .form-modern). #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/forms-modern.css') }}?v=20260530-bold">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 form-modern">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ request.referrer or url_for('settings.service_types') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+        <h1 class="mb-0">{{ 'Editar' if type else 'Novo' }} Tipo de Serviço</h1>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nome</label>
+                            <input type="text" class="form-control" id="name" name="name"
+                                   value="{{ type.name if type else '' }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Descrição</label>
+                            <textarea class="form-control" id="description" name="description" rows="3">{{ type.description if type else '' }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="default_warranty" class="form-label">Garantia Padrão (dias)</label>
+                            <input type="number" class="form-control" id="default_warranty" name="default_warranty"
+                                   value="{{ type.default_warranty if type else '90' }}" min="0" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="active" name="active"
+                                       {{ 'checked' if not type or type.active }}>
+                                <label class="form-check-label" for="active">
+                                    Ativo
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

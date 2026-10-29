@@ -1,0 +1,507 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+{# Fase 7 - Modernizacao cosmetica da listagem de OS (escopado em .orders-modern) #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/orders-modern.css') }}?v=20260529-tema">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 orders-modern">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="bi bi-tools text-primary"></i>
+            Ordens de Serviço
+        </h2>
+        <a href="{{ url_for('orders.add') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nova OS
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <form method="GET" class="row g-3" id="filterForm">
+                <div class="col-md-2">
+                    <label for="order_id" class="form-label">Número da OS</label>
+                    <input type="number" class="form-control" id="order_id" name="order_id" 
+                           placeholder="Ex: 123" value="{{ request.args.get('order_id', '') }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="search" class="form-label">Buscar</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="search" name="search" 
+                               placeholder="Cliente, documento, equipamento ou modelo..." 
+                               value="{{ request.args.get('search', '') }}">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <label for="status" class="form-label">Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">Todos os status</option>
+                        {% for status_code, status_label in available_status %}
+                        <option value="{{ status_code }}" {{ 'selected' if request.args.get('status') == status_code }}>{{ status_label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="warranty" class="form-label">Garantia</label>
+                    <select name="warranty" id="warranty" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="in_warranty" {{ 'selected' if request.args.get('warranty') == 'in_warranty' }}>Em Garantia</option>
+                        <option value="out_warranty" {{ 'selected' if request.args.get('warranty') == 'out_warranty' }}>Fora de Garantia</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-secondary w-100">
+                        <i class="bi bi-funnel"></i> Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de OS -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>OS #</th>
+                            <th>Cliente</th>
+                            <th>Equipamento</th>
+                            <th>Modelo</th>
+                            <th>Entrada</th>
+                            <th>Status</th>
+                            <th>Garantia</th>
+                            <th>Prioridade</th>
+                            <th>Tempo Aberto</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders.items %}
+                        {% set is_in_warranty = order.is_in_warranty() %}
+                        {% if (request.args.get('warranty') == 'in_warranty' and is_in_warranty) or 
+                              (request.args.get('warranty') == 'out_warranty' and not is_in_warranty) or 
+                              not request.args.get('warranty') %}
+                        <tr>
+                            <td>
+                                <strong class="text-primary">#{{ order.id }}</strong>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-person-circle text-secondary me-2"></i>
+                                    {{ order.client.name }}
+                                </div>
+                            </td>
+                            <td>{{ order.equipment }}</td>
+                            <td>
+                                {% if order.model %}
+                                    {{ order.model }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ order.created_at.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                <span class="badge bg-{{ {
+                                    'aguardando_diagnostico': 'warning',
+                                    'em_diagnostico': 'info',
+                                    'aguardando_autorizacao': 'secondary',
+                                    'autorizado': 'primary',
+                                    'nao_autorizado': 'danger',
+                                    'em_manutencao': 'info',
+                                    'concluido_sucesso': 'success',
+                                    'concluido_falha': 'danger',
+                                    'finalizada': 'dark',
+                                    'em_garantia': 'success',
+                                    'aguardando_peca': 'warning'
+                                }[order.status] }}">
+                                    {{ order.get_status_description() }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if order.warranty_end_date %}
+                                    {% if order.is_in_warranty() %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-shield-check"></i> Em Garantia
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-shield-x"></i> Expirada
+                                        </span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ order.get_priority_class() }}">
+                                    {{ order.PRIORITY_CHOICES[order.priority] }}
+                                </span>
+                            </td>
+                            <td>
+                                {% set days_open = order.get_days_open() %}
+                                {% set delay_status = order.get_delay_status() %}
+                                <span class="badge bg-{{ 'danger' if delay_status == 'critical' else 'warning' if delay_status == 'warning' else 'secondary' }}">
+                                    {{ days_open }} dia{{ 's' if days_open != 1 }}
+                                    {% if delay_status == 'critical' %}
+                                        <i class="bi bi-exclamation-triangle-fill" title="OS em atraso crítico"></i>
+                                    {% elif delay_status == 'warning' %}
+                                        <i class="bi bi-exclamation-circle-fill" title="OS em atraso"></i>
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <a href="{{ url_for('orders.view', id=order.id) }}" 
+                                       class="btn btn-sm btn-primary"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="Visualizar OS">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('orders.edit', id=order.id) }}" 
+                                       class="btn btn-sm btn-warning"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="Editar OS">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    {% if current_user.role in ['admin', 'developer'] %}
+                                    <button type="button" 
+                                            class="btn btn-sm btn-danger"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Excluir OS"
+                                            onclick="confirmDelete('{{ order.id }}')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                    <!-- Botão WhatsApp -->
+                                    {% if order.client and order.client.whatsapp %}
+                                    <a href="#" 
+                                       onclick="abrirModalOrcamento('{{ order.id }}', '{{ order.client.name }}', '{{ order.client.whatsapp }}')" 
+                                       class="btn btn-sm btn-success"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="Enviar WhatsApp">
+                                        <i class="bi bi-whatsapp"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% else %}
+                        <tr>
+                            <td colspan="10" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="bi bi-inbox fs-2"></i>
+                                    <p class="mt-2">Nenhuma ordem de serviço encontrada.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginação -->
+            {% if orders.pages > 1 %}
+            <nav aria-label="Navegação de páginas" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <!-- Primeira página -->
+                    <li class="page-item {{ 'disabled' if orders.page == 1 }}">
+                        <a class="page-link" href="{{ url_for('orders.list', page=1, status=status, search=search, order_id=request.args.get('order_id', ''), warranty=request.args.get('warranty', '')) }}">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </a>
+                    </li>
+                    
+                    <!-- Página anterior -->
+                    <li class="page-item {{ 'disabled' if orders.page == 1 }}">
+                        <a class="page-link" href="{{ url_for('orders.list', page=orders.page-1, status=status, search=search, order_id=request.args.get('order_id', ''), warranty=request.args.get('warranty', '')) }}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    <!-- Páginas -->
+                    {% set start = [orders.page-2, 1]|max %}
+                    {% set end = [start+4, orders.pages+1]|min %}
+                    {% set start = [end-4, 1]|max %}
+
+                    {% if start > 1 %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                    {% endif %}
+
+                    {% for page in range(start, end) %}
+                    <li class="page-item {{ 'active' if page == orders.page }}">
+                        <a class="page-link" href="{{ url_for('orders.list', page=page, status=status, search=search, order_id=request.args.get('order_id', ''), warranty=request.args.get('warranty', '')) }}">
+                            {{ page }}
+                        </a>
+                    </li>
+                    {% endfor %}
+
+                    {% if end < orders.pages+1 %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                    {% endif %}
+
+                    <!-- Próxima página -->
+                    <li class="page-item {{ 'disabled' if orders.page == orders.pages }}">
+                        <a class="page-link" href="{{ url_for('orders.list', page=orders.page+1, status=status, search=search, order_id=request.args.get('order_id', ''), warranty=request.args.get('warranty', '')) }}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+
+                    <!-- Última página -->
+                    <li class="page-item {{ 'disabled' if orders.page == orders.pages }}">
+                        <a class="page-link" href="{{ url_for('orders.list', page=orders.pages, status=status, search=search, order_id=request.args.get('order_id', ''), warranty=request.args.get('warranty', '')) }}">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmação de exclusão -->
+<div class="modal" id="deleteModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle text-danger"></i>
+                    Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close" onclick="closeDeleteModal()"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir esta ordem de serviço?</p>
+                <p class="text-danger">
+                    <i class="bi bi-exclamation-circle"></i>
+                    Esta ação não pode ser desfeita!
+                </p>
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" method="POST" onsubmit="return handleDelete(event)">
+                    <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Orçamento WhatsApp -->
+<div class="modal fade" id="orcamentoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-whatsapp text-success"></i>
+                    Enviar Orçamento por WhatsApp
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="orcamentoForm">
+                    <input type="hidden" id="orcamentoOrderId">
+                    <input type="hidden" id="orcamentoClientName">
+                    <input type="hidden" id="orcamentoWhatsapp">
+                    
+                    <div class="mb-3">
+                        <label for="orcamentoValor" class="form-label">Valor do Orçamento</label>
+                        <div class="input-group">
+                            <span class="input-group-text">R$</span>
+                            <input type="number" class="form-control" id="orcamentoValor" 
+                                   step="0.01" min="0" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="orcamentoObs" class="form-label">Observações (opcional)</label>
+                        <textarea class="form-control" id="orcamentoObs" rows="3" 
+                                placeholder="Digite observações adicionais..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="enviarOrcamento()">
+                    <i class="bi bi-whatsapp me-2"></i>Enviar Orçamento
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+{{ super() }}
+<script>
+function confirmDelete(id) {
+    currentOrderId = id;
+    var modal = document.getElementById('deleteModal');
+    modal.style.display = 'block';
+}
+
+function closeDeleteModal() {
+    var modal = document.getElementById('deleteModal');
+    modal.style.display = 'none';
+    currentOrderId = null;
+}
+
+function handleDelete(event) {
+    event.preventDefault();
+    
+    if (!currentOrderId) return false;
+    
+    var submitButton = event.target.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Excluindo...';
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/orders/' + currentOrderId + '/delete', true);
+    
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            // Força atualização do dashboard se estiver aberto
+            if (window.refreshDashboard) {
+                refreshDashboard();
+            }
+            // Recarrega a página após sucesso
+            window.location.reload();
+        } else {
+            alert('Erro ao excluir ordem de serviço');
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="bi bi-trash"></i> Excluir';
+            closeDeleteModal();
+        }
+    };
+    
+    xhr.onerror = function() {
+        alert('Erro ao excluir ordem de serviço');
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<i class="bi bi-trash"></i> Excluir';
+        closeDeleteModal();
+    };
+    
+    xhr.send();
+    return false;
+}
+
+function abrirModalOrcamento(orderId, clienteName, whatsapp) {
+    // Preenche os campos ocultos
+    document.getElementById('orcamentoOrderId').value = orderId;
+    document.getElementById('orcamentoClientName').value = clienteName;
+    document.getElementById('orcamentoWhatsapp').value = whatsapp;
+    
+    // Limpa os campos do formulário
+    document.getElementById('orcamentoValor').value = '';
+    document.getElementById('orcamentoObs').value = '';
+    
+    // Abre o modal
+    const modal = new bootstrap.Modal(document.getElementById('orcamentoModal'));
+    modal.show();
+}
+
+function enviarOrcamento() {
+    const orderId = document.getElementById('orcamentoOrderId').value;
+    const clienteName = document.getElementById('orcamentoClientName').value;
+    const whatsapp = document.getElementById('orcamentoWhatsapp').value;
+    const valor = document.getElementById('orcamentoValor').value;
+    const obs = document.getElementById('orcamentoObs').value;
+    
+    if (!valor) {
+        alert('Por favor, informe o valor do orçamento');
+        return;
+    }
+    
+    // Remove caracteres não numéricos do WhatsApp
+    const whatsappNumber = whatsapp.replace(/\D/g, '');
+    
+    // Formata o valor para duas casas decimais
+    const valorFormatado = parseFloat(valor).toFixed(2);
+    
+    // Monta a mensagem
+    let mensagem = `Olá ${clienteName}, seu orçamento está pronto!\n\n`;
+    mensagem += `Valor: R$ ${valorFormatado}`;
+    
+    if (obs) {
+        mensagem += `\n\nObservações:\n${obs}`;
+    }
+    
+    mensagem += `\n\nAgradecemos a preferência!`;
+    
+    // Salva o orçamento no histórico
+    fetch(`/orders/${orderId}/add_quote`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            value: parseFloat(valor),
+            notes: obs
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Fecha o modal
+            bootstrap.Modal.getInstance(document.getElementById('orcamentoModal')).hide();
+            
+            // Abre o WhatsApp em nova aba
+            window.open(`https://wa.me/55${whatsappNumber}?text=${encodeURIComponent(mensagem)}`, '_blank');
+        } else {
+            alert('Erro ao salvar orçamento: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao salvar orçamento');
+    });
+}
+
+// Atualiza o onclick do botão de WhatsApp
+document.querySelectorAll('[onclick^="abrirModalOrcamento"]').forEach(button => {
+    const onclick = button.getAttribute('onclick');
+    const params = onclick.match(/\((.*?)\)/)[1].split(',').map(p => p.trim());
+    button.setAttribute('onclick', `abrirModalOrcamento(${params.join(',')})`);
+});
+
+// Inicializa os tooltips do Bootstrap
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+
+// Script para limpar filtros vazios
+document.getElementById('filterForm').addEventListener('submit', function(e) {
+    // Remove campos vazios do formulário antes de enviar
+    const inputs = this.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        if (!input.value) {
+            input.disabled = true;
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

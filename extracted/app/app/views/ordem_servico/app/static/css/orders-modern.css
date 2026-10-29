@@ -1,0 +1,376 @@
+/* =============================================================================
+   orders-modern.css — Modernizacao cosmetica da listagem de Ordens de Servico
+   =============================================================================
+   ESCOPO: TODOS os seletores comecam com .orders-modern para nao afetar
+   nenhum outro template do sistema.
+
+   FILOSOFIA (mesma das Fases 1 e 4):
+   - Apenas substitui visualmente cards/tabela/badges/botoes/paginacao.
+   - Mantem 100% do JS (modal de exclusao, orcamento WhatsApp) intacto.
+   - Convive com .navbar.ui-modern (Fase 5) e theme-toggle (Fase 6).
+   - Paleta sincronizada com Union (#0D47A1 + #2196F3).
+   - Suporte a prefers-color-scheme: dark e theme-light/dark forcados.
+   ============================================================================= */
+
+/* ---------- Tokens locais ---------------------------------------------- */
+.orders-modern {
+    --or-accent:        #0D47A1;
+    --or-accent-2:      #2196F3;
+    --or-accent-soft:   rgba(13, 71, 161, 0.10);
+    --or-text:          #0f172a;
+    --or-text-muted:    #64748b;
+    --or-bg-card:       #ffffff;
+    --or-bg-card-soft:  #f8fafc;
+    --or-border:        #e2e8f0;
+    --or-border-strong: #cbd5e1;
+    --or-radius:        14px;
+    --or-radius-sm:     10px;
+    --or-radius-pill:   9999px;
+    --or-shadow-sm:     0 1px 3px rgba(15, 23, 42, 0.06);
+    --or-shadow-md:     0 4px 14px rgba(15, 23, 42, 0.08);
+
+    /* Status semaforo (atraso) */
+    --or-status-ok:        #2E7D32;
+    --or-status-ok-bg:     rgba(46, 125, 50, 0.10);
+    --or-status-warning:   #F57C00;
+    --or-status-warning-bg: rgba(245, 124, 0, 0.12);
+    --or-status-critical:  #DC2626;
+    --or-status-critical-bg: rgba(220, 38, 38, 0.10);
+}
+
+/* Dark 100% OPT-IN (29-05-2026): so com .theme-dark (era @media dark, que
+   ligava sozinho no Windows escuro e deixava texto claro em fundo claro). */
+:root.theme-dark .orders-modern {
+    --or-text:          #e2e8f0;
+    --or-text-muted:    #94a3b8;
+    --or-bg-card:       #1e293b;
+    --or-bg-card-soft:  #0f172a;
+    --or-border:        #334155;
+    --or-border-strong: #475569;
+}
+
+/* ============================================================================
+   HEADER — titulo + botao "Nova OS"
+   ============================================================================ */
+.orders-modern > .d-flex {
+    background: linear-gradient(135deg, var(--or-accent) 0%, var(--or-accent-2) 100%);
+    color: #ffffff;
+    padding: 1.1rem 1.4rem !important;
+    border-radius: var(--or-radius);
+    box-shadow: var(--or-shadow-md);
+    margin-bottom: 1.5rem !important;
+}
+
+.orders-modern > .d-flex h2 {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 1.4rem !important;
+    margin: 0;
+    letter-spacing: 0.01em;
+}
+.orders-modern > .d-flex h2 i {
+    color: rgba(255, 255, 255, 0.92) !important;
+    margin-right: 0.5rem;
+}
+
+/* Botao "Nova OS" no header */
+.orders-modern > .d-flex .btn-primary {
+    background: rgba(255, 255, 255, 0.18) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    color: #ffffff !important;
+    border-radius: var(--or-radius-pill) !important;
+    padding: 0.45rem 1.05rem !important;
+    font-weight: 500;
+    transition: background 0.18s ease, transform 0.15s ease;
+    backdrop-filter: blur(6px);
+}
+.orders-modern > .d-flex .btn-primary:hover {
+    background: rgba(255, 255, 255, 0.30) !important;
+    transform: translateY(-1px);
+}
+
+/* ============================================================================
+   CARD DE FILTROS
+   ============================================================================ */
+.orders-modern > .card.mb-4.shadow-sm {
+    background: var(--or-bg-card) !important;
+    border: 1px solid var(--or-border) !important;
+    border-radius: var(--or-radius) !important;
+    box-shadow: var(--or-shadow-sm) !important;
+    overflow: hidden;
+}
+
+.orders-modern .card-body .form-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--or-text-muted);
+    margin-bottom: 0.35rem;
+}
+
+.orders-modern .form-control,
+.orders-modern .form-select {
+    border-radius: var(--or-radius-sm) !important;
+    border-color: var(--or-border) !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    font-size: 0.92rem;
+}
+.orders-modern .form-control:focus,
+.orders-modern .form-select:focus {
+    border-color: var(--or-accent-2) !important;
+    box-shadow: 0 0 0 3px var(--or-accent-soft) !important;
+}
+
+.orders-modern .input-group-text {
+    background: var(--or-bg-card-soft);
+    border-color: var(--or-border);
+    color: var(--or-text-muted);
+    border-top-left-radius: var(--or-radius-sm) !important;
+    border-bottom-left-radius: var(--or-radius-sm) !important;
+}
+
+/* Botao Filtrar */
+.orders-modern .btn-secondary {
+    background: var(--or-accent) !important;
+    border-color: var(--or-accent) !important;
+    color: #ffffff !important;
+    border-radius: var(--or-radius-pill) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+.orders-modern .btn-secondary:hover {
+    background: var(--or-accent-2) !important;
+    border-color: var(--or-accent-2) !important;
+    transform: translateY(-1px);
+}
+
+/* ============================================================================
+   CARD DE LISTAGEM + TABELA
+   ============================================================================ */
+.orders-modern > .card.shadow-sm {
+    background: var(--or-bg-card) !important;
+    border: 1px solid var(--or-border) !important;
+    border-radius: var(--or-radius) !important;
+    box-shadow: var(--or-shadow-sm) !important;
+    overflow: hidden;
+}
+
+.orders-modern .table {
+    margin-bottom: 0;
+    color: var(--or-text);
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--or-text);
+    --bs-table-hover-bg: var(--or-accent-soft);
+}
+
+/* Header tabela em "kicker" */
+.orders-modern .table thead.table-light {
+    background: var(--or-bg-card-soft) !important;
+}
+.orders-modern .table thead th {
+    font-size: 0.74rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    color: var(--or-text-muted) !important;
+    font-weight: 700 !important;
+    background: var(--or-bg-card-soft) !important;
+    border-bottom: 1px solid var(--or-border) !important;
+    padding: 0.7rem 0.85rem !important;
+    white-space: nowrap;
+}
+
+.orders-modern .table tbody tr {
+    transition: background 0.15s ease;
+}
+.orders-modern .table tbody tr:hover {
+    background: var(--or-accent-soft) !important;
+}
+
+.orders-modern .table tbody td {
+    padding: 0.6rem 0.85rem !important;
+    border-color: var(--or-border) !important;
+    color: var(--or-text);
+    vertical-align: middle;
+    font-size: 0.92rem;
+}
+
+/* Numero da OS em destaque */
+.orders-modern .table tbody td strong.text-primary {
+    color: var(--or-accent) !important;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+/* Avatar circle do cliente */
+.orders-modern .table tbody .bi-person-circle {
+    color: var(--or-accent) !important;
+    font-size: 1.1rem;
+}
+
+/* ============================================================================
+   STATUS BADGES — paleta Material Light
+   ============================================================================ */
+.orders-modern .badge {
+    border-radius: var(--or-radius-pill) !important;
+    padding: 0.32rem 0.72rem !important;
+    font-size: 0.74rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    line-height: 1.2;
+}
+
+/* Status: cores Material Light */
+.orders-modern .badge.bg-warning {
+    background: rgba(245, 158, 11, 0.14) !important;
+    color: #b45309 !important;
+    border-color: rgba(245, 158, 11, 0.30);
+}
+.orders-modern .badge.bg-info {
+    background: rgba(33, 150, 243, 0.14) !important;
+    color: #0c5fb6 !important;
+    border-color: rgba(33, 150, 243, 0.30);
+}
+.orders-modern .badge.bg-secondary {
+    background: rgba(100, 116, 139, 0.16) !important;
+    color: #475569 !important;
+    border-color: rgba(100, 116, 139, 0.30);
+}
+.orders-modern .badge.bg-primary {
+    background: rgba(13, 71, 161, 0.14) !important;
+    color: #0c3a8a !important;
+    border-color: rgba(13, 71, 161, 0.30);
+}
+.orders-modern .badge.bg-danger {
+    background: var(--or-status-critical-bg) !important;
+    color: var(--or-status-critical) !important;
+    border-color: rgba(220, 38, 38, 0.30);
+}
+.orders-modern .badge.bg-success {
+    background: var(--or-status-ok-bg) !important;
+    color: var(--or-status-ok) !important;
+    border-color: rgba(46, 125, 50, 0.30);
+}
+.orders-modern .badge.bg-dark {
+    background: rgba(15, 23, 42, 0.14) !important;
+    color: #1e293b !important;
+    border-color: rgba(15, 23, 42, 0.30);
+}
+
+/* ============================================================================
+   BOTOES DE ACAO (View / Edit / Delete / WhatsApp)
+   ============================================================================ */
+.orders-modern .btn-group .btn {
+    border-radius: 8px !important;
+    margin: 0 1px;
+    padding: 0.32rem 0.55rem !important;
+    border: none !important;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+    font-size: 0.85rem;
+}
+.orders-modern .btn-group .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(15, 23, 42, 0.15);
+}
+.orders-modern .btn-group .btn.btn-primary {
+    background: var(--or-accent) !important;
+    color: #ffffff !important;
+}
+.orders-modern .btn-group .btn.btn-warning {
+    background: #F57C00 !important;
+    color: #ffffff !important;
+}
+.orders-modern .btn-group .btn.btn-danger {
+    background: var(--or-status-critical) !important;
+    color: #ffffff !important;
+}
+.orders-modern .btn-group .btn.btn-success {
+    background: #25D366 !important;     /* WhatsApp green */
+    color: #ffffff !important;
+}
+
+/* ============================================================================
+   PAGINACAO
+   ============================================================================ */
+.orders-modern .pagination {
+    margin-top: 1.3rem;
+    gap: 0.25rem;
+}
+
+.orders-modern .pagination .page-link {
+    border: 1px solid var(--or-border) !important;
+    border-radius: var(--or-radius-sm) !important;
+    color: var(--or-text-muted);
+    padding: 0.4rem 0.75rem !important;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.orders-modern .pagination .page-link:hover {
+    background: var(--or-accent-soft) !important;
+    color: var(--or-accent) !important;
+    border-color: var(--or-accent) !important;
+}
+.orders-modern .pagination .page-item.active .page-link {
+    background: var(--or-accent) !important;
+    border-color: var(--or-accent) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(13, 71, 161, 0.25);
+}
+.orders-modern .pagination .page-item.disabled .page-link {
+    background: var(--or-bg-card-soft) !important;
+    color: #cbd5e1 !important;
+    border-color: var(--or-border) !important;
+}
+
+/* ============================================================================
+   ESTADO VAZIO
+   ============================================================================ */
+.orders-modern .table tbody tr td.text-center.py-4 {
+    background: var(--or-bg-card-soft);
+}
+.orders-modern .table tbody .bi-inbox {
+    color: var(--or-accent-2);
+    opacity: 0.6;
+}
+
+/* ============================================================================
+   RESPONSIVO
+   ============================================================================ */
+@media (max-width: 991.98px) {
+    .orders-modern > .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.75rem;
+    }
+    .orders-modern > .d-flex .btn-primary {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .orders-modern .table thead th {
+        font-size: 0.7rem !important;
+        padding: 0.55rem 0.55rem !important;
+    }
+    .orders-modern .table tbody td {
+        padding: 0.55rem 0.55rem !important;
+        font-size: 0.85rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .orders-modern .btn-group .btn,
+    .orders-modern > .d-flex .btn-primary,
+    .orders-modern .btn-secondary,
+    .orders-modern .table tbody tr {
+        transition: none !important;
+        transform: none !important;
+    }
+}

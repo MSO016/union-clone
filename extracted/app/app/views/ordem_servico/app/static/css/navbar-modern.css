@@ -1,0 +1,329 @@
+/* =============================================================================
+   navbar-modern.css — Modernizacao da navbar e dropdowns (Fase 5)
+   =============================================================================
+   ESCOPO: TODOS os seletores comecam com .navbar.ui-modern para garantir
+   que NADA fora da navbar seja afetado.
+
+   ATIVACAO: variavel de ambiente UI_MODERN_NAVBAR=1 (default).
+   FALLBACK: se UI_MODERN_NAVBAR=0, a classe .ui-modern nao e aplicada e
+             todo este CSS fica inativo automaticamente — visual antigo
+             volta sem qualquer modificacao adicional.
+
+   FILOSOFIA:
+   - Nao redefine .navbar global (escopo apenas .navbar.ui-modern).
+   - Mantem altura 56px do body padding-top (zero impacto no layout).
+   - Mantem z-index 1030 (zero impacto em modais Bootstrap).
+   - Mantem comportamento JS existente (Bootstrap.Dropdown + hover handler).
+   - Compativel com WebView2 (translateZ + will-change preservados).
+   ============================================================================= */
+
+/* ----------------------- Tokens locais ---------------------------------- */
+.navbar.ui-modern {
+    --nv-bg-from:        #0D47A1;   /* Azul Union escuro (sidebar.py) */
+    --nv-bg-to:          #1565C0;   /* Azul Union medio */
+    --nv-accent:         #2196F3;   /* Azul Union claro (item_active_marker) */
+    --nv-text:           #ffffff;
+    --nv-text-soft:      rgba(255, 255, 255, 0.78);
+    --nv-text-muted:     rgba(255, 255, 255, 0.55);
+    --nv-hover-bg:       rgba(255, 255, 255, 0.10);
+    --nv-active-bg:      #2196F3;
+    --nv-active-text:    #ffffff;
+    --nv-active-shadow:  0 2px 8px rgba(33, 150, 243, 0.45);
+    --nv-shadow:         0 2px 14px rgba(0, 0, 0, 0.18);
+    --nv-radius-pill:    9999px;
+    --nv-radius-md:      8px;
+}
+
+/* ============================================================================
+   NAVBAR PRINCIPAL
+   ============================================================================ */
+.navbar.ui-modern {
+    /* Sobrescreve gradient antigo #1e3c72 -> #2a5298 */
+    background: linear-gradient(135deg, var(--nv-bg-from) 0%, var(--nv-bg-to) 100%) !important;
+    box-shadow: var(--nv-shadow) !important;
+    /* Mantem padding original 0.5rem 1rem para nao alterar altura. */
+    padding: 0.5rem 1rem !important;
+    /* Borda inferior decorativa em azul claro */
+    border-bottom: 1px solid rgba(33, 150, 243, 0.35);
+    /* HOTFIX (17/05/2026): defesa contra wrap acidental quando dropdown
+       abre via hover. Garante que a navbar NUNCA quebre em duas linhas
+       independente do conteudo dos filhos (brand + collapse). */
+    flex-wrap: nowrap !important;
+}
+
+/* HOTFIX (17/05/2026): mesmo principio aplicado ao container interno,
+   que em algumas versoes do Bootstrap herda flex-wrap: wrap. */
+.navbar.ui-modern > .container,
+.navbar.ui-modern > .container-fluid,
+.navbar.ui-modern > .container-sm,
+.navbar.ui-modern > .container-md,
+.navbar.ui-modern > .container-lg,
+.navbar.ui-modern > .container-xl {
+    flex-wrap: nowrap !important;
+}
+
+/* ----------------------- Brand (logo "Union OS Manager") ---------------- */
+.navbar.ui-modern .navbar-brand {
+    color: var(--nv-text) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em;
+    font-size: 1.05rem;
+    padding: 0.4rem 0.9rem !important;
+    margin-right: 1.2rem;
+    border-radius: var(--nv-radius-md);
+    transition: background 0.15s ease, transform 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+.navbar.ui-modern .navbar-brand::before {
+    /* Pequeno indicador visual antes do texto (ponto azul claro) */
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--nv-accent);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.25);
+}
+.navbar.ui-modern .navbar-brand:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-1px);
+}
+
+/* ----------------------- Toggler mobile --------------------------------- */
+.navbar.ui-modern .navbar-toggler {
+    border: 1px solid rgba(255, 255, 255, 0.30) !important;
+    border-radius: var(--nv-radius-md);
+    padding: 0.35rem 0.6rem;
+}
+.navbar.ui-modern .navbar-toggler:focus {
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.35);
+}
+
+/* ============================================================================
+   ITENS DE MENU (.nav-link)
+   ============================================================================ */
+.navbar.ui-modern .navbar-nav .nav-link {
+    color: var(--nv-text-soft) !important;
+    padding: 0.5rem 0.9rem !important;
+    margin: 0 0.15rem;
+    border-radius: var(--nv-radius-pill);
+    font-weight: 500;
+    font-size: 0.93rem;
+    transition: background 0.18s ease, color 0.18s ease, transform 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+}
+.navbar.ui-modern .navbar-nav .nav-link i {
+    font-size: 1rem;
+    line-height: 1;
+    opacity: 0.9;
+}
+.navbar.ui-modern .navbar-nav .nav-link:hover {
+    background: var(--nv-hover-bg);
+    color: var(--nv-text) !important;
+    transform: translateY(-1px);
+}
+.navbar.ui-modern .navbar-nav .nav-link:focus-visible {
+    outline: 2px solid var(--nv-accent);
+    outline-offset: 2px;
+}
+
+/* Active state — pilula com fundo solido (escolha do cliente) */
+.navbar.ui-modern .navbar-nav .nav-link.active {
+    background: var(--nv-active-bg) !important;
+    color: var(--nv-active-text) !important;
+    box-shadow: var(--nv-active-shadow);
+    font-weight: 600;
+}
+.navbar.ui-modern .navbar-nav .nav-link.active i {
+    opacity: 1;
+}
+
+/* Dropdown toggle indicator (caret) */
+.navbar.ui-modern .navbar-nav .nav-link.dropdown-toggle::after {
+    margin-left: 0.45rem;
+    border-top-color: currentColor;
+    transition: transform 0.2s ease;
+}
+.navbar.ui-modern .navbar-nav .dropdown.show > .nav-link.dropdown-toggle::after {
+    transform: rotate(180deg);
+}
+
+/* ============================================================================
+   DROPDOWN MENUS (Checklists, Configuracoes)
+   ============================================================================ */
+.navbar.ui-modern .dropdown-menu {
+    /* HOTFIX (17/05/2026): faixa azul no topo via background empilhado
+       (3px no topo + branco no resto). Evita usar position:relative no
+       proprio .dropdown-menu, que conflitava com o position:absolute
+       calculado pelo Popper.js do Bootstrap, fazendo o menu cair no
+       fluxo normal da navbar e quebrar o layout em 2 linhas no hover. */
+    background:
+        linear-gradient(90deg, var(--nv-bg-from), var(--nv-accent)) top / 100% 3px no-repeat,
+        #ffffff;
+    border: 1px solid rgba(13, 71, 161, 0.12) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 12px 32px rgba(13, 71, 161, 0.18),
+                0 2px 8px rgba(0, 0, 0, 0.06) !important;
+    /* Padding superior um pouco maior para nao ficar colado na faixa azul */
+    padding: 0.7rem 0.45rem 0.45rem 0.45rem !important;
+    margin-top: 0.4rem !important;
+    min-width: 220px;
+    overflow: hidden;
+    /* IMPORTANTE: NAO usar position:relative aqui — deixar o Bootstrap
+       e o Popper.js controlarem position:absolute via inline style. */
+}
+
+.navbar.ui-modern .dropdown-item {
+    border-radius: 8px !important;
+    padding: 0.55rem 0.85rem !important;
+    color: #0f172a;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.15s ease, color 0.15s ease, padding-left 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 1px 0;
+}
+.navbar.ui-modern .dropdown-item i {
+    color: var(--nv-bg-from);
+    font-size: 1rem;
+    flex-shrink: 0;
+    width: 18px;
+    text-align: center;
+}
+.navbar.ui-modern .dropdown-item:hover,
+.navbar.ui-modern .dropdown-item:focus {
+    background: rgba(33, 150, 243, 0.10) !important;
+    color: var(--nv-bg-from) !important;
+    padding-left: 1rem !important;
+}
+.navbar.ui-modern .dropdown-item.active,
+.navbar.ui-modern .dropdown-item:active {
+    background: var(--nv-bg-from) !important;
+    color: #ffffff !important;
+}
+.navbar.ui-modern .dropdown-item.active i,
+.navbar.ui-modern .dropdown-item:active i {
+    color: #ffffff !important;
+}
+
+.navbar.ui-modern .dropdown-divider {
+    border-top: 1px solid rgba(13, 71, 161, 0.08);
+    margin: 0.35rem 0.25rem !important;
+}
+
+/* ============================================================================
+   LOGOUT (ultimo item)
+   ============================================================================ */
+.navbar.ui-modern .navbar-nav.ms-auto .nav-link,
+.navbar.ui-modern .navbar-nav:last-child .nav-link {
+    /* Logout fica destacado com borda fina */
+    border: 1px solid rgba(255, 255, 255, 0.22);
+}
+.navbar.ui-modern .navbar-nav.ms-auto .nav-link:hover,
+.navbar.ui-modern .navbar-nav:last-child .nav-link:hover {
+    background: rgba(244, 67, 54, 0.85);
+    border-color: rgba(244, 67, 54, 0.85);
+    color: #ffffff !important;
+}
+
+/* ============================================================================
+   RESPONSIVO — desktop apertado (entre breakpoint lg e xl)
+   ============================================================================
+   HOTFIX (17/05/2026): em viewports entre 992px e 1199px (laptops 13-14"
+   e janelas WebView2 nao maximizadas) o conjunto brand + 10 itens + logout
+   pode estourar o espaco horizontal. Reduzimos margin/padding/font-size
+   nesse range para garantir que a navbar SEMPRE caiba em 1 linha.
+   ============================================================================ */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+    .navbar.ui-modern .navbar-nav .nav-link {
+        padding: 0.45rem 0.65rem !important;
+        margin: 0 0.08rem;
+        font-size: 0.88rem;
+        gap: 0.32rem;
+    }
+    .navbar.ui-modern .navbar-nav .nav-link i {
+        font-size: 0.95rem;
+    }
+    .navbar.ui-modern .navbar-brand {
+        padding: 0.4rem 0.7rem !important;
+        margin-right: 0.6rem;
+        font-size: 1rem;
+    }
+}
+
+/* ============================================================================
+   RESPONSIVO — mobile/tablet (mantem layout colapsado funcional)
+   ============================================================================ */
+@media (max-width: 991.98px) {
+    .navbar.ui-modern .navbar-collapse {
+        background: linear-gradient(180deg, var(--nv-bg-from) 0%, var(--nv-bg-to) 100%);
+        padding: 1rem;
+        border-radius: 12px;
+        margin-top: 0.75rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+    .navbar.ui-modern .navbar-nav .nav-link {
+        margin: 0.15rem 0;
+        padding: 0.55rem 0.9rem !important;
+    }
+    .navbar.ui-modern .dropdown-menu {
+        background: rgba(255, 255, 255, 0.96);
+        margin-top: 0.25rem !important;
+        margin-left: 0.5rem;
+    }
+}
+
+/* ============================================================================
+   ACESSIBILIDADE
+   ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+    .navbar.ui-modern .navbar-nav .nav-link,
+    .navbar.ui-modern .navbar-brand,
+    .navbar.ui-modern .dropdown-item,
+    .navbar.ui-modern .navbar-nav .nav-link.dropdown-toggle::after {
+        transition: none !important;
+    }
+    .navbar.ui-modern .navbar-nav .nav-link:hover,
+    .navbar.ui-modern .navbar-brand:hover {
+        transform: none !important;
+    }
+}
+
+/* ============================================================================
+   MITIGACOES DE BUGS LEGADOS — aplicadas APENAS no escopo .ui-modern
+   ============================================================================
+   Os bugs abaixo existem no comportamento global do base.html mas, dentro
+   do escopo modernizado, podem ser corrigidos sem afetar o resto do sistema.
+   Se a flag UI_MODERN_NAVBAR=0, estes patches nao sao aplicados e o
+   comportamento legado continua intacto.
+   ============================================================================ */
+
+/* BUG 1 — Flicker no hover de dropdown (causado por hover handler JS).
+   No escopo modernizado, garantimos que o submenu mantem position estavel
+   mesmo durante a transicao open/close do Bootstrap. */
+.navbar.ui-modern .dropdown-menu {
+    transform-origin: top center;
+    will-change: transform, opacity;
+}
+
+/* BUG 2 — z-index do dropdown podia ficar atras de elementos com
+   position:relative em algumas paginas. Forcamos z-index alto APENAS
+   no escopo modernizado. */
+.navbar.ui-modern .dropdown-menu {
+    z-index: 1035 !important;  /* > 1030 navbar, < 1040 modal-backdrop */
+}
+
+/* BUG 3 — pointer-events:none global em algumas tags afetava clicks
+   dentro do dropdown. Re-habilitado aqui de forma defensiva. */
+.navbar.ui-modern .dropdown-menu,
+.navbar.ui-modern .dropdown-item,
+.navbar.ui-modern .nav-link {
+    pointer-events: auto !important;
+}

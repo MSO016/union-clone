@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+{# Fase 10 - Modernizacao cosmetica da listagem alternativa de vendas (escopado em .sales-modern).
+   Nao mexe em confirm-sale/cancel-sale via fetch, filter-form. #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sales-modern.css') }}?v=20260529-tema">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 sales-modern">
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+        <h1 class="mb-0">
+            <i class="bi bi-receipt me-2"></i>
+            Vendas e Orçamentos
+        </h1>
+        <a href="{{ url_for('inventory.sale') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-2"></i>Nova Venda
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-white">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-funnel me-2 text-primary"></i>
+                <h5 class="mb-0">Filtros</h5>
+            </div>
+        </div>
+        <div class="card-body">
+            <form id="filter-form" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" name="status">
+                        <option value="">Todos</option>
+                        {% for value, label in Sale.STATUS_CHOICES.items() %}
+                        <option value="{{ value }}" {% if request.args.get('status') == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Data Inicial</label>
+                    <input type="date" class="form-control" name="start_date" 
+                           value="{{ request.args.get('start_date', '') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Data Final</label>
+                    <input type="date" class="form-control" name="end_date" 
+                           value="{{ request.args.get('end_date', '') }}">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="bi bi-search me-2"></i>Filtrar
+                    </button>
+                    <a href="{{ url_for('inventory.list_sales') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle me-2"></i>Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Vendas -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-table me-2 text-primary"></i>
+                <h5 class="mb-0">Vendas Realizadas</h5>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Data</th>
+                            <th>Cliente</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                            <th>Vendedor</th>
+                            <th width="150">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in sales %}
+                        <tr>
+                            <td>{{ sale.id }}</td>
+                            <td>{{ sale.date.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>
+                                {% if sale.client %}
+                                    {{ sale.client.name }}
+                                {% else %}
+                                    {{ sale.client_name or 'Cliente não informado' }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ {
+                                    'draft': 'warning',
+                                    'confirmed': 'success',
+                                    'cancelled': 'danger'
+                                }[sale.status] }}">
+                                    {{ sale.get_status_display() }}
+                                </span>
+                            </td>
+                            <td>R$ {{ "%.2f"|format(sale.final_amount) }}</td>
+                            <td>{{ sale.created_by.username }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('inventory.view_sale', id=sale.id) }}" 
+                                       class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if sale.status == 'draft' %}
+                                    <button type="button" class="btn btn-sm btn-success confirm-sale" 
+                                            data-id="{{ sale.id }}">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                    {% endif %}
+                                    {% if sale.status == 'confirmed' %}
+                                    <button type="button" class="btn btn-sm btn-danger cancel-sale" 
+                                            data-id="{{ sale.id }}">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                    {% endif %}
+                                    <a href="{{ url_for('reports.sale_pdf', id=sale.id) }}" 
+                                       class="btn btn-sm btn-secondary" target="_blank">
+                                        <i class="bi bi-file-pdf"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">
+                                Nenhuma venda encontrada
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+// Confirmação de venda
+document.querySelectorAll('.confirm-sale').forEach(button => {
+    button.addEventListener('click', function() {
+        if (confirm('Deseja confirmar esta venda?')) {
+            const id = this.dataset.id;
+            fetch(`{{ url_for('inventory.confirm_sale', id=0) }}`.replace('0', id), {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            });
+        }
+    });
+});
+
+// Cancelamento de venda
+document.querySelectorAll('.cancel-sale').forEach(button => {
+    button.addEventListener('click', function() {
+        if (confirm('Deseja cancelar esta venda? Esta ação não pode ser desfeita.')) {
+            const id = this.dataset.id;
+            fetch(`{{ url_for('inventory.cancel_sale', id=0) }}`.replace('0', id), {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            });
+        }
+    });
+});
+
+// Atualiza a URL com os filtros
+document.getElementById('filter-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const params = new URLSearchParams();
+    
+    for (let [key, value] of formData.entries()) {
+        if (value) params.append(key, value);
+    }
+    
+    window.location.search = params.toString();
+});
+</script>
+{% endblock %} 

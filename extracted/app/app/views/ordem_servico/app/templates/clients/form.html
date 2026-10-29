@@ -1,0 +1,603 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+{# Fase 8 - Modernizacao cosmetica do formulario (escopado em .form-modern).
+   Nao mexe em IMask, busca CEP via viacep.com.br, validacao CPF/CNPJ,
+   SweetAlert2 ou submit do formulario. #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/forms-modern.css') }}?v=20260530-bold">
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4 form-modern">
+    <div class="col-md-8">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="card">
+            <div class="card-header">
+                <h4>{{ 'Editar' if client else 'Novo' }} Cliente</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="clientForm" action="{{ url_for('clients.edit', id=client.id) if client and client is not mapping else url_for('clients.add') }}{% if return_to_order %}?return_to_order=true{% endif %}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo de Pessoa</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="type" id="typePF" value="PF"
+                                           {{ 'checked' if not client or client.type == 'PF' }} required>
+                                    <label class="form-check-label" for="typePF">Pessoa Física</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="type" id="typePJ" value="PJ"
+                                           {{ 'checked' if client and client.type == 'PJ' }}>
+                                    <label class="form-check-label" for="typePJ">Pessoa Jurídica</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Nome *</label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ client.name if client else '' }}" required
+                                   placeholder="Digite o nome completo">
+                            <div class="invalid-feedback">
+                                Nome é obrigatório
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="document" class="form-label">
+                                <span id="documentLabel">{% if locale and locale.code == 'PT' %}NIF{% elif locale and locale.code == 'US' %}{{ 'EIN' if client and client.type == 'PJ' else 'SSN' }}{% else %}{{ 'CNPJ' if client and client.type == 'PJ' else 'CPF' }}{% endif %}</span>
+                                <small class="text-muted">(opcional)</small>
+                            </label>
+                            <input type="text" class="form-control" id="document" name="document"
+                                   value="{{ client.document if client else '' }}"
+                                   placeholder="Digite apenas números">
+                            <div class="invalid-feedback" id="documentFeedback">
+                                Documento inválido
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Telefone</label>
+                            <input type="text" class="form-control" id="phone" name="phone" 
+                                   value="{{ client.phone if client else '' }}"
+                                   placeholder="(00) 00000-0000">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="whatsapp" class="form-label">WhatsApp</label>
+                            <input type="text" class="form-control" id="whatsapp" name="whatsapp" 
+                                   value="{{ client.whatsapp if client else '' }}"
+                                   placeholder="(00) 00000-0000">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">E-mail</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{ client.email if client and client.email != 'None' else '' }}"
+                                   placeholder="exemplo@email.com">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="birthday" class="form-label">Data de Nascimento</label>
+                            <input type="text" class="form-control" id="birthday" name="birthday" 
+                                   value="{{ client.birthday.strftime('%d/%m/%Y') if client and client.birthday else '' }}"
+                                   placeholder="dd/mm/aaaa">
+                            <div class="invalid-feedback">
+                                Data de nascimento inválida
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="cep" class="form-label">CEP</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="cep" name="cep"
+                                       value="{{ client.cep if client else '' }}" placeholder="00000-000">
+                                <button class="btn btn-primary" type="button" id="searchCep" title="Buscar endereço">
+                                    Buscar
+                                </button>
+                            </div>
+                            <div class="invalid-feedback">
+                                CEP inválido
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="rua" class="form-label">Rua</label>
+                            <input type="text" class="form-control" id="rua" name="rua">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="numero" class="form-label">Número</label>
+                            <input type="text" class="form-control" id="numero" name="numero">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="bairro" class="form-label">Bairro</label>
+                            <input type="text" class="form-control" id="bairro" name="bairro">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="cidade" class="form-label">Cidade/UF</label>
+                            <input type="text" class="form-control" id="cidade" name="cidade">
+                        </div>
+                        <!-- Campo oculto para o endereço completo -->
+                        <input type="hidden" id="address" name="address">
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('clients.list') }}" class="btn btn-secondary me-md-2">Cancelar</a>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/imask"></script>
+<script>
+// Locale ativo (BR/PT/US). Define rotulo do documento, mascara e validacao.
+// Fallback BR se o context_processor nao injetar (mantem comportamento original).
+const LOCALE_CODE = "{{ locale.code if locale else 'BR' }}";
+function _docLabel(isPF) {
+    if (LOCALE_CODE === 'PT') return 'NIF';
+    if (LOCALE_CODE === 'US') return isPF ? 'SSN' : 'EIN';
+    return isPF ? 'CPF' : 'CNPJ';
+}
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('clientForm');
+    const submitBtn = document.getElementById('submitBtn');
+    let documentMask;
+    let addressWasUpdatedByCep = false;
+    
+    // Máscaras para os campos
+    const phoneMask = IMask(document.getElementById('phone'), {
+        mask: '(00) 00000-0000'
+    });
+    
+    const whatsappMask = IMask(document.getElementById('whatsapp'), {
+        mask: '(00) 00000-0000'
+    });
+    
+    const cepMask = IMask(document.getElementById('cep'), {
+        mask: '00000-000'
+    });
+
+    // Máscara para data de nascimento
+    const birthdayMask = IMask(document.getElementById('birthday'), {
+        mask: Date,
+        pattern: 'dd/mm/yyyy',
+        blocks: {
+            dd: {
+                mask: IMask.MaskedRange,
+                from: 1,
+                to: 31,
+                maxLength: 2,
+            },
+            mm: {
+                mask: IMask.MaskedRange,
+                from: 1,
+                to: 12,
+                maxLength: 2,
+            },
+            yyyy: {
+                mask: IMask.MaskedRange,
+                from: 1900,
+                to: new Date().getFullYear(),
+                maxLength: 4,
+            }
+        },
+        format: function (date) {
+            let day = date.getDate().toString().padStart(2, '0');
+            let month = (date.getMonth() + 1).toString().padStart(2, '0');
+            let year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        },
+        parse: function (str) {
+            const [day, month, year] = str.split('/');
+            return new Date(year, month - 1, day);
+        },
+        lazy: true  // Permite campo vazio
+    });
+
+    // Função para validar CPF
+    function validateCPF(cpf) {
+        cpf = cpf.replace(/[^\d]/g, '');
+        
+        if (cpf.length !== 11) return false;
+        if (/^(\d)\1+$/.test(cpf)) return false;
+        
+        let sum = 0;
+        for (let i = 0; i < 9; i++) {
+            sum += parseInt(cpf.charAt(i)) * (10 - i);
+        }
+        let rev = 11 - (sum % 11);
+        if (rev === 10 || rev === 11) rev = 0;
+        if (rev !== parseInt(cpf.charAt(9))) return false;
+        
+        sum = 0;
+        for (let i = 0; i < 10; i++) {
+            sum += parseInt(cpf.charAt(i)) * (11 - i);
+        }
+        rev = 11 - (sum % 11);
+        if (rev === 10 || rev === 11) rev = 0;
+        if (rev !== parseInt(cpf.charAt(10))) return false;
+        
+        return true;
+    }
+
+    // Função para validar CNPJ
+    function validateCNPJ(cnpj) {
+        cnpj = cnpj.replace(/[^\d]/g, '');
+        
+        if (cnpj.length !== 14) return false;
+        if (/^(\d)\1+$/.test(cnpj)) return false;
+        
+        let size = cnpj.length - 2;
+        let numbers = cnpj.substring(0, size);
+        let digits = cnpj.substring(size);
+        let sum = 0;
+        let pos = size - 7;
+        
+        for (let i = size; i >= 1; i--) {
+            sum += numbers.charAt(size - i) * pos--;
+            if (pos < 2) pos = 9;
+        }
+        
+        let result = sum % 11 < 2 ? 0 : 11 - sum % 11;
+        if (result !== parseInt(digits.charAt(0))) return false;
+        
+        size = size + 1;
+        numbers = cnpj.substring(0, size);
+        sum = 0;
+        pos = size - 7;
+        
+        for (let i = size; i >= 1; i--) {
+            sum += numbers.charAt(size - i) * pos--;
+            if (pos < 2) pos = 9;
+        }
+        
+        result = sum % 11 < 2 ? 0 : 11 - sum % 11;
+        if (result !== parseInt(digits.charAt(1))) return false;
+        
+        return true;
+    }
+    
+    // Atualiza a máscara do documento conforme o tipo
+    function updateDocumentMask() {
+        const documentInput = document.getElementById('document');
+        const documentLabel = document.getElementById('documentLabel');
+        const isPF = document.getElementById('typePF').checked;
+        
+        if (documentMask) {
+            documentMask.destroy();
+            documentMask = null;
+        }
+
+        documentLabel.textContent = _docLabel(isPF);
+
+        // Mascara CPF/CNPJ so faz sentido no Brasil. Em PT/US o campo aceita
+        // texto livre (NIF/EIN tem formatos diferentes) para nao bloquear o usuario.
+        if (LOCALE_CODE === 'BR') {
+            documentMask = IMask(documentInput, {
+                mask: isPF ? '000.000.000-00' : '00.000.000/0000-00'
+            });
+        }
+    }
+    
+    // Atualiza máscara quando o tipo de pessoa muda
+    document.getElementById('typePF').addEventListener('change', updateDocumentMask);
+    document.getElementById('typePJ').addEventListener('change', updateDocumentMask);
+    
+    // Inicializa a máscara do documento
+    updateDocumentMask();
+    
+    // Função para buscar CEP
+    async function searchCepAddress(e) {
+        // Previne o envio do formulário se a tecla for Enter
+        if (e && e.key === 'Enter') {
+            e.preventDefault();
+        }
+
+        const cep = document.getElementById('cep').value.replace(/\D/g, '');
+        if (cep.length !== 8) {
+            document.getElementById('cep').classList.add('is-invalid');
+            return false;
+        }
+        
+        try {
+            const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            const data = await response.json();
+            
+            if (data.erro) {
+                document.getElementById('cep').classList.add('is-invalid');
+                return false;
+            }
+            
+            // Verifica se já tem dados preenchidos
+            if (document.getElementById('rua').value || 
+                document.getElementById('bairro').value || 
+                document.getElementById('cidade').value) {
+                
+                // Usa SweetAlert para confirmar
+                Swal.fire({
+                    title: 'Endereço encontrado!',
+                    text: 'Deseja preencher os campos com os dados do CEP?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, preencher',
+                    cancelButtonText: 'Não',
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#dc3545'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        preencherEndereco(data);
+                        
+                        // Pergunta se deseja salvar o cliente
+                        Swal.fire({
+                            title: 'Deseja salvar o cliente agora?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: 'Sim, salvar',
+                            cancelButtonText: 'Não',
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#6c757d'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit();
+                            }
+                        });
+                    }
+                });
+            } else {
+                // Se não tem dados, preenche direto e pergunta se quer salvar
+                preencherEndereco(data);
+                
+                Swal.fire({
+                    title: 'Endereço preenchido!',
+                    text: 'Deseja salvar o cliente agora?',
+                    icon: 'success',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, salvar',
+                    cancelButtonText: 'Não',
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            }
+            
+            document.getElementById('cep').classList.remove('is-invalid');
+            return true;
+            
+        } catch (error) {
+            console.error('Erro ao buscar CEP:', error);
+            document.getElementById('cep').classList.add('is-invalid');
+            return false;
+        }
+    }
+
+    // Função para preencher o endereço
+    function preencherEndereco(data) {
+        document.getElementById('rua').value = data.logradouro;
+        document.getElementById('bairro').value = data.bairro;
+        document.getElementById('cidade').value = `${data.localidade}/${data.uf}`;
+        document.getElementById('numero').focus();
+    }
+
+    // Adiciona evento de tecla Enter no campo CEP
+    document.getElementById('cep').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchCepAddress(e);
+        }
+    });
+    
+    // Busca endereço quando clica no botão
+    document.getElementById('searchCep').addEventListener('click', searchCepAddress);
+
+    // Função para separar endereço existente
+    function separarEnderecoExistente() {
+        const addressInput = document.getElementById('address');
+        if (addressInput.value) {
+            const endereco = addressInput.value;
+            const matches = endereco.match(/^(.*?),\s*(\d+)\s*-\s*(.*?)\s*-\s*(.*)$/);
+            
+            if (matches) {
+                document.getElementById('rua').value = matches[1].trim();
+                document.getElementById('numero').value = matches[2].trim();
+                document.getElementById('bairro').value = matches[3].trim();
+                document.getElementById('cidade').value = matches[4].trim();
+            }
+        }
+    }
+
+    // Se estiver editando, separa o endereço existente
+    if (window.location.href.includes('/edit/')) {
+        separarEnderecoExistente();
+    }
+
+    // Função para validar data
+    function validateDate(dateStr) {
+        if (!dateStr) return true; // Data não é obrigatória
+        
+        const regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+        if (!regex.test(dateStr)) return false;
+        
+        const [, day, month, year] = dateStr.match(regex);
+        const date = new Date(year, month - 1, day);
+        
+        // Verifica se é uma data válida
+        if (date.getDate() != day || date.getMonth() + 1 != month || date.getFullYear() != year) {
+            return false;
+        }
+        
+        // Verifica se a data não é futura
+        if (date > new Date()) {
+            return false;
+        }
+        
+        // Verifica se a pessoa não tem mais de 120 anos
+        const minDate = new Date();
+        minDate.setFullYear(minDate.getFullYear() - 120);
+        if (date < minDate) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    // Função para montar o endereço completo
+    function montarEnderecoCompleto() {
+        const rua = document.getElementById('rua').value;
+        const numero = document.getElementById('numero').value;
+        const bairro = document.getElementById('bairro').value;
+        const cidade = document.getElementById('cidade').value;
+        
+        if (rua && bairro) {
+            const enderecoCompleto = `${rua}, ${numero} - ${bairro} - ${cidade}`.trim();
+            document.getElementById('address').value = enderecoCompleto;
+        }
+    }
+
+    // Validação do formulário
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Remove classes de validação anteriores
+        form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        
+        let isValid = true;
+        
+        // Valida nome
+        const nameInput = document.getElementById('name');
+        if (!nameInput.value.trim()) {
+            nameInput.classList.add('is-invalid');
+            isValid = false;
+        }
+        
+        // Valida documento se preenchido
+        const documentInput = document.getElementById('document');
+        const documentValue = documentInput.value.replace(/\D/g, '');
+        const isPF = document.getElementById('typePF').checked;
+        
+        if (documentValue) {
+            // Validacao estrita de CPF/CNPJ so se aplica ao Brasil. Em PT/US
+            // aceitamos o documento como texto livre (NIF/EIN tem outro formato).
+            if (LOCALE_CODE === 'BR') {
+                if (isPF) {
+                    if (!validateCPF(documentValue)) {
+                        documentInput.classList.add('is-invalid');
+                        document.getElementById('documentFeedback').textContent = 'CPF inválido';
+                        isValid = false;
+                    }
+                } else {
+                    if (!validateCNPJ(documentValue)) {
+                        documentInput.classList.add('is-invalid');
+                        document.getElementById('documentFeedback').textContent = 'CNPJ inválido';
+                        isValid = false;
+                    }
+                }
+            }
+            
+            // Só verifica documento duplicado se for um novo cliente
+            const isNewClient = !window.location.href.includes('/edit/');
+            if (isNewClient) {
+                try {
+                    const response = await fetch(`/clients/check_document?document=${documentValue}&type=${isPF ? 'PF' : 'PJ'}`);
+                    const data = await response.json();
+                    
+                    if (data.exists) {
+                        documentInput.classList.add('is-invalid');
+                        document.getElementById('documentFeedback').textContent = `Este ${_docLabel(isPF)} já está cadastrado`;
+                        isValid = false;
+                    }
+                } catch (error) {
+                    console.error('Erro ao verificar documento:', error);
+                }
+            }
+        }
+        
+        // Valida email se preenchido
+        const emailInput = document.getElementById('email');
+        if (emailInput.value.trim()) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailInput.value.trim())) {
+                emailInput.classList.add('is-invalid');
+                isValid = false;
+            }
+        }
+        
+        // Valida telefone se preenchido
+        const phoneInput = document.getElementById('phone');
+        if (phoneInput.value.trim()) {
+            const phoneClean = phoneInput.value.replace(/[^\d]/g, '');
+            if (phoneClean.length < 10 || phoneClean.length > 11) {
+                phoneInput.classList.add('is-invalid');
+                isValid = false;
+            }
+        }
+        
+        // Valida WhatsApp se preenchido
+        const whatsappInput = document.getElementById('whatsapp');
+        if (whatsappInput.value.trim()) {
+            const whatsappClean = whatsappInput.value.replace(/[^\d]/g, '');
+            if (whatsappClean.length < 10 || whatsappClean.length > 11) {
+                whatsappInput.classList.add('is-invalid');
+                isValid = false;
+            }
+        }
+        
+        // Valida data de nascimento apenas se foi preenchida
+        const birthdayInput = document.getElementById('birthday');
+        if (birthdayInput.value.trim() && !validateDate(birthdayInput.value)) {
+            birthdayInput.classList.add('is-invalid');
+            isValid = false;
+        }
+        
+        if (isValid) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Salvando...';
+            
+            // Monta o endereço completo antes de enviar
+            montarEnderecoCompleto();
+            
+            // Converte a data para o formato YYYY-MM-DD antes de enviar
+            if (birthdayInput.value.trim()) {
+                const [day, month, year] = birthdayInput.value.split('/');
+                const formattedDate = `${year}-${month}-${day}`;
+                
+                // Cria um campo hidden para enviar a data no formato correto
+                const hiddenDate = document.createElement('input');
+                hiddenDate.type = 'hidden';
+                hiddenDate.name = 'birthday';
+                hiddenDate.value = formattedDate;
+                
+                // Substitui o campo original
+                birthdayInput.name = 'birthday_display';
+                form.appendChild(hiddenDate);
+            }
+            
+            form.submit();
+        }
+    });
+});
+</script>
+{% endblock %}

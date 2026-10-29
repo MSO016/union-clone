@@ -1,0 +1,339 @@
+{% extends "finance/base.html" %}
+
+{% block title %}Fluxo de Caixa{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Força a visibilidade do item ativo no menu */
+    .nav-link.active[href*="cash_flow"] {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Garante que o item pai também fique visível */
+    .nav-item:has(.nav-link.active[href*="cash_flow"]) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Mantém o estilo do item ativo */
+    .sidebar .nav-link.active[href*="cash_flow"] {
+        background-color: var(--bs-primary);
+        color: white !important;
+        border-radius: 0.25rem;
+        margin: 0.25rem 0;
+    }
+
+    /* Esconde o item duplicado nos relatórios quando estiver na página principal */
+    .sidebar-heading:has(+ .nav .nav-link.active[href*="cash_flow"]) ~ .sidebar-heading .nav .nav-link[href*="cash_flow"] {
+        display: none !important;
+    }
+
+    /* Esconde o item duplicado na seção principal quando estiver nos relatórios */
+    .sidebar-heading:has(+ .nav .nav-link[href*="reports"]) ~ .sidebar-heading .nav .nav-link.active[href*="cash_flow"] + .nav .nav-link[href*="cash_flow"] {
+        display: none !important;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 2rem;
+    }
+    
+    .filter-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .summary-card {
+        border: none;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .summary-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .summary-card.receitas {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+    
+    .summary-card.despesas {
+        background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+        color: white;
+    }
+    
+    .summary-card.saldo {
+        background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
+        color: white;
+    }
+    
+    .summary-card .card-title {
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .summary-card .card-value {
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+    
+    .table-responsive {
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .period-tabs .nav-link {
+        color: #495057;
+        border: none;
+        border-radius: 20px;
+        padding: 0.5rem 1.5rem;
+        margin-right: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .period-tabs .nav-link:hover {
+        background-color: rgba(0,0,0,0.05);
+    }
+    
+    .period-tabs .nav-link.active {
+        background-color: #007bff;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{{ super() }}
+<div class="container-fluid py-4">
+    <!-- Filtros -->
+    <div class="card filter-card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Período</label>
+                    <ul class="nav nav-pills period-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link {% if period == 'daily' %}active{% endif %}" 
+                               href="{{ url_for('finance.cash_flow', period='daily', start_date=start_date, end_date=end_date) }}">
+                                Diário
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if period == 'weekly' %}active{% endif %}"
+                               href="{{ url_for('finance.cash_flow', period='weekly', start_date=start_date, end_date=end_date) }}">
+                                Semanal
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if period == 'monthly' %}active{% endif %}"
+                               href="{{ url_for('finance.cash_flow', period='monthly', start_date=start_date, end_date=end_date) }}">
+                                Mensal
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Data Inicial</label>
+                    <input type="date" name="start_date" class="form-control" value="{{ start_date }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Data Final</label>
+                    <input type="date" name="end_date" class="form-control" value="{{ end_date }}">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter"></i> Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cards de Resumo -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card summary-card receitas">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Receitas</h5>
+                    <div class="card-value">R$ {{ "%.2f"|format(total_receitas) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card summary-card despesas">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Despesas</h5>
+                    <div class="card-value">R$ {{ "%.2f"|format(total_despesas) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card summary-card saldo">
+                <div class="card-body">
+                    <h5 class="card-title">Saldo do Período</h5>
+                    <div class="card-value">R$ {{ "%.2f"|format(saldo_total) }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Gráfico de Evolução -->
+        <div class="col-md-8 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Evolução do Fluxo de Caixa</h5>
+                    <div class="chart-container">
+                        <canvas id="evolutionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico de Categorias -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Distribuição por Categoria</h5>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela Detalhada -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Detalhamento por Período</h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Período</th>
+                            <th class="text-end">Receitas</th>
+                            <th class="text-end">Despesas</th>
+                            <th class="text-end">Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for period_key, data in grouped_data.items()|sort %}
+                        <tr>
+                            <td>{{ period_key }}</td>
+                            <td class="text-end text-success">R$ {{ "%.2f"|format(data.receitas) }}</td>
+                            <td class="text-end text-danger">R$ {{ "%.2f"|format(data.despesas) }}</td>
+                            <td class="text-end {% if data.saldo >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                R$ {{ "%.2f"|format(data.saldo) }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Dados para os gráficos
+    const groupedData = {{ grouped_data|tojson }};
+    const categoriesData = {{ categories_data|tojson }};
+    
+    // Prepara dados para o gráfico de evolução
+    const periods = Object.keys(groupedData).sort();
+    const receitas = periods.map(p => groupedData[p].receitas);
+    const despesas = periods.map(p => groupedData[p].despesas);
+    const saldos = periods.map(p => groupedData[p].saldo);
+    
+    // Gráfico de Evolução
+    new Chart(document.getElementById('evolutionChart'), {
+        type: 'line',
+        data: {
+            labels: periods,
+            datasets: [{
+                label: 'Receitas',
+                data: receitas,
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                fill: true
+            }, {
+                label: 'Despesas',
+                data: despesas,
+                borderColor: '#dc3545',
+                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                fill: true
+            }, {
+                label: 'Saldo',
+                data: saldos,
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    
+    // Prepara dados para o gráfico de categorias
+    const categories = Object.keys(categoriesData);
+    const categoryReceitas = categories.map(c => categoriesData[c].receitas);
+    const categoryDespesas = categories.map(c => categoriesData[c].despesas);
+    
+    // Gráfico de Categorias
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'doughnut',
+        data: {
+            labels: categories,
+            datasets: [{
+                data: categoryDespesas,
+                backgroundColor: [
+                    '#dc3545', '#fd7e14', '#ffc107', '#20c997', '#6610f2',
+                    '#e83e8c', '#6f42c1', '#17a2b8', '#28a745', '#007bff'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right'
+                },
+                title: {
+                    display: true,
+                    text: 'Despesas por Categoria'
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

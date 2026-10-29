@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-bell"></i> Notificações de Checklist
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if notifications %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>OS</th>
+                            <th>Item</th>
+                            <th>Data</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for notification in notifications %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('orders.view', id=notification.checklist.order.id) }}">
+                                    OS #{{ notification.checklist.order.id }}
+                                </a>
+                            </td>
+                            <td>
+                                {{ notification.item.description }}
+                                <span class="badge bg-danger">Crítico</span>
+                            </td>
+                            <td>{{ notification.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>
+                                {% if notification.status == 'pending' %}
+                                <span class="badge bg-warning">Pendente</span>
+                                {% elif notification.status == 'viewed' %}
+                                <span class="badge bg-info">Visualizado</span>
+                                {% else %}
+                                <span class="badge bg-success">Resolvido</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('checklists.view', checklist_id=notification.checklist.id) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i> Ver Checklist
+                                    </a>
+                                    {% if notification.status == 'pending' %}
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-success"
+                                            onclick="resolveNotification({{ notification.id }})">
+                                        <i class="bi bi-check-lg"></i> Resolver
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Não há notificações pendentes.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+function resolveNotification(notificationId) {
+    if (confirm('Deseja marcar esta notificação como resolvida?')) {
+        fetch(`{{ url_for('checklists.resolve_notification', notification_id=0) }}`.replace('0', notificationId), {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+</script>
+{% endblock %} 

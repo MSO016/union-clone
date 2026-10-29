@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ request.referrer or url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+            <h1 class="mb-0">Tipos de Serviço</h1>
+        </div>
+        <a href="{{ url_for('settings.add_service_type') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Novo Tipo
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Descrição</th>
+                            <th>Garantia Padrão (dias)</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for type in types %}
+                        <tr>
+                            <td>{{ type.name }}</td>
+                            <td>{{ type.description }}</td>
+                            <td>{{ type.default_warranty }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if type.active else 'danger' }}">
+                                    {{ 'Ativo' if type.active else 'Inativo' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('settings.edit_service_type', id=type.id) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                            onclick="confirmDelete({{ type.id }}, '{{ type.name }}')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o tipo de serviço <strong id="deleteServiceTypeName"></strong>?</p>
+                <p class="text-danger">Esta ação não pode ser desfeita!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+let deleteModal;
+let serviceTypeToDelete;
+
+document.addEventListener('DOMContentLoaded', function() {
+    deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    
+    // Configura o botão de confirmação
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        if (serviceTypeToDelete) {
+            deleteServiceType(serviceTypeToDelete.id);
+        }
+    });
+});
+
+function confirmDelete(id, name) {
+    serviceTypeToDelete = { id, name };
+    document.getElementById('deleteServiceTypeName').textContent = name;
+    deleteModal.show();
+}
+
+function deleteServiceType(id) {
+    fetch(`{{ url_for('settings.delete_service_type', id=0) }}`.replace('0', id), {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Fecha o modal
+            deleteModal.hide();
+            
+            // Redireciona para a URL de retorno se existir, senão recarrega a página
+            if (data.return_url) {
+                window.location.href = data.return_url;
+            } else {
+                window.location.reload();
+            }
+        } else {
+            alert(data.message || 'Erro ao excluir tipo de serviço');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao excluir tipo de serviço');
+    });
+}
+</script>
+{% endblock %} 

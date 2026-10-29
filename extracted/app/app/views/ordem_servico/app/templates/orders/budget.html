@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+/* Estilos para melhorar a área clicável do botão voltar */
+.back-button-container {
+    position: relative;
+    z-index: 1000;
+    padding: 10px 0;
+    margin-bottom: 1rem;
+}
+
+.back-button-container .btn {
+    padding: 8px 16px;
+    font-size: 1rem;
+    min-width: 140px;
+    display: inline-block;
+}
+</style>
+
+<div class="container mt-4">
+    <!-- Botão voltar em posição mais acessível -->
+    <div class="back-button-container">
+        <a href="{{ url_for('orders.view', id=order.id) }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar para OS
+        </a>
+    </div>
+
+    <!-- Título da página -->
+    <div class="d-flex align-items-center mb-4">
+        <nav aria-label="breadcrumb" class="flex-grow-1">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('orders.list') }}">Ordens de Serviço</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('orders.view', id=order.id) }}">OS #{{ order.id }}</a></li>
+                <li class="breadcrumb-item active">Orçamento</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Card principal do orçamento -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-file-earmark-text"></i> Gerar Orçamento - OS #{{ order.id }}
+            </h5>
+        </div>
+        <div class="card-body">
+            <!-- Informações do Cliente e Equipamento -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h6 class="text-muted mb-3">Informações do Cliente</h6>
+                    <table class="table table-sm">
+                        <tr>
+                            <th width="30%">Cliente:</th>
+                            <td>{{ order.client.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Documento:</th>
+                            <td>{{ order.client.document }}</td>
+                        </tr>
+                        <tr>
+                            <th>Telefone:</th>
+                            <td>{{ order.client.phone or 'Não informado' }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-muted mb-3">Informações do Equipamento</h6>
+                    <table class="table table-sm">
+                        <tr>
+                            <th width="30%">Equipamento:</th>
+                            <td>{{ order.equipment }}</td>
+                        </tr>
+                        <tr>
+                            <th>Marca/Modelo:</th>
+                            <td>{{ order.brand }} {{ order.model }}</td>
+                        </tr>
+                        <tr>
+                            <th>Problema:</th>
+                            <td>{{ order.problem }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Formulário de Orçamento -->
+            <form id="budgetForm" class="needs-validation" novalidate>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="total_value" class="form-label">Valor do Serviço ({{ locale.currency_symbol if locale else 'R$' }}) *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">{{ locale.currency_symbol if locale else 'R$' }}</span>
+                                <input type="number" class="form-control" id="total_value" name="total_value" 
+                                       step="0.01" min="0" required
+                                       placeholder="Informe o valor total do serviço (ex: 150.00)"
+                                       aria-describedby="totalValueHelp">
+                            </div>
+                            <div class="invalid-feedback">
+                                Por favor, informe um valor válido para o serviço (maior que zero).
+                            </div>
+                            <small id="totalValueHelp" class="form-text text-muted">
+                                Digite apenas números, usando ponto para decimais (ex: 150.00)
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <!-- Espaço para campos personalizados -->
+                        <div id="customFields"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="observations" class="form-label">Diagnóstico Técnico *</label>
+                    <textarea class="form-control" id="observations" name="observations" 
+                              rows="4" required
+                              placeholder="Descreva detalhadamente: 
+1. Diagnóstico realizado
+2. Peças necessárias para o reparo
+3. Procedimentos que serão realizados
+4. Observações importantes para o cliente"
+                              aria-describedby="observationsHelp"></textarea>
+                    <div class="invalid-feedback">
+                        É necessário fornecer um diagnóstico técnico detalhado para gerar o orçamento.
+                    </div>
+                    <small id="observationsHelp" class="form-text text-muted">
+                        Seja claro e específico no diagnóstico para facilitar a compreensão do cliente.
+                    </small>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('orders.view', id=order.id) }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary" id="generateBudget">
+                        <i class="bi bi-file-earmark-text"></i> Gerar Orçamento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Histórico de Orçamentos -->
+    <div class="card mt-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-clock-history"></i> Histórico de Orçamentos
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Valor</th>
+                            <th>Diagnóstico</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="budgetHistory">
+                        <!-- Será preenchido via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteConfirmModalLabel">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir este orçamento?</p>
+                <p class="text-danger"><strong>Atenção:</strong> Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="bi bi-trash"></i> Excluir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+// Configurações iniciais
+const ORDER_ID = "{{ order.id }}";
+const GENERATE_BUDGET_URL = "{{ url_for('orders.generate_budget', id=order.id) }}";
+const GET_BUDGET_HISTORY_URL = "{{ url_for('orders.get_budget_history', id=order.id) }}";
+
+// Carrega dados do orçamento ao carregar a página
+document.addEventListener('DOMContentLoaded', function() {
+    loadBudgetHistory();
+    
+    // Inicializa o formulário
+    const form = document.getElementById('budgetForm');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        generateBudget();
+    });
+});
+
+// Função para carregar histórico de orçamentos
+function loadBudgetHistory() {
+    fetch(GET_BUDGET_HISTORY_URL)
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('budgetHistory');
+            tbody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Nenhum orçamento foi gerado para esta OS ainda
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            data.forEach(budget => {
+                const date = new Date(budget.date).toLocaleString('pt-BR');
+                // Extrai o nome do arquivo da URL do PDF
+                const filename = budget.pdf_url.split('/').pop();
+                const _budgetSym = "{{ locale.currency_symbol if locale else 'R$' }}";
+                const _budgetPos = "{{ locale.currency_position if locale else 'before' }}";
+                const _budgetVal = parseFloat(budget.value).toFixed(2);
+                const _budgetFormatted = _budgetPos === 'after'
+                    ? `${_budgetVal} ${_budgetSym}`
+                    : `${_budgetSym} ${_budgetVal}`;
+                const row = `
+                    <tr>
+                        <td>${date}</td>
+                        <td>${_budgetFormatted}</td>
+                        <td>${budget.observations || '-'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="handleBudgetView('${budget.pdf_url}')" title="Visualizar orçamento">
+                                <i class="bi bi-eye"></i> Visualizar
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteBudget('${filename}')" title="Excluir orçamento">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar histórico:', error);
+            showAlert('danger', 'Não foi possível carregar o histórico de orçamentos. Por favor, tente novamente.');
+        });
+}
+
+// Função para gerar orçamento
+function generateBudget() {
+    const form = document.getElementById('budgetForm');
+    const submitButton = document.getElementById('generateBudget');
+    
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        showAlert('warning', 'Por favor, preencha todos os campos obrigatórios corretamente.');
+        return;
+    }
+    
+    // Desabilita o botão durante o processamento
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Gerando orçamento...';
+    
+    const formData = new FormData(form);
+    
+    fetch(GENERATE_BUDGET_URL, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', 'Orçamento gerado com sucesso! O PDF será aberto em uma nova janela.');
+            handleBudgetView(data.pdf_url);
+            loadBudgetHistory();
+            form.reset();
+            form.classList.remove('was-validated');
+        } else {
+            throw new Error(data.message || 'Erro ao gerar orçamento');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showAlert('danger', 'Ocorreu um erro ao gerar o orçamento. Por favor, tente novamente.');
+    })
+    .finally(() => {
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<i class="bi bi-file-earmark-text"></i> Gerar Orçamento';
+    });
+}
+
+// Função para visualizar orçamento
+function handleBudgetView(url) {
+    window.open(url, '_blank');
+}
+
+// Função para excluir orçamento
+function deleteBudget(filename) {
+    // Configura o modal
+    const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    
+    // Configura o botão de confirmação
+    confirmBtn.onclick = function() {
+        modal.hide();
+        
+        fetch(`/orders/${ORDER_ID}/budget/${filename}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', 'Orçamento excluído com sucesso!');
+                loadBudgetHistory();
+            } else {
+                throw new Error(data.message || 'Erro ao excluir orçamento');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            showAlert('danger', 'Não foi possível excluir o orçamento. Por favor, tente novamente.');
+        });
+    };
+    
+    // Mostra o modal
+    modal.show();
+}
+
+// Função para mostrar alertas
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'x-circle'} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    `;
+    
+    const container = document.querySelector('.container');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    // Scroll para o topo para garantir que o usuário veja o alerta
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Remove o alerta após 5 segundos
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.classList.remove('show');
+            setTimeout(() => alertDiv.remove(), 150);
+        }
+    }, 5000);
+}
+</script>
+{% endblock %} 
