@@ -1,0 +1,232 @@
+TERMOS DE USO, LICENÇA DE SOFTWARE E TERMO DE RESPONSABILIDADE
+================================================================
+
+TECH UNION SOLUTIONS
+Versão 1.3.4.2
+
+RESTORECELL Soluções Tecnológicas
+www.restorecellsolucoes.com
+
+IMPORTANTE: LEIA CUIDADOSAMENTE ESTES TERMOS ANTES DE INSTALAR OU USAR ESTE SOFTWARE.
+
+Ao instalar, copiar ou usar de qualquer forma este software, você concorda em ficar vinculado aos termos e condições desta licença e deste Termo de Responsabilidade. Se você não concordar com estes termos, não instale nem use o software.
+
+1. FINALIDADE DAS FERRAMENTAS
+==============================
+
+As ferramentas disponibilizadas pela Tech Union Solutions (incluindo,
+entre outros, módulos de diagnóstico, desbloqueio, reparo de firmware,
+MTK Tools, e demais funcionalidades disponibilizadas pela plataforma)
+são destinadas exclusivamente para uso técnico profissional, voltado
+para manutenção, diagnóstico e assistência autorizada de dispositivos
+eletrônicos.
+
+As ferramentas NÃO se destinam e NÃO devem ser usadas para fins ilícitos.
+
+2. CONCESSÃO DE LICENÇA
+========================
+
+A RESTORECELL Soluções Tecnológicas concede a você uma licença de uso limitada, não exclusiva e pessoal para utilizar o software "TECH UNION SOLUTIONS" ("Software") de acordo com os termos desta licença.
+
+A aquisição de créditos, chaves, módulos ou assinaturas representa
+apenas licença de uso, não venda do software.
+
+O usuário concorda que:
+- A licença é pessoal, intransferível e pode ser revogada em caso de
+  violação dos termos;
+- Funções podem ser atualizadas, modificadas ou descontinuadas a
+  qualquer momento.
+
+3. DECLARAÇÃO DO USUÁRIO
+=========================
+
+Ao adquirir, ativar ou utilizar qualquer ferramenta ou módulo da Tech
+Union Solutions, o usuário declara e concorda que:
+
+- Possui mais de 18 anos;
+- É técnico especializado, profissional ou empresa atuante no ramo de
+  manutenção de dispositivos eletrônicos;
+- Irá utilizar as ferramentas apenas em equipamentos próprios ou com
+  autorização formal, expressa e documentada do proprietário do
+  dispositivo;
+- Tem ciência de que o uso indevido, sem comprovação de propriedade, pode
+  configurar crime de acordo com a legislação vigente do país.
+
+4. RESTRIÇÕES DE USO
+=====================
+
+Condições de Uso:
+- O Software deve ser utilizado conforme sua finalidade original
+- Respeite todos os direitos de propriedade intelectual
+- O uso comercial requer licenciamento específico
+- Mantenha a integridade dos dados e funcionalidades do sistema
+- Utilize o Software de forma ética e responsável
+- Preserve todas as informações de identificação e propriedade
+
+5. PROIBIÇÕES
+==============
+
+É estritamente proibido utilizar as ferramentas da Tech Union Solutions
+para:
+
+- Fraudes ou clonagem de dispositivos;
+- Remoção de FRP sem autorização expressa do proprietário;
+- Alteração, modificação ou troca de IMEI;
+- Desbloqueio de iCloud ou contas associadas sem comprovação de
+  propriedade;
+- Bypass de segurança sem comprovação de propriedade;
+- Desbloqueios sem autorização expressa do dono do dispositivo;
+- Acessar informações privadas de terceiros;
+- Qualquer serviço que viole a lei ou direitos de propriedade.
+
+Qualquer tentativa de uso ilícito resultará em bloqueio permanente, sem
+direito a reembolso.
+
+6. RESPONSABILIDADE PELO USO
+==============================
+
+O usuário assume total responsabilidade pelo uso das ferramentas.
+
+A equipe responsável pela Tech Union Solutions:
+
+- Não se responsabiliza por danos, perdas, bloqueios, falhas, mau uso,
+  uso não autorizado ou ilegal;
+- Não apoia, incentiva ou participa de qualquer prática ilícita;
+- Não responde por nenhuma ação do usuário após a compra, ativação ou
+  uso da ferramenta.
+
+7. COMPROVAÇÃO DE PROPRIEDADE
+==============================
+
+Em caso de solicitação judicial, policial ou administrativa, o usuário
+deve apresentar:
+
+- Nota fiscal do aparelho;
+- Autorização assinada pelo proprietário;
+- Ordem de serviço;
+- Documento equivalente que comprove a legitimidade do procedimento.
+
+8. SEGURANÇA E INTEGRIDADE DO SISTEMA
+======================================
+
+As ferramentas utilizam proteções técnicas e logs internos para:
+
+- Prevenir uso ilegal;
+- Preservar a integridade do sistema;
+- Proteger a propriedade intelectual das ferramentas.
+
+Qualquer tentativa de engenharia reversa, crack, modificação ou
+compartilhamento indevido resultará em banimento imediato.
+
+9. FÓRUM DE COMPARTILHAMENTO DE SOLUÇÕES
+==========================================
+
+9.1 RESPONSABILIDADE DO CONTEÚDO
+Ao participar do fórum de compartilhamento de soluções, você concorda que:
+- É inteiramente responsável pelo conteúdo que postar ou compartilhar
+- Não compartilhará informações confidenciais de clientes sem autorização
+- Respeitará os direitos de propriedade intelectual de terceiros
+- Não publicará conteúdo ofensivo, difamatório ou inadequado
+
+9.2 LICENÇA DE CONTEÚDO
+Ao postar soluções ou informações no fórum, você concede à RESTORECELL e outros usuários uma licença não exclusiva para usar, reproduzir e distribuir seu conteúdo dentro da plataforma.
+
+9.3 MODERAÇÃO
+A RESTORECELL reserva-se o direito de moderar, editar ou remover qualquer conteúdo postado no fórum sem aviso prévio.
+
+10. PRIVACIDADE E DADOS
+========================
+
+10.1 COLETA DE DADOS
+O Software pode coletar informações técnicas sobre dispositivos analisados e dados de uso para melhorar o serviço. Informações pessoais de clientes não são coletadas sem consentimento.
+
+10.2 PROTEÇÃO DE DADOS
+Você concorda em manter a confidencialidade de todos os dados de clientes acessados através do Software e não divulgá-los sem autorização.
+
+11. ISENÇÃO DE GARANTIAS
+=========================
+
+O SOFTWARE É FORNECIDO "COMO ESTÁ", SEM GARANTIAS DE QUALQUER TIPO, EXPRESSAS OU IMPLÍCITAS, INCLUINDO, MAS NÃO SE LIMITANDO A, GARANTIAS DE COMERCIALIZAÇÃO, ADEQUAÇÃO A UM PROPÓSITO ESPECÍFICO E NÃO VIOLAÇÃO.
+
+12. LIMITAÇÃO DE RESPONSABILIDADE
+===================================
+
+EM NENHUMA CIRCUNSTÂNCIA A RESTORECELL SERÁ RESPONSÁVEL POR DANOS DIRETOS, INDIRETOS, INCIDENTAIS, ESPECIAIS OU CONSEQUENCIAIS RESULTANTES DO USO OU INCAPACIDADE DE USAR O SOFTWARE.
+
+13. PROPRIEDADE INTELECTUAL
+=============================
+
+Todos os direitos de propriedade intelectual relacionados ao Software são de titularidade exclusiva da RESTORECELL Soluções Tecnológicas. Esta licença concede apenas direitos de uso limitados conforme especificado.
+
+14. POLÍTICA DE REEMBOLSO
+===========================
+
+⚠️ ATENÇÃO - IMPORTANTE ⚠️
+
+APÓS A ATIVAÇÃO E PRIMEIRO USO DO SOFTWARE, NÃO HAVERÁ POSSIBILIDADE DE REEMBOLSO OU DEVOLUÇÃO DO VALOR PAGO, EM HIPÓTESE ALGUMA.
+
+Esta política é IRREVOGÁVEL e se aplica a partir do momento em que:
+- O software for instalado e executado pela primeira vez
+- Qualquer funcionalidade do sistema for utilizada
+- O usuário acessar qualquer área do programa
+
+Ao prosseguir com a instalação, você RECONHECE E ACEITA esta condição de forma DEFINITIVA e IRREVERSÍVEL.
+
+15. DISPOSIÇÕES LEGAIS
+========================
+
+O usuário declara estar ciente de que o uso indevido pode violar a
+legislação brasileira vigente, incluindo mas não se limitando a:
+
+- Art. 154-A do Código Penal — Invasão de dispositivo informático
+  (Lei 14.155/2021 — pena de 1 a 4 anos de reclusão e multa);
+- Art. 180 do Código Penal — Receptação qualificada, quando em
+  atividade comercial (pena de 3 a 8 anos de reclusão e multa);
+- Art. 163 do Código Penal — Dano, incluindo inutilização de
+  dispositivo (brick) sem autorização do proprietário;
+- Lei 15.397/2026 — Furto qualificado de aparelho celular, computador
+  ou tablet (pena de 4 a 10 anos de reclusão e multa);
+- Crimes cibernéticos, falsidade ideológica e fraudes eletrônicas
+  conforme legislação aplicável.
+
+Toda responsabilização legal recai exclusivamente sobre o usuário.
+
+16. RESCISÃO
+=============
+
+Esta licença é efetiva até ser rescindida. Você pode rescindi-la a qualquer momento cessando o uso do Software. A RESTORECELL pode rescindir esta licença imediatamente em caso de violação dos termos.
+
+17. LEI APLICÁVEL
+==================
+
+Esta licença é regida pelas leis brasileiras. Qualquer disputa será resolvida nos tribunais competentes do Brasil.
+
+18. ATUALIZAÇÕES E MODIFICAÇÕES
+=================================
+
+A RESTORECELL reserva-se o direito de modificar estes termos a qualquer momento. Usuários serão notificados sobre mudanças significativas.
+
+19. CONTATO
+=============
+
+Para questões sobre esta licença ou o Software:
+E-mail: ti.restorecell@gmail.com
+Website: www.restorecellsolucoes.com
+
+20. ACEITAÇÃO
+==============
+
+Ao clicar em "Aceito", "Concordo", "Comprar", "Usar", "Ativar",
+"Gerar Key", "Conectar", ou ao instalar/usar o Software, ou interagir
+de qualquer forma com as ferramentas e serviços da Tech Union Solutions,
+o usuário declara que:
+
+- ✔ Leu
+- ✔ Compreendeu
+- ✔ Concorda integralmente com todos os termos desta licença e deste
+    Termo de Responsabilidade
+
+================================================================
+© 2025-2026 RESTORECELL Soluções Tecnológicas
+Todos os direitos reservados.
+================================================================
